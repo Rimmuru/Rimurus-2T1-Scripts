@@ -6,7 +6,7 @@
  
 <h1 align="center">Installation</h1>
 
-Navigate to the [Releases Panel](https://github.com/Rimmuru/Rimurus-Toolkit-w-CustomUI/releases)<br/>
+Navigate to the [Releases Panel](https://github.com/Rimmuru/Rimurus-2T1-Scripts/releases/) and download the release titled Rimurus Menu<br/>
 
 Make sure to not download the source, or you risk downloading a version that can crash you.<br/>
 
