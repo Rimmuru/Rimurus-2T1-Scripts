@@ -46,7 +46,7 @@ function GrappleGun()
     local loc = player.get_player_coords(player.player_id())
     impact.x = impact.x - loc.x
     impact.y = impact.y - loc.y
-    impact.z = impact.z - loc.z + 70
+    impact.z = impact.z - loc.z + 25
     
     if boolrtn then       
         entity.set_entity_velocity(player.get_player_ped(player.player_id()), impact)
@@ -72,19 +72,34 @@ function ExplosionTypeGun(num)
 end
 
 function DeleteGun()
+  local ent = player.get_entity_player_is_aiming_at(player.player_id())
+  entity.delete_entity(ent)
+end
+
+function distBetween(startPos, endPos)
+    local result = v3()
+    result.x = startPos.x - endPos.x
+    result.y = startPos.y - endPos.y
+    result.z = startPos.z - endPos.z
+    return result
+end
+
+function RopeGun()
     local boolrtn, impact = ped.get_ped_last_weapon_impact(player.get_player_ped(player.player_id()))
+    local first
+    local firstPos, secondPos
+    local firstRope, secondRope
 
     if boolrtn then
-        local obj = object.create_object(gameplay.get_hash_key("prop_golf_ball_p4"), impact, true, false)
-        local timer = 0
-        
-        if(timer < 1000) then
-            system.wait(0)
-        else
-            timer = timer+1
-         end
-
-         entity.delete_entity(obj)
+        first = false
+        rope.rope_load_textures()
+        if(not first) then
+            firstPos = impact
+            firstRope = rope.add_rope(impact, v3(0,0,0), distBetween(firstPos, secondPos), 1, 300,  0.5, 0.5, false, true, true, 1.0, false, 0)
+            rope.attach_entities_to_rope(1, firstRope, secondRope, entity.get_entity_coords(firstRope), entity.get_entity_coords(secondRope), distBetween(entity.get_entity_coords(firstRope), entity.get_entity_coords(secondRope)), 1,1)
+            rope.activate_physics(firstRope)
+            first = true
+        end
     end
 end
 
@@ -218,11 +233,32 @@ end
 function tpVehicle()
     local vehicle = player.get_personal_vehicle()
 
-    while(not network.request_control_of_entity(vehicle) and utils.time_ms() + 450 > utils.time_ms()) do
+    while(not network.request_control_of_entity(vehicle) and utils.time_ms() + 450 > utils.time_ms() and streaming.is_model_valid(vehicle)) do
         system.wait(0)
   end
    entity.set_entity_coords_no_offset(vehicle, player.get_player_coords(player.player_id()))
 end
+
+function FindVehicleName(Hash)
+    if not Hash or Hash==0 then return false end
+    for k,v in pairs(vehicleList) do
+        if tonumber(Hash)==tonumber(v[2]) then return v[1] end
+    end
+    return false
+end
+
+tbl_GSV={}
+function GetVehicleSlots()
+    local max_slots = script.get_global_i(1585844)
+    for i=0,max_slots,1 do
+        local hash=script.get_global_i(1585844+1+(i*142)+66)
+        local name=FindVehicleName(hash)
+        if name then
+            table.insert(tbl_GSV, {i,name,hash,script.get_global_i(1585844+1+(i*142)+1)})
+        end
+    end
+end
+GetVehicleSlots()
 
 function PedFlop()
     local peds = ped.get_all_peds()

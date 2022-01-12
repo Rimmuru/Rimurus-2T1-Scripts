@@ -11,10 +11,10 @@ LuaUI = {
 		 scroll = 0,
 		 maxScroll = 0,
 		 menuWH = v2(),
-		 menuPos = v2()
-		},
-		currentMenu = "",
-		menus = {}
+		 menuPos = v2(),
+		 currentMenu = "",
+		 menus = {}
+		}
 }
 
 --Shader Stuffs
@@ -106,12 +106,12 @@ function LuaUI.drawSubmenu(text, num)
 end
 
 function LuaUI.drawStringSlider(text, num, option, sliderValue)
-	LuaUI.drawText("< "..tostring(option[sliderValue + 1]).." >", LuaUI.Options.menuPos.x + 0.06, LuaUI.Options.menuPos.y + 0.035 + (0.34 * num/10) + 0.005, 0, 0.3, true, false)
+	LuaUI.drawText("<"..tostring(option[sliderValue + 1])..">", LuaUI.Options.menuPos.x + 0.06, LuaUI.Options.menuPos.y + 0.035 + (0.34 * num/10) + 0.005, 0, 0.3, true, false)
 	LuaUI.drawText(tostring(text), LuaUI.Options.menuPos.x, LuaUI.Options.menuPos.y + 0.035 + (0.34 * num/10), 1, 0.5, true, false)
 end
 
 function LuaUI.drawIntSlider(text, num, option)
-	LuaUI.drawText("< "..tonumber(option).." >", LuaUI.Options.menuPos.x + 0.06, LuaUI.Options.menuPos.y + 0.035 + (0.34 * num/10) + 0.005, 0, 0.3, true, false)
+	LuaUI.drawText("<"..tonumber(option)..">", LuaUI.Options.menuPos.x + 0.06, LuaUI.Options.menuPos.y + 0.035 + (0.34 * num/10) + 0.005, 0, 0.3, true, false)
 	LuaUI.drawText(tostring(text), LuaUI.Options.menuPos.x, LuaUI.Options.menuPos.y + 0.035 + (0.34 * num/10), 1, 0.5, true, false)
 end
 

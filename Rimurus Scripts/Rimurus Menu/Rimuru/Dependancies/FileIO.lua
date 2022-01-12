@@ -1,6 +1,7 @@
 require("Rimuru\\Tables\\Models")
 require("Rimuru\\Tables\\Peds")
 require("Rimuru\\Tables\\Weapons")
+require("Rimuru\\Tables\\Vehicles")
 
 function LoadFaves()
     local appdata = utils.get_appdata_path("PopstarDevs", "").."\\2Take1Menu\\"
@@ -30,16 +31,3 @@ function SaveFaves(obj_id, ped_id)
     io.write((pedList[ped_id.value+1].."\n"))
     io.close(pedfile)
 end
-
-function openUIFile()
-    local appdata = utils.get_appdata_path("PopstarDevs", "").."\\2Take1Menu\\"
-    rUI = io.open(appdata.."scripts\\Rimuru\\UI.ini", "r")
-   
-    io.output(rUI) 
-    for line in io.lines(appdata.."scripts\\Rimuru\\UI.ini") do
-        table.insert(UIcolourSaved, line)
-        --print(UIcolourSaved[line])
-    end
-    io.close(rUI)
-end
-openUIFile()
