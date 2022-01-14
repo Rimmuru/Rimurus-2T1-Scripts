@@ -1,7 +1,7 @@
 <h1 align="center">Rimurus Menu</h1>
 
  Rimurus Menu is a script for [2Take1 Menu](https://gta.2take1.menu/) <br/>built from my original script [Rimurus Toolkit](https://github.com/Rimmuru/Rimurus-2T1-Scripts/tree/main/Rimurus%20Scripts/Rimurus%20Toolkit).<br/><br/>
- From version 1.4 (expected sometime janaury), the legacy script "Rimurus Toolkit" will be discontinued <br/>
+ From release of Rimurus Menu, Rimurus Toolkit will be discontinued and deemed incompatible <br/>
 
  
 <h1 align="center">Installation</h1>
