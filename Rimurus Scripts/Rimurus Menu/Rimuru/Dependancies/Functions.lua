@@ -76,7 +76,7 @@ function DeleteGun()
   entity.delete_entity(ent)
 end
 
-function distBetween(startPos, endPos)
+local function distBetween(startPos, endPos)
     local result = v3()
     result.x = startPos.x - endPos.x
     result.y = startPos.y - endPos.y
@@ -86,20 +86,21 @@ end
 
 function RopeGun()
     local boolrtn, impact = ped.get_ped_last_weapon_impact(player.get_player_ped(player.player_id()))
-    local first
     local firstPos, secondPos
     local firstRope, secondRope
 
     if boolrtn then
-        first = false
         rope.rope_load_textures()
-        if(not first) then
             firstPos = impact
-            firstRope = rope.add_rope(impact, v3(0,0,0), distBetween(firstPos, secondPos), 1, 300,  0.5, 0.5, false, true, true, 1.0, false, 0)
+            secondPos = impact
+        --#### int          add_rope(v3 pos, v3 rot, float maxLen, int ropeType, float initLength, float minLength, float lengthChangeRate, bool onlyPPU, bool collisionOn, bool lockFromFront, float timeMultiplier, bool breakable)
+
+            firstRope = rope.add_rope(impact, v3(0,0,0), distBetween(firstPos, secondPos).z, 1, 300,  0.5, 0.5, false, true, true, 1.0, false)
+            secondRope = rope.add_rope(impact, v3(0,0,0), distBetween(firstPos, secondPos).z, 1, 300,  0.5, 0.5, false, true, true, 1.0, false)
             rope.attach_entities_to_rope(1, firstRope, secondRope, entity.get_entity_coords(firstRope), entity.get_entity_coords(secondRope), distBetween(entity.get_entity_coords(firstRope), entity.get_entity_coords(secondRope)), 1,1)
             rope.activate_physics(firstRope)
-            first = true
-        end
+            rope.activate_physics(secondRope)
+       
     end
 end
 
@@ -134,12 +135,14 @@ function SpawnObjFromName()
   end
 end
 
-function SpawnObj(val)
-    object.create_object(gameplay.get_hash_key(Objs[val+1]), player.get_player_coords(player.player_id()), true, false)
+function SpawnObj(val, pid)
+    pid = pid or player.player_id()
+    object.create_object(gameplay.get_hash_key(Objs[val+1]), player.get_player_coords(pid), true, false)
 end
 
-function SpawnWrld(val)
-    local wrld = object.create_world_object(gameplay.get_hash_key(Objs[val+1]), player.get_player_coords(player.player_id()), true, false)
+function SpawnWrld(val, pid)
+    pid = pid or player.player_id()
+    local wrld = object.create_world_object(gameplay.get_hash_key(Objs[val+1]), player.get_player_coords(pid), true, false)
     entity.freeze_entity(wrld, true)
 end
 

@@ -116,5 +116,6 @@ function LuaUI.drawIntSlider(text, num, option)
 end
 
 function LuaUI.switchToSub(sub)
+	LuaUI.Options.scroll = 0
 	LuaUI.Options.currentMenu = LuaUI.Options.menus[sub]
 end

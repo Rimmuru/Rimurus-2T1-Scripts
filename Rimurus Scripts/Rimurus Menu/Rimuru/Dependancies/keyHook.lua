@@ -48,7 +48,9 @@ LuaUI.Options.menus = {
     "Online",
     "Settings",
     "PlayerMenu",
-    "Garage Vehicles"
+    "Garage Vehicles",
+    "PlayerMenu2",
+    "PlayerMenu3"
 }
 
 function keyHook()
@@ -161,93 +163,119 @@ function keyHook()
         end
     end
 
-    if (controls.is_control_pressed(2, 191)) then --enter
-        if (LuaUI.Options.currentMenu == LuaUI.Options.menus[1]) then
-            LuaUI.switchToSub(LuaUI.Options.scroll + 2)
-            LuaUI.Options.scroll = -1
-        end
+    if (controls.is_control_pressed(0, 191)) then --enter     
+            if (LuaUI.Options.currentMenu == LuaUI.Options.menus[1]) then
+                LuaUI.switchToSub(LuaUI.Options.scroll + 2)
+                LuaUI.Options.scroll = -1
+            end
+    
+            if (LuaUI.Options.currentMenu == LuaUI.Options.menus[2]) then
+                if (LuaUI.Options.scroll == 0) then
+                    if(sliders.gunSliderValue == 0) then
+                        toggles.grappleGun_t = not toggles.grappleGun_t
+                    end
+                    if(sliders.gunSliderValue == 1) then
+                        toggles.objGun_t = not toggles.objGun_t
+                    end
+                    if(sliders.gunSliderValue == 2) then
+                        toggles.waterGun_t = not toggles.waterGun_t
+                    end
+                    if(sliders.gunSliderValue == 3) then
+                        toggles.fireGun_t = not toggles.fireGun_t
+                    end
+                    if(sliders.gunSliderValue == 4) then
+                        toggles.dustGun_t = not toggles.dustGun_t
+                    end
+                    if(sliders.gunSliderValue == 5) then
+                        toggles.deleteGun_t = not toggles.deleteGun_t
+                    end
+                    if(sliders.gunSliderValue == 6) then
+                        toggles.ropeGun_t = not toggles.ropeGun_t
+                    end
+                end
+                if(LuaUI.Options.scroll == 1) then
+                    toggles.blackParade_t = not toggles.blackParade_t
+                end
+            end
+    
+            if (LuaUI.Options.currentMenu == LuaUI.Options.menus[3]) then
+                if (LuaUI.Options.scroll == 0) then
+                    Gta4Neons()
+                end
+                if (LuaUI.Options.scroll == 1) then
+                    local objs = object.get_all_objects()
+                    for i = 1, #objs do
+                        entity.delete_entity(objs[i])
+                    end
+                end
+                if (LuaUI.Options.scroll == 2) then
+                    tpVehicle()
+                end
+                if(LuaUI.Options.scroll == 3) then
+                    LuaUI.switchToSub(8)
+                end
+            end
+    
+            if (LuaUI.Options.currentMenu == LuaUI.Options.menus[4]) then
+                if (LuaUI.Options.scroll == 0) then
+                    SpawnPed(sliders.pedSliderValue, 100)
+                end
+    
+                if (LuaUI.Options.scroll == 1) then
+                    SpawnObj(sliders.objectSliderValue)
+                end
+               
+                if (LuaUI.Options.scroll == 4) then
+                    SpawnObjFromName()
+                end
+            end
+    
+            if (LuaUI.Options.currentMenu == LuaUI.Options.menus[5]) then
+               if(LuaUI.Options.scroll > 1) then
+                    LuaUI.switchToSub(7)
+               end
+            end
+    
+            if (LuaUI.Options.currentMenu == LuaUI.Options.menus[6]) then
+                if (LuaUI.Options.scroll == 3) then
+                    toggles.banner_t = not toggles.banner_t
+                end
+            end
+    
+            if (LuaUI.Options.currentMenu == LuaUI.Options.menus[7]) then
+                if (LuaUI.Options.scroll == 0) then
+                       SpawnObj(math.random(1, #Objs), playerInfo.playerID)
+                end
+            end
 
-        if (LuaUI.Options.currentMenu == LuaUI.Options.menus[2]) then
-            if (LuaUI.Options.scroll == 0) then
-                if(sliders.gunSliderValue == 0) then
-                    toggles.grappleGun_t = not toggles.grappleGun_t
-                end
-                if(sliders.gunSliderValue == 1) then
-                    toggles.objGun_t = not toggles.objGun_t
-                    print("Test")
-                end
-                if(sliders.gunSliderValue == 2) then
-                    toggles.waterGun_t = not toggles.waterGun_t
-                end
-                if(sliders.gunSliderValue == 3) then
-                    toggles.fireGun_t = not toggles.fireGun_t
-                end
-                if(sliders.gunSliderValue == 4) then
-                    toggles.dustGun_t = not toggles.dustGun_t
-                end
-                if(sliders.gunSliderValue == 5) then
-                    toggles.deleteGun_t = not toggles.deleteGun_t
-                end
-                if(sliders.gunSliderValue == 6) then
-                    toggles.ropeGun_t = not toggles.ropeGun_t
-                end
-            end
-            if(LuaUI.Options.scroll == 1) then
-                toggles.blackParade_t = not toggles.blackParade_t
-            end
-        end
-
-        if (LuaUI.Options.currentMenu == LuaUI.Options.menus[3]) then
-            if (LuaUI.Options.scroll == 0) then
-                Gta4Neons()
-            end
-            if (LuaUI.Options.scroll == 1) then
-                local objs = object.get_all_objects()
-                for i = 1, #objs do
-                    entity.delete_entity(objs[i])
-                end
-            end
-            if (LuaUI.Options.scroll == 2) then
-                tpVehicle()
-            end
-        end
-
-        if (LuaUI.Options.currentMenu == LuaUI.Options.menus[4]) then
-            if (LuaUI.Options.scroll == 0) then
-                SpawnPed(sliders.pedSliderValue, 100)
-            end
-
-            if (LuaUI.Options.scroll == 1) then
-                SpawnObj(sliders.objectSliderValue)
+            if (LuaUI.Options.currentMenu == LuaUI.Options.menus[8]) then
+                if (LuaUI.Options.scroll > 1) then
+                    local garageVehicles = {}
+                    for k,v in pairs(tbl_GSV) do
+                        garageVehicles = v[2]    
+                        print(garageVehicles[1])
+                    end
+                    --streaming.request_model(gameplay.get_hash_key(garageVehicles[LuaUI.Options.scroll]))
+                    --vehicle.create_vehicle(gameplay.get_hash_key(garageVehicles[LuaUI.Options.scroll]), player.get_player_coords(player.player_id()), 1.0, true, false)
+                end   
             end
            
-            if (LuaUI.Options.scroll == 4) then
-                SpawnObjFromName()
+            if (LuaUI.Options.currentMenu == LuaUI.Options.menus[5]) then
+                if (LuaUI.Options.scroll > 1 ) then
+                        LuaUI.switchToSub(7)
+                end
             end
-        end
-
-        if (LuaUI.Options.currentMenu == LuaUI.Options.menus[5]) then
-            if (names == nil) then
-            else
+    
+            if (LuaUI.Options.scroll == 5) then        
+                local appdata = utils.get_appdata_path("PopstarDevs", "").."\\2Take1Menu\\"
+                saveUI = io.open(appdata.."scripts\\Rimuru\\UI.ini", "w")
+               
+                io.output(saveUI)  
+                io.write((channels.redChannel .."\n"))
+                io.write((channels.greenChannel.."\n"))
+                io.write((channels.blueChannel.."\n"))
+                io.close(saveUI)
             end
-        end
-
-        if (LuaUI.Options.currentMenu == LuaUI.Options.menus[6]) then
-            if (LuaUI.Options.scroll == 3) then
-                toggles.banner_t = not toggles.banner_t
-            end
-        end
-        if (LuaUI.Options.scroll == 5) then        
-            local appdata = utils.get_appdata_path("PopstarDevs", "").."\\2Take1Menu\\"
-            saveUI = io.open(appdata.."scripts\\Rimuru\\UI.ini", "w")
-           
-            io.output(saveUI)  
-            io.write((channels.redChannel .."\n"))
-            io.write((channels.greenChannel.."\n"))
-            io.write((channels.blueChannel.."\n"))
-            io.close(saveUI)
-        end
-
     end
 
     if (controls.is_control_pressed(2, 194)) then --backspace
