@@ -1,7 +1,7 @@
 require("Rimuru\\Dependancies\\FileIO")
 
 function loaded()
-    ui.notify_above_map("Welcome "..os.getenv("USERNAME").." To Rimurus Toolkit", "", 140)
+    ui.notify_above_map("Welcome "..os.getenv("USERNAME").." To Rimurus Menu", "", 140)
 end
 
 function AutoWaypoint(pid)
@@ -176,6 +176,23 @@ function SpawnPed(val, health)
     streaming.set_model_as_no_longer_needed(hash) 
 end
 
+function Wings()
+    local hash = gameplay.get_hash_key("vw_prop_art_wings_01a")
+
+    if streaming.is_model_valid(hash) then
+	    streaming.request_model(hash)
+	    while not streaming.has_model_loaded(hash) and utils.time_ms() + 450 > utils.time_ms() do
+		    system.wait(0)
+	    end
+
+	    local pos = entity.get_entity_coords(player.player_id(), true)
+	    local wings = object.create_object(hash, pos, true, true)
+
+	    entity.attach_entity_to_entity(wings, player.get_player_ped(player.player_id()), ped.get_ped_bone_index(player.get_player_ped(player.player_id()), 0x5c01), v3(-1,0,0), v3(00,90,0), true, false, true, 0, true)
+	    streaming.set_model_as_no_longer_needed(hash)
+    end
+end
+
 function SpawnPedFromName()
     local input, i = input.get("Input A Ped Name", "", 100, 0)
 
@@ -250,14 +267,14 @@ function FindVehicleName(Hash)
     return false
 end
 
-tbl_GSV={}
+garageSlots={}
 function GetVehicleSlots()
     local max_slots = script.get_global_i(1585844)
     for i=0,max_slots,1 do
         local hash=script.get_global_i(1585844+1+(i*142)+66)
         local name=FindVehicleName(hash)
         if name then
-            table.insert(tbl_GSV, {i,name,hash,script.get_global_i(1585844+1+(i*142)+1)})
+            table.insert(garageSlots, {i, name, hash, script.get_global_i(1585844+1+(i*142)+1)})
         end
     end
 end

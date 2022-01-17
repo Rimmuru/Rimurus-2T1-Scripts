@@ -25,6 +25,12 @@ sliders = {
     bannerSliderValue = 1
 }
 
+channels = {
+    redChannel = 0,
+    greenChannel = 208,
+    blueChannel = 242
+}
+
 gunTypes = {
     "GrappleGun",
     "Object Gun",
@@ -196,6 +202,12 @@ function keyHook()
                 if(LuaUI.Options.scroll == 1) then
                     toggles.blackParade_t = not toggles.blackParade_t
                 end
+                if(LuaUI.Options.scroll == 2) then
+                    toggles.AdminSpec_t = not toggles.AdminSpec_t
+                end
+                if(LuaUI.Options.scroll == 3) then
+                    Wings()
+                end
             end
     
             if (LuaUI.Options.currentMenu == LuaUI.Options.menus[3]) then
@@ -250,13 +262,10 @@ function keyHook()
 
             if (LuaUI.Options.currentMenu == LuaUI.Options.menus[8]) then
                 if (LuaUI.Options.scroll > 1) then
-                    local garageVehicles = {}
-                    for k,v in pairs(tbl_GSV) do
-                        garageVehicles = v[2]    
-                        print(garageVehicles[1])
-                    end
-                    --streaming.request_model(gameplay.get_hash_key(garageVehicles[LuaUI.Options.scroll]))
-                    --vehicle.create_vehicle(gameplay.get_hash_key(garageVehicles[LuaUI.Options.scroll]), player.get_player_coords(player.player_id()), 1.0, true, false)
+                    script.set_global_i(2810287+911, 1)
+                    script.set_global_i(2810287+961, 0)
+                    script.set_global_i(2810287+958, LuaUI.Options.scroll) --veh index
+                    script.set_global_i(2810287+176, 0)
                 end   
             end
            
@@ -313,10 +322,5 @@ function functions()
         BlackParade()
     end
 
-    local channels = {
-        redChannel = 0,
-        greenChannel = 208,
-        blueChannel = 242
-   }
     customColour = {r = channels.redChannel, g = channels.greenChannel, b = channels.blueChannel, a = 255}
 end

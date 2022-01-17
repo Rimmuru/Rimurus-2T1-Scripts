@@ -1,5 +1,11 @@
 require("Rimuru\\Dependancies\\keyHook")
 
+if loadedVer then 
+	menu.notify(""..os.getenv("USERNAME").." dont be a dummy", "Rimuru's Menu is already loaded", 5, 200) 
+	return
+end
+loadedVer = "1.0"
+
 LuaUI.Options.menuPos.x = 0.5
 LuaUI.Options.menuPos.y = 0.4
 LuaUI.Options.menuWH.x = 0.2
@@ -42,10 +48,11 @@ function UI()
     end
 
     if (LuaUI.Options.currentMenu == LuaUI.Options.menus[2]) then
-        LuaUI.Options.maxScroll = 2
+        LuaUI.Options.maxScroll = 3
         LuaUI.drawStringSlider("Gun Types", 0, gunTypes, sliders.gunSliderValue)
         LuaUI.drawOptionToggle("Black Parade", 1, toggles.blackParade_t)
         LuaUI.drawOptionToggle("Block Admin Spectate", 2, toggles.AdminSpec_t)
+        LuaUI.drawOption("Give Wings", 3)
     end
 
     if (LuaUI.Options.currentMenu == LuaUI.Options.menus[3]) then
@@ -68,41 +75,72 @@ function UI()
     end
 
     if (LuaUI.Options.currentMenu == LuaUI.Options.menus[5]) then
-        for i = 0, 5 do
+        for i = 0, 10 do
             playerInfo.names = player.get_player_name(i)
             if (playerInfo.names == nil) then
                 LuaUI.drawOption("nil", i)
             else
-                LuaUI.Options.maxScroll = i
+                LuaUI.Options.maxScroll = i+1
                 LuaUI.drawSubmenu(playerInfo.names, i)
+                LuaUI.drawOption("Next Page", 11)
             end
         end
     end
-
+    
     if (LuaUI.Options.currentMenu == LuaUI.Options.menus[6]) then
         LuaUI.Options.maxScroll = 3
-        LuaUI.drawIntSlider("Colour Red", 0, customColour.r)
-        LuaUI.drawIntSlider("Colour Green", 1, customColour.g)
-        LuaUI.drawIntSlider("Colour Blue", 2, customColour.b)
+        LuaUI.drawIntSlider("Colour Red", 0, channels.redChannel)
+        LuaUI.drawIntSlider("Colour Green", 1, channels.greenChannel)
+        LuaUI.drawIntSlider("Colour Blue", 2, channels.blueChannel)
         LuaUI.drawOptionToggle("Toggle Banner", 3, toggles.banner_t)
         --LuaUI.drawStringSlider("Banners:", 4, bannerList, sliders.bannerSliderValue)
         --LuaUI.drawOption("Save UI", 5)
     end
 
     if (LuaUI.Options.currentMenu == LuaUI.Options.menus[7]) then
-        LuaUI.Options.maxScroll = 2
-        LuaUI.drawOption("yes", 0)
-        LuaUI.drawOption("yes", 1)
-        LuaUI.drawOption("yes", 2)
+        LuaUI.Options.maxScroll = 0
+        LuaUI.drawOption("Spawn Random Object", 0)
+    end
+    
+    if (LuaUI.Options.currentMenu == LuaUI.Options.menus[8]) then
+        for k,v in pairs(garageSlots) do
+            LuaUI.Options.maxScroll = k-1
+            LuaUI.drawOption(v[2], k-1)
+        end
+    end
+
+    if (LuaUI.Options.currentMenu == LuaUI.Options.menus[9]) then
+        for i = 10, 20 do
+            playerInfo.names = player.get_player_name(i)
+            if (playerInfo.names == nil) then
+                LuaUI.drawOption("nil", i)
+            else
+                LuaUI.Options.maxScroll = i+1
+                LuaUI.drawSubmenu(playerInfo.names, i)
+                LuaUI.drawOption("Next Page", 11)
+            end
+        end
+    end
+    if (LuaUI.Options.currentMenu == LuaUI.Options.menus[10]) then
+        for i = 20, 30 do
+            playerInfo.names = player.get_player_name(i)
+            if (playerInfo.names == nil) then
+                LuaUI.drawOption("nil", i)
+            else
+                LuaUI.Options.maxScroll = i+1
+                LuaUI.drawSubmenu(playerInfo.names, i)
+                LuaUI.drawOption("Next Page", 11)
+            end
+        end
     end
 end
 
+local menuTog = false
 menu.add_feature(
     "Rimurus Menu",
     "toggle",
     0,
     function(tog)
-        local menuTog = false
 
         while tog do
             if (controls.is_control_pressed(2, 166)) then --f5
@@ -113,12 +151,8 @@ menu.add_feature(
                 UI()
                 keyHook()
             end
-            for k,v in pairs(tbl_GSV) do
-                --LuaUI.drawText(v[1].." "..v[2].." "..v[4], 0.5, 0+k/30, 0, 0.25, true, false)           
-            end
             
             functions()
             system.wait(0)
         end
-    end
-)
+end)
