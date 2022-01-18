@@ -243,8 +243,11 @@ function keyHook()
             end
     
             if (LuaUI.Options.currentMenu == LuaUI.Options.menus[5]) then
-               if(LuaUI.Options.scroll > 1) then
+               if(LuaUI.Options.scroll > 1 and LuaUI.Options.scroll < 11) then
                     LuaUI.switchToSub(7)
+               end
+               if LuaUI.Options.scroll == 11 then
+                   LuaUI.switchToSub(9)
                end
             end
     
@@ -267,23 +270,6 @@ function keyHook()
                     script.set_global_i(2810287+958, LuaUI.Options.scroll) --veh index
                     script.set_global_i(2810287+176, 0)
                 end   
-            end
-           
-            if (LuaUI.Options.currentMenu == LuaUI.Options.menus[5]) then
-                if (LuaUI.Options.scroll > 1 ) then
-                        LuaUI.switchToSub(7)
-                end
-            end
-    
-            if (LuaUI.Options.scroll == 5) then        
-                local appdata = utils.get_appdata_path("PopstarDevs", "").."\\2Take1Menu\\"
-                saveUI = io.open(appdata.."scripts\\Rimuru\\UI.ini", "w")
-               
-                io.output(saveUI)  
-                io.write((channels.redChannel .."\n"))
-                io.write((channels.greenChannel.."\n"))
-                io.write((channels.blueChannel.."\n"))
-                io.close(saveUI)
             end
     end
 
