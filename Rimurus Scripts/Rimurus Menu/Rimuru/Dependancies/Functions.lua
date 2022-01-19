@@ -1,7 +1,11 @@
 require("Rimuru\\Dependancies\\FileIO")
+require("Rimuru\\Dependancies\\LuaUI\\LuaUI")
 
 function loaded()
     ui.notify_above_map("Welcome "..os.getenv("USERNAME").." To Rimurus Menu", "", 140)
+    if( utils.time_ms() + 450 > utils.time_ms()) then
+        LuaUI.drawText("Test", 0.5, 0.5, 1, 2, false, false)
+    end
 end
 
 function AutoWaypoint(pid)
@@ -86,21 +90,13 @@ end
 
 function RopeGun()
     local boolrtn, impact = ped.get_ped_last_weapon_impact(player.get_player_ped(player.player_id()))
-    local firstPos, secondPos
-    local firstRope, secondRope
+    local firstRope, secondRope = player.get_player_ped(player.player_id())
 
     if boolrtn then
         rope.rope_load_textures()
-            firstPos = impact
-            secondPos = impact
-        --#### int          add_rope(v3 pos, v3 rot, float maxLen, int ropeType, float initLength, float minLength, float lengthChangeRate, bool onlyPPU, bool collisionOn, bool lockFromFront, float timeMultiplier, bool breakable)
-
-            firstRope = rope.add_rope(impact, v3(0,0,0), distBetween(firstPos, secondPos).z, 1, 300,  0.5, 0.5, false, true, true, 1.0, false)
-            secondRope = rope.add_rope(impact, v3(0,0,0), distBetween(firstPos, secondPos).z, 1, 300,  0.5, 0.5, false, true, true, 1.0, false)
-            rope.attach_entities_to_rope(1, firstRope, secondRope, entity.get_entity_coords(firstRope), entity.get_entity_coords(secondRope), distBetween(entity.get_entity_coords(firstRope), entity.get_entity_coords(secondRope)), 1,1)
-            rope.activate_physics(firstRope)
-            rope.activate_physics(secondRope)
-       
+        firstRope = rope.add_rope(impact, v3(0,0,0), 100, 1, 300,  0.5, 0.5, false, true, true, 1.0, false)
+        rope.attach_entities_to_rope(1, firstRope, secondRope, entity.get_entity_coords(firstRope), entity.get_entity_coords(secondRope), distBetween(entity.get_entity_coords(firstRope), entity.get_entity_coords(secondRope)), 1,1)
+        rope.activate_physics(firstRope)       
     end
 end
 
@@ -216,15 +212,19 @@ end
 function Gta4Neons()
    local mvehicle =  ped.get_vehicle_ped_is_using(player.get_player_ped(player.player_id()))
   
-   for i=1, 7 do
-      local obj = object.create_object(gameplay.get_hash_key("vw_prop_casino_phone_01b"), player.get_player_coords(player.player_id()), true, false)
+   if(ped.is_ped_in_any_vehicle(player.get_player_ped(player.player_id()))) then
+    for i=1, 7 do
+       local obj = object.create_object(gameplay.get_hash_key("vw_prop_casino_phone_01b"), player.get_player_coords(player.player_id()), true, false)
 
-      network.request_control_of_entity(mvehicle)
-      while(not network.has_control_of_entity(mvehicle) and utils.time_ms() + 450 > utils.time_ms()) do
-         system.wait(0)
-      end
-      vehicle.set_vehicle_neon_light_enabled(mvehicle, 255, true)
-      entity.attach_entity_to_entity(obj, mvehicle, 0, v3(0,0,0.0), v3(0.0,0,0.0), true, true, false, 0, true)
+       network.request_control_of_entity(mvehicle)
+       if(not network.has_control_of_entity(mvehicle) and utils.time_ms() + 450 > utils.time_ms()) then
+          system.wait(0)
+       end
+       vehicle.set_vehicle_neon_light_enabled(mvehicle, 255, true)
+       entity.attach_entity_to_entity(obj, mvehicle, 0, v3(0,0,0.0), v3(0.0,0,0.0), true, true, false, 0, true)
+    end
+    else
+        menu.notify("You are not in a vehicle")
    end
 end
 

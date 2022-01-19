@@ -1,4 +1,3 @@
-require("Rimuru\\Dependancies\\LuaUI\\LuaUI")
 require("Rimuru\\Dependancies\\Functions")
 require("Rimuru\\Dependancies\\BannerHandller")
 
@@ -18,11 +17,13 @@ toggles = {
 
 sliders = {
     pedSliderValue = 0,
+    animalSliderValue = 0,
     objectSliderValue = 0,
     worldSliderValue = 0,
     propSliderValue = 0,
     gunSliderValue = 0,
-    bannerSliderValue = 1
+    bannerSliderValue = 1,
+    fontSliderValue = 1
 }
 
 channels = {
@@ -89,6 +90,9 @@ function keyHook()
             end
 
             if (LuaUI.Options.scroll == 1) then
+                sliders.animalSliderValue = sliders.animalSliderValue - 1
+            end
+            if (LuaUI.Options.scroll == 2) then
                 sliders.objectSliderValue = sliders.objectSliderValue - 1
             end
         end
@@ -113,8 +117,8 @@ function keyHook()
             end
 
             if (LuaUI.Options.scroll == 4) then
-                if sliders.bannerSliderValue > 0 then
-                    sliders.bannerSliderValue = sliders.bannerSliderValue - 1
+                if sliders.fontSliderValue > 0 and sliders.fontSliderValue <= 4 then
+                    sliders.fontSliderValue = sliders.fontSliderValue - 1
                 end
             end
          
@@ -137,8 +141,11 @@ function keyHook()
                 sliders.pedSliderValue = sliders.pedSliderValue + 1
             end
 
-            if (LuaUI.Options.scroll == 1) then
+            if (LuaUI.Options.scroll == 2) then
                 sliders.objectSliderValue = sliders.objectSliderValue + 1
+            end
+            if (LuaUI.Options.scroll == 3) then
+                sliders.worldSliderValue = sliders.worldSliderValue + 1
             end
         end
 
@@ -162,8 +169,8 @@ function keyHook()
             end
 
             if (LuaUI.Options.scroll == 4) then
-                if sliders.bannerSliderValue < #bannerList then
-                    sliders.bannerSliderValue = sliders.bannerSliderValue + 1
+                if sliders.fontSliderValue >= 0 and sliders.fontSliderValue <= 3 then
+                    sliders.fontSliderValue = sliders.fontSliderValue + 1
                 end
             end
         end
@@ -233,11 +240,11 @@ function keyHook()
                     SpawnPed(sliders.pedSliderValue, 100)
                 end
     
-                if (LuaUI.Options.scroll == 1) then
+                if (LuaUI.Options.scroll == 2) then
                     SpawnObj(sliders.objectSliderValue)
                 end
                
-                if (LuaUI.Options.scroll == 4) then
+                if (LuaUI.Options.scroll == 5) then
                     SpawnObjFromName()
                 end
             end
@@ -245,6 +252,7 @@ function keyHook()
             if (LuaUI.Options.currentMenu == LuaUI.Options.menus[5]) then
                if(LuaUI.Options.scroll > 1 and LuaUI.Options.scroll < 11) then
                     LuaUI.switchToSub(7)
+                    playerInfo.playerID = LuaUI.Options.scroll
                end
                if LuaUI.Options.scroll == 11 then
                    LuaUI.switchToSub(9)

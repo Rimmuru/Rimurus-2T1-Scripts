@@ -91,28 +91,33 @@ function LuaUI.drawText(text, x, y, font, scale, center, alignRight)
 end
 
 --Menu Functions
-function LuaUI.drawOption(text, num)
-    LuaUI.drawText(tostring(text), LuaUI.Options.menuPos.x, LuaUI.Options.menuPos.y + 0.035 + (0.34 * num/10), 1, 0.5, true, false)
+function LuaUI.drawOption(text, num, font)
+	font = font or 1
+    LuaUI.drawText(tostring(text), LuaUI.Options.menuPos.x, LuaUI.Options.menuPos.y + 0.035 + (0.34 * num/10), font, 0.5, true, false)
 end
 
-function LuaUI.drawOptionToggle(text, num, toggle)
+function LuaUI.drawOptionToggle(text, num, toggle, font)
+	font = font or 1
 	LuaUI.drawText(tostring(toggle and 'on' or "off"), LuaUI.Options.menuPos.x + 0.06, LuaUI.Options.menuPos.y + 0.035 + (0.34 * num/10) + 0.005, 0, 0.3, true, false)
-	LuaUI.drawText(tostring(text), LuaUI.Options.menuPos.x, LuaUI.Options.menuPos.y + 0.035 + (0.34 * num/10), 1, 0.5, true, false)
+	LuaUI.drawText(tostring(text), LuaUI.Options.menuPos.x, LuaUI.Options.menuPos.y + 0.035 + (0.34 * num/10), font, 0.5, true, false)
 end
 
-function LuaUI.drawSubmenu(text, num)
-	LuaUI.drawText(tostring(text), LuaUI.Options.menuPos.x, LuaUI.Options.menuPos.y + 0.035 + (0.34 * num/10), 1, 0.5, true, false)
-	LuaUI.drawText(">>", LuaUI.Options.menuPos.x + 0.05, LuaUI.Options.menuPos.y + 0.032 + (0.34 * num/10) + 0.005, 1, 0.5, true, false)
+function LuaUI.drawSubmenu(text, num, font)
+	font = font or 1
+	LuaUI.drawText(tostring(text), LuaUI.Options.menuPos.x, LuaUI.Options.menuPos.y + 0.035 + (0.34 * num/10), font, 0.5, true, false)
+	LuaUI.drawText(">>", LuaUI.Options.menuPos.x + 0.05, LuaUI.Options.menuPos.y + 0.032 + (0.34 * num/10) + 0.005, font, 0.5, true, false)
 end
 
-function LuaUI.drawStringSlider(text, num, option, sliderValue)
+function LuaUI.drawStringSlider(text, num, option, sliderValue, font)
+	font = font or 1
 	LuaUI.drawText("<"..tostring(option[sliderValue + 1])..">", LuaUI.Options.menuPos.x + 0.06, LuaUI.Options.menuPos.y + 0.035 + (0.34 * num/10) + 0.005, 0, 0.3, true, false)
-	LuaUI.drawText(tostring(text), LuaUI.Options.menuPos.x, LuaUI.Options.menuPos.y + 0.035 + (0.34 * num/10), 1, 0.5, true, false)
+	LuaUI.drawText(tostring(text), LuaUI.Options.menuPos.x, LuaUI.Options.menuPos.y + 0.035 + (0.34 * num/10), font, 0.5, true, false)
 end
 
-function LuaUI.drawIntSlider(text, num, option)
+function LuaUI.drawIntSlider(text, num, option, font)
+	font = font or 1
 	LuaUI.drawText("<"..tonumber(option)..">", LuaUI.Options.menuPos.x + 0.06, LuaUI.Options.menuPos.y + 0.035 + (0.34 * num/10) + 0.005, 0, 0.3, true, false)
-	LuaUI.drawText(tostring(text), LuaUI.Options.menuPos.x, LuaUI.Options.menuPos.y + 0.035 + (0.34 * num/10), 1, 0.5, true, false)
+	LuaUI.drawText(tostring(text), LuaUI.Options.menuPos.x, LuaUI.Options.menuPos.y + 0.035 + (0.34 * num/10), font, 0.5, true, false)
 end
 
 function LuaUI.switchToSub(sub)
