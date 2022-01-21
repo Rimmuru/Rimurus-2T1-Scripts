@@ -120,6 +120,12 @@ function LuaUI.drawIntSlider(text, num, option, font)
 	LuaUI.drawText(tostring(text), LuaUI.Options.menuPos.x, LuaUI.Options.menuPos.y + 0.035 + (0.34 * num/10), font, 0.5, true, false)
 end
 
+function LuaUI.drawFloatSlider(text, num, option, font)
+	font = font or 1
+	LuaUI.drawText("<"..string.format("%.2f", option)..">", LuaUI.Options.menuPos.x + 0.06, LuaUI.Options.menuPos.y + 0.035 + (0.34 * num/10) + 0.005, 0, 0.3, true, false)
+	LuaUI.drawText(tostring(text), LuaUI.Options.menuPos.x, LuaUI.Options.menuPos.y + 0.035 + (0.34 * num/10), font, 0.5, true, false)
+end
+
 function LuaUI.switchToSub(sub)
 	LuaUI.Options.scroll = 0
 	LuaUI.Options.currentMenu = LuaUI.Options.menus[sub]

@@ -57,7 +57,8 @@ LuaUI.Options.menus = {
     "PlayerMenu",
     "Garage Vehicles",
     "PlayerMenu2",
-    "PlayerMenu3"
+    "PlayerMenu3",
+    "Ini Vehicles"
 }
 
 function keyHook()
@@ -121,7 +122,17 @@ function keyHook()
                     sliders.fontSliderValue = sliders.fontSliderValue - 1
                 end
             end
-         
+            if (LuaUI.Options.scroll == 5) then
+                if LuaUI.Options.menuPos.x > 0 and LuaUI.Options.menuPos.x <= 1 then
+                    LuaUI.Options.menuPos.x = LuaUI.Options.menuPos.x - 0.05
+                end
+            end
+            
+            if (LuaUI.Options.scroll == 6) then
+                if LuaUI.Options.menuPos.y > -0 and LuaUI.Options.menuPos.y <= 1 then
+                    LuaUI.Options.menuPos.y = LuaUI.Options.menuPos.y - 0.05
+                end
+            end
         end
     end
 
@@ -173,6 +184,16 @@ function keyHook()
                     sliders.fontSliderValue = sliders.fontSliderValue + 1
                 end
             end
+            if (LuaUI.Options.scroll == 5) then
+                if LuaUI.Options.menuPos.x >= 0 and LuaUI.Options.menuPos.x <= 1 then
+                    LuaUI.Options.menuPos.x = LuaUI.Options.menuPos.x + 0.05
+                end
+            end
+            if (LuaUI.Options.scroll == 6) then
+                if LuaUI.Options.menuPos.y >= 0 and LuaUI.Options.menuPos.y <= 1 then
+                    LuaUI.Options.menuPos.y = LuaUI.Options.menuPos.y + 0.05
+                end
+            end
         end
     end
 
@@ -182,7 +203,7 @@ function keyHook()
                 LuaUI.Options.scroll = -1
             end
     
-            if (LuaUI.Options.currentMenu == LuaUI.Options.menus[2]) then
+         if (LuaUI.Options.currentMenu == LuaUI.Options.menus[2]) then
                 if (LuaUI.Options.scroll == 0) then
                     if(sliders.gunSliderValue == 0) then
                         toggles.grappleGun_t = not toggles.grappleGun_t
@@ -222,16 +243,16 @@ function keyHook()
                     Gta4Neons()
                 end
                 if (LuaUI.Options.scroll == 1) then
-                    local objs = object.get_all_objects()
-                    for i = 1, #objs do
-                        entity.delete_entity(objs[i])
-                    end
+                    RemoveGtaNeons()
                 end
                 if (LuaUI.Options.scroll == 2) then
                     tpVehicle()
                 end
                 if(LuaUI.Options.scroll == 3) then
                     LuaUI.switchToSub(8)
+                end
+                if(LuaUI.Options.scroll == 4) then
+                    LuaUI.switchToSub(11)
                 end
             end
     
@@ -279,6 +300,11 @@ function keyHook()
                     script.set_global_i(2810287+176, 0)
                 end   
             end
+            if (LuaUI.Options.currentMenu == LuaUI.Options.menus[11]) then
+                if(LuaUI.Options.scroll > 1) then
+                    ParseIniVehicle()
+                end
+            end
     end
 
     if (controls.is_control_pressed(2, 194)) then --backspace
@@ -315,6 +341,7 @@ function functions()
     if toggles.blackParade_t then
         BlackParade()
     end
+    DisableSCTV(toggles.AdminSpec_t)
 
     customColour = {r = channels.redChannel, g = channels.greenChannel, b = channels.blueChannel, a = 255}
 end

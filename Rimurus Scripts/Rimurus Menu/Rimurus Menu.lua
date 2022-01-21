@@ -61,11 +61,12 @@ function UI()
     end
 
     if (LuaUI.Options.currentMenu == LuaUI.Options.menus[3]) then
-        LuaUI.Options.maxScroll = 3
+        LuaUI.Options.maxScroll = 4
         LuaUI.drawOption("Gta4 Style Neons", 0, sliders.fontSliderValue)
         LuaUI.drawOption("Remove Neons", 1, sliders.fontSliderValue)
         LuaUI.drawOption("Teleport Personal Vehicle", 2, sliders.fontSliderValue)
         LuaUI.drawSubmenu("Garage Vehicles", 3, sliders.fontSliderValue)
+        LuaUI.drawSubmenu("Ini Vehicles", 4, sliders.fontSliderValue)
         --LuaUI.drawOption("Save Vehicle", 4)
         --LuaUI.drawStringSlider("Load Vehicle", 5, gunTypes, 1)
     end
@@ -94,12 +95,14 @@ function UI()
     end
     
     if (LuaUI.Options.currentMenu == LuaUI.Options.menus[6]) then
-        LuaUI.Options.maxScroll = 4
+        LuaUI.Options.maxScroll = 6
         LuaUI.drawIntSlider("Colour Red", 0, channels.redChannel, sliders.fontSliderValue)
         LuaUI.drawIntSlider("Colour Green", 1, channels.greenChannel, sliders.fontSliderValue)
         LuaUI.drawIntSlider("Colour Blue", 2, channels.blueChannel, sliders.fontSliderValue)
         LuaUI.drawOptionToggle("Toggle Banner", 3, toggles.banner_t, sliders.fontSliderValue)
         LuaUI.drawIntSlider("Font", 4, sliders.fontSliderValue, sliders.fontSliderValue)
+        LuaUI.drawFloatSlider("Menu X", 5, LuaUI.Options.menuPos.x, sliders.fontSliderValue)
+        LuaUI.drawFloatSlider("Menu Y", 6, LuaUI.Options.menuPos.y, sliders.fontSliderValue)
         --LuaUI.drawStringSlider("Banners:", 4, bannerList, sliders.bannerSliderValue)
         --LuaUI.drawOption("Save UI", 5)
     end
@@ -112,7 +115,8 @@ function UI()
     if (LuaUI.Options.currentMenu == LuaUI.Options.menus[8]) then
         for k,v in pairs(garageSlots) do
             LuaUI.Options.maxScroll = k-1
-            if(v[2] == "") then
+            if(not v[2]) then
+                LuaUI.drawOption("nil", k-1, sliders.fontSliderValue)
             else
                 LuaUI.drawOption(v[2], k-1, sliders.fontSliderValue)
             end
@@ -135,12 +139,18 @@ function UI()
         for i = 20, 30 do
             playerInfo.names = player.get_player_name(i)
             if (playerInfo.names == nil) then
-                LuaUI.drawOption("nil", i)
+                LuaUI.drawOption("nil", i-10)
             else
                 LuaUI.Options.maxScroll = i+1
                 LuaUI.drawSubmenu(playerInfo.names, i, sliders.fontSliderValue)
                 LuaUI.drawOption("Next Page", 11, sliders.fontSliderValue)
             end
+        end
+    end
+    if (LuaUI.Options.currentMenu == LuaUI.Options.menus[11]) then
+        for i=1, #IniVehicle do
+            LuaUI.Options.maxScroll = i-1
+            LuaUI.drawOption(IniVehicle[i], i-1, sliders.fontSliderValue)
         end
     end
 end

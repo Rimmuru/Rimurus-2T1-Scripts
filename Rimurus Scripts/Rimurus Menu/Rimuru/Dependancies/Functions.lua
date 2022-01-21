@@ -3,9 +3,7 @@ require("Rimuru\\Dependancies\\LuaUI\\LuaUI")
 
 function loaded()
     ui.notify_above_map("Welcome "..os.getenv("USERNAME").." To Rimurus Menu", "", 140)
-    if( utils.time_ms() + 450 > utils.time_ms()) then
-        LuaUI.drawText("Test", 0.5, 0.5, 1, 2, false, false)
-    end
+    ui.notify_above_map("Controls: \nF5 to open\nEnter to select option\nArrow keys to scroll", "Rimurus Menu", 140)
 end
 
 function AutoWaypoint(pid)
@@ -228,6 +226,13 @@ function Gta4Neons()
    end
 end
 
+function RemoveGtaNeons()
+    local objs = object.get_all_objects()
+    for i = 1, #objs do
+        entity.delete_entity(objs[i])
+    end
+end
+
 function SaveVehicleState()
     local appdata = utils.get_appdata_path("PopstarDevs", "").."\\2Take1Menu\\"
 
@@ -260,7 +265,7 @@ function tpVehicle()
 end
 
 function FindVehicleName(Hash)
-    if not Hash or Hash==0 then return false end
+    if not Hash or Hash==0 then menu.notify("FindVehicleName was unable to find vehicle") end
     for k,v in pairs(vehicleList) do
         if tonumber(Hash)==tonumber(v[2]) then return v[1] end
     end
@@ -279,6 +284,49 @@ function GetVehicleSlots()
     end
 end
 GetVehicleSlots()
+
+IniVehicle = {}
+function GetIniVehicles()
+    local appdata = utils.get_appdata_path("PopstarDevs", "").."\\2Take1Menu\\"
+    IniVehicle = utils.get_all_files_in_directory(appdata.."scripts\\Rimuru\\IniVehicles", "ini")
+end
+GetIniVehicles()
+
+function CreateVehicle(hash, primary, secondary, pearl, tireColour)
+    primary = primary or 0
+    secondary = secondary or 0
+    pearl = pearl or 0
+    tireColour = tireColour or 0
+
+    local vHash = hash
+    local mPos = player.get_player_coords(player.player_id())
+    mPos.x = mPos.x - 6
+
+    streaming.request_model(vHash)
+    if (streaming.has_model_loaded(vHash)) then
+        local mVeh = vehicle.create_vehicle(hash, mPos, 1.0, true, false)
+        vehicle.set_vehicle_color(mVeh, primary, secondary, pearl, tireColour)
+    end
+end
+
+function ParseIniVehicle()
+    local ini = require("Rimuru\\Dependancies\\ini_parser")
+    local cfg = ini.parse("Rimuru\\IniVehicles\\"..IniVehicle[LuaUI.Options.scroll+1])
+
+    if (not ini) then
+       menu.notify("Unable to find ini_parser", "Rimurus Menu") 
+    end
+
+    CreateVehicle(cfg.Vehicle.model, 
+    cfg.Vehicle["primary paint"], 
+    cfg.Vehicle["secondary paint"], 
+    cfg.Vehicle["pearlescent colour"], 
+    cfg.Vehicle["wheel colour"])
+
+  
+    print("\n\nVehicle Hash:"..cfg.Vehicle.model)
+  
+end
 
 function PedFlop()
     local peds = ped.get_all_peds()
@@ -335,3 +383,10 @@ function AttachPlayerVehicle()
    end
 end
 
+function DisableSCTV(tog)
+    if(tog) then
+        script.set_global_i(262145+8528, 1)
+    else
+        script.set_global_i(262145+8528, 0)
+    end
+end
