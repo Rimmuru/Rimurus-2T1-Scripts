@@ -1,5 +1,8 @@
-require("Rimuru\\Dependancies\\Functions")
-require("Rimuru\\Dependancies\\BannerHandller")
+local functInlude = require("Rimuru\\Dependancies\\Functions")
+local bannerInlude = require("Rimuru\\Dependancies\\BannerHandller")
+
+if not functInlude then menu.notify("Could not find function include") end
+if not bannerInlude then menu.notify("Could not find banner include") end
 
 customColour = {}
 toggles = {
@@ -341,7 +344,12 @@ function functions()
     if toggles.blackParade_t then
         BlackParade()
     end
-    DisableSCTV(toggles.AdminSpec_t)
 
+    if(toggles.AdminSpec_t) then
+        script.set_global_i(262145+8528, 1)
+    else
+        script.set_global_i(262145+8528, 0)
+    end
+    
     customColour = {r = channels.redChannel, g = channels.greenChannel, b = channels.blueChannel, a = 255}
 end

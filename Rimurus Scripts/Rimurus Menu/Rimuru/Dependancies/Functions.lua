@@ -1,5 +1,8 @@
-require("Rimuru\\Dependancies\\FileIO")
-require("Rimuru\\Dependancies\\LuaUI\\LuaUI")
+local fileInlcude = require("Rimuru\\Dependancies\\FileIO")
+local luaInclude = require("Rimuru\\Dependancies\\LuaUI\\LuaUI")
+
+if not fileInlcude then menu.notify("Could not find FileIO") end
+if not luaInclude then menu.notify("Could not find LuaUI") end
 
 function loaded()
     ui.notify_above_map("Welcome "..os.getenv("USERNAME").." To Rimurus Menu", "", 140)
@@ -273,6 +276,7 @@ function FindVehicleName(Hash)
 end
 
 garageSlots={}
+
 function GetVehicleSlots()
     local max_slots = script.get_global_i(1585844)
     for i=0,max_slots,1 do
@@ -292,20 +296,28 @@ function GetIniVehicles()
 end
 GetIniVehicles()
 
-function CreateVehicle(hash, primary, secondary, pearl, tireColour)
+function CreateModdedVehicle(hash, primary, secondary, pearl, tireColour, numPlate)
     primary = primary or 0
     secondary = secondary or 0
     pearl = pearl or 0
     tireColour = tireColour or 0
-
+    numPlate = numPlate or ""
+ 
+    local objetProperties = {
+        hash = 0,
+        pos = v3(),
+        offset = v3(),
+        collision = 0
+    }
     local vHash = hash
     local mPos = player.get_player_coords(player.player_id())
     mPos.x = mPos.x - 6
-
+    
     streaming.request_model(vHash)
     if (streaming.has_model_loaded(vHash)) then
         local mVeh = vehicle.create_vehicle(hash, mPos, 1.0, true, false)
         vehicle.set_vehicle_color(mVeh, primary, secondary, pearl, tireColour)
+        vehicle.set_vehicle_number_plate_text(mVeh, numPlate)
     end
 end
 
@@ -317,15 +329,12 @@ function ParseIniVehicle()
        menu.notify("Unable to find ini_parser", "Rimurus Menu") 
     end
 
-    CreateVehicle(cfg.Vehicle.model, 
+    CreateModdedVehicle(cfg.Vehicle.model, 
     cfg.Vehicle["primary paint"], 
     cfg.Vehicle["secondary paint"], 
     cfg.Vehicle["pearlescent colour"], 
-    cfg.Vehicle["wheel colour"])
-
-  
-    print("\n\nVehicle Hash:"..cfg.Vehicle.model)
-  
+    cfg.Vehicle["wheel colour"],
+    cfg.Vehicle["plate text"])  
 end
 
 function PedFlop()
@@ -381,12 +390,4 @@ function AttachPlayerVehicle()
    else
        menu.notify("You are not in a vehicle", "", 10, 2)
    end
-end
-
-function DisableSCTV(tog)
-    if(tog) then
-        script.set_global_i(262145+8528, 1)
-    else
-        script.set_global_i(262145+8528, 0)
-    end
 end
