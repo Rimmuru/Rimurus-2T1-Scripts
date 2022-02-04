@@ -1,7 +1,6 @@
 pedList = {
     "ig_lamardavis_02",
     "P_Franklin_02",
-    "a_c_chop_02",
     "a_f_y_studioparty_01",
     "a_f_y_studioparty_02",
     "a_m_m_studioparty_01",
@@ -951,3 +950,38 @@ pedList = {
 }
 
 favouritePeds = {}
+animalsPeds = {
+    "A_C_Boar",
+    "A_C_Chickenhawk",
+    "A_C_Chimp",
+    "A_C_Chop",
+    "A_C_Chop_02",
+    "A_C_Cormorant",
+    "A_C_Cow",
+    "A_C_Coyote",
+    "A_C_Crow",
+    "A_C_Deer",
+    "A_C_Dolphin",
+    "A_C_Fish",
+    "A_C_Hen",
+    "A_C_HumpBack",
+    "A_C_Husky",
+    "A_C_KillerWhale",
+    "A_C_MtLion",
+    "A_C_Panther",
+    "A_C_Pig",
+    "A_C_Pigeon",
+    "A_C_Poodle",
+    "A_C_Pug",
+    "A_C_Rabbit_01",
+    "A_C_Rat",
+    "A_C_Retriever",
+    "A_C_Rhesus",
+    "A_C_Rottweiler",
+    "A_C_Seagull",
+    "A_C_SharkHammer",
+    "A_C_SharkTiger",
+    "A_C_shepherd",
+    "A_C_Stingray",
+    "A_C_Westy"
+}

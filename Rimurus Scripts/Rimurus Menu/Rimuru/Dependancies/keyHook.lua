@@ -15,7 +15,8 @@ toggles = {
     ropeGun_t = false,
     blackParade_t = false,
     AdminSpec_t = true,
-    banner_t = true
+    banner_t = false,
+    flash_t = false
 }
 
 sliders = {
@@ -36,13 +37,13 @@ channels = {
 }
 
 gunTypes = {
-    "GrappleGun",
-    "Object Gun",
-    "Water Gun",
-    "Fire Gun",
-    "Dust Gun",
-    "Delete Gun", 
-    "Rope Gun"
+    "Grapple",
+    "Object",
+    "Water",
+    "Fire",
+    "Dust",
+    "Delete", 
+    "Rope"
 }
 
 playerInfo ={
@@ -65,19 +66,38 @@ LuaUI.Options.menus = {
 }
 
 function keyHook()
-    if (controls.is_control_pressed(2, 173)) then --down arrow
-        if LuaUI.Options.scroll < LuaUI.Options.maxScroll then
-            LuaUI.Options.scroll = LuaUI.Options.scroll + 1
-        end
+    if isKeyDown(0x28) then --down arrow
+        doKey(350, 0x28, true, function()
+            if LuaUI.Options.scroll < LuaUI.Options.maxScroll then
+                LuaUI.Options.scroll = LuaUI.Options.scroll + 1
+                if LuaUI.Options.drawScroll + 15 - LuaUI.Options.scroll <= 2 and not (LuaUI.Options.drawScroll >= LuaUI.Options.maxScroll - 15) then
+                    LuaUI.Options.drawScroll = LuaUI.Options.drawScroll + 1
+                end
+            elseif LuaUI.Options.scroll >= LuaUI.Options.maxScroll then
+                LuaUI.Options.scroll = 0
+                LuaUI.Options.drawScroll = 0
+            end
+        end)
     end
 
-    if (controls.is_control_pressed(2, 172)) then -- up arrow
-        if LuaUI.Options.scroll > 0 and LuaUI.Options.scroll <= LuaUI.Options.maxScroll + 1 then
-            LuaUI.Options.scroll = LuaUI.Options.scroll - 1
-        end
+    if isKeyDown(0x26) then --up arrow
+        doKey(350, 0x26, true, function()
+            if LuaUI.Options.scroll > 0 and LuaUI.Options.scroll <= LuaUI.Options.maxScroll + 1 then
+                LuaUI.Options.scroll = LuaUI.Options.scroll - 1
+                if LuaUI.Options.scroll - LuaUI.Options.drawScroll <= 2 and not (LuaUI.Options.drawScroll - 1 < 0) then
+                    LuaUI.Options.drawScroll = LuaUI.Options.drawScroll - 1
+                end
+            elseif LuaUI.Options.scroll == 0 then
+                LuaUI.Options.scroll = LuaUI.Options.maxScroll
+                if LuaUI.Options.maxScroll > 15 then
+                    LuaUI.Options.drawScroll = LuaUI.Options.maxScroll - 15
+                end
+            end
+        end)
     end
 
-    if (controls.is_control_pressed(2, 174)) then -- left arrow
+    if isKeyDown(0x25) then 
+        doKey(350, 0x25, true, function() -- left arrow
         if (LuaUI.Options.currentMenu == LuaUI.Options.menus[2]) then
             if (LuaUI.Options.scroll == 0) then
                 sliders.gunSliderValue = sliders.gunSliderValue - 1
@@ -98,6 +118,12 @@ function keyHook()
             end
             if (LuaUI.Options.scroll == 2) then
                 sliders.objectSliderValue = sliders.objectSliderValue - 1
+            end
+            if (LuaUI.Options.scroll == 3) then
+                sliders.worldSliderValue = sliders.worldSliderValue - 1
+            end
+            if (LuaUI.Options.scroll == 4) then
+                sliders.propSliderValue = sliders.propSliderValue - 1
             end
         end
 
@@ -137,9 +163,11 @@ function keyHook()
                 end
             end
         end
+    end)
     end
 
-    if (controls.is_control_pressed(2, 175)) then -- right arrow
+    if isKeyDown(0x27) then -- right arrow
+        doKey(350, 0x27, true, function() 
         if (LuaUI.Options.currentMenu == LuaUI.Options.menus[2]) then
             if (LuaUI.Options.scroll == 0) then
                 sliders.gunSliderValue = sliders.gunSliderValue + 1
@@ -154,12 +182,17 @@ function keyHook()
             if (LuaUI.Options.scroll == 0) then
                 sliders.pedSliderValue = sliders.pedSliderValue + 1
             end
-
+            if (LuaUI.Options.scroll == 1) then
+                sliders.animalSliderValue = sliders.animalSliderValue + 1
+            end
             if (LuaUI.Options.scroll == 2) then
                 sliders.objectSliderValue = sliders.objectSliderValue + 1
             end
             if (LuaUI.Options.scroll == 3) then
                 sliders.worldSliderValue = sliders.worldSliderValue + 1
+            end
+            if (LuaUI.Options.scroll == 4) then
+                sliders.propSliderValue = sliders.propSliderValue + 1
             end
         end
 
@@ -198,15 +231,17 @@ function keyHook()
                 end
             end
         end
+        end)
     end
 
-    if (controls.is_control_pressed(0, 191)) then --enter     
+    if isKeyDown(0x0D) then --enter
+        doKey(350, 0x0D, false, function()
             if (LuaUI.Options.currentMenu == LuaUI.Options.menus[1]) then
                 LuaUI.switchToSub(LuaUI.Options.scroll + 2)
-                LuaUI.Options.scroll = -1
-            end
-    
-         if (LuaUI.Options.currentMenu == LuaUI.Options.menus[2]) then
+                LuaUI.Options.scroll = 0
+			   
+	
+            elseif (LuaUI.Options.currentMenu == LuaUI.Options.menus[2]) then
                 if (LuaUI.Options.scroll == 0) then
                     if(sliders.gunSliderValue == 0) then
                         toggles.grappleGun_t = not toggles.grappleGun_t
@@ -239,14 +274,33 @@ function keyHook()
                 if(LuaUI.Options.scroll == 3) then
                     Wings()
                 end
-            end
-    
-            if (LuaUI.Options.currentMenu == LuaUI.Options.menus[3]) then
+                if(LuaUI.Options.scroll == 4) then
+                   toggles.flash_t = not toggles.flash_t
+                end
+                if(LuaUI.Options.scroll == 5) then
+                    local val, txt = input.get("Enter message", "", 100, 0)
+                    if val == 1 then
+                     return HANDLER_CONTINUE
+                    end
+                    if val == 2 then
+                     return HANDLER_POP
+                    end
+                    if not txt then
+                    else
+                        network.send_chat_message(string.format("¦ %s", txt), false)
+                    end
+                end
+			   
+	
+            elseif (LuaUI.Options.currentMenu == LuaUI.Options.menus[3]) then
                 if (LuaUI.Options.scroll == 0) then
                     Gta4Neons()
                 end
                 if (LuaUI.Options.scroll == 1) then
-                    RemoveGtaNeons()
+                    local objs = object.get_all_objects()
+                    for i = 1, #objs do
+                        entity.delete_entity(objs[i])
+                    end
                 end
                 if (LuaUI.Options.scroll == 2) then
                     tpVehicle()
@@ -256,58 +310,57 @@ function keyHook()
                 end
                 if(LuaUI.Options.scroll == 4) then
                     LuaUI.switchToSub(11)
-                end
-            end
-    
-            if (LuaUI.Options.currentMenu == LuaUI.Options.menus[4]) then
+                end	   
+	
+            elseif (LuaUI.Options.currentMenu == LuaUI.Options.menus[4]) then
                 if (LuaUI.Options.scroll == 0) then
                     SpawnPed(sliders.pedSliderValue, 100)
                 end
-    
+                if (LuaUI.Options.scroll == 1) then
+                    SpawnAnimal(sliders.animalSliderValue, 100)
+                end              
                 if (LuaUI.Options.scroll == 2) then
                     SpawnObj(sliders.objectSliderValue)
+                end 
+                if (LuaUI.Options.scroll == 3) then
+                    SpawnWrld(sliders.objectSliderValue)
                 end
-               
-                if (LuaUI.Options.scroll == 5) then
-                    SpawnObjFromName()
+                if (LuaUI.Options.scroll == 4) then
+                    SpawnProp(sliders.propSliderValue)
                 end
-            end
-    
-            if (LuaUI.Options.currentMenu == LuaUI.Options.menus[5]) then
-               if(LuaUI.Options.scroll > 1 and LuaUI.Options.scroll < 11) then
+	
+            elseif (LuaUI.Options.currentMenu == LuaUI.Options.menus[5]) then
+               if(LuaUI.Options.scroll > -1 ) then
                     LuaUI.switchToSub(7)
                     playerInfo.playerID = LuaUI.Options.scroll
                end
-               if LuaUI.Options.scroll == 11 then
-                   LuaUI.switchToSub(9)
-               end
-            end
-    
-            if (LuaUI.Options.currentMenu == LuaUI.Options.menus[6]) then
+			   
+            elseif (LuaUI.Options.currentMenu == LuaUI.Options.menus[6]) then
                 if (LuaUI.Options.scroll == 3) then
-                    toggles.banner_t = not toggles.banner_t
+                    --toggles.banner_t = not toggles.banner_t
                 end
-            end
-    
-            if (LuaUI.Options.currentMenu == LuaUI.Options.menus[7]) then
+			   
+	
+            elseif (LuaUI.Options.currentMenu == LuaUI.Options.menus[7]) then
                 if (LuaUI.Options.scroll == 0) then
-                       SpawnObj(math.random(1, #Objs), playerInfo.playerID)
+                    SpawnObj(math.random(1, #Objs), playerInfo.playerID)
                 end
-            end
+			   
 
-            if (LuaUI.Options.currentMenu == LuaUI.Options.menus[8]) then
-                if (LuaUI.Options.scroll > 1) then
+            elseif (LuaUI.Options.currentMenu == LuaUI.Options.menus[8]) then
+                if (LuaUI.Options.scroll > -1 and LuaUI.Options.scroll < LuaUI.Options.maxScroll) then
                     script.set_global_i(2810287+911, 1)
                     script.set_global_i(2810287+961, 0)
                     script.set_global_i(2810287+958, LuaUI.Options.scroll) --veh index
                     script.set_global_i(2810287+176, 0)
                 end   
-            end
-            if (LuaUI.Options.currentMenu == LuaUI.Options.menus[11]) then
-                if(LuaUI.Options.scroll > 1) then
+
+            elseif (LuaUI.Options.currentMenu == LuaUI.Options.menus[11]) then
+                if(LuaUI.Options.scroll > -1) then
                     ParseIniVehicle()
                 end
             end
+        end)
     end
 
     if (controls.is_control_pressed(2, 194)) then --backspace
@@ -340,15 +393,19 @@ function functions()
     end
     if toggles.ropeGun_t then
         RopeGun()
-    end
+    end  
     if toggles.blackParade_t then
         BlackParade()
     end
 
-    if(toggles.AdminSpec_t) then
+    if toggles.AdminSpec_t then
         script.set_global_i(262145+8528, 1)
     else
         script.set_global_i(262145+8528, 0)
+    end
+
+    if toggles.flash_t then
+        doPTFX()
     end
     
     customColour = {r = channels.redChannel, g = channels.greenChannel, b = channels.blueChannel, a = 255}

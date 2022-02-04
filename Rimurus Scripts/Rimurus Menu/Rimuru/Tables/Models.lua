@@ -17292,5 +17292,16 @@ Objs ={
 }
 
 favouriteModels = {}
-WorldObjects = {}
-prop = {}
+worldObjects = {}
+props = {}
+
+local function filterObjects()
+    for i=1, #Objs do 
+        if streaming.is_model_a_world_object(gameplay.get_hash_key(Objs[i])) then
+            worldObjects[#worldObjects+1] = Objs[i]
+        end
+        if string.find(Objs[i], "prop") then
+            props[#props+1] = Objs[i]
+        end
+    end
+end filterObjects()

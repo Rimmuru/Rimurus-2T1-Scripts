@@ -2,7 +2,7 @@
 Colour = {
 	pastelGreen = {r=167, g=244, b=163, a=255},
 	white = {r=255, g=255, b=255, a=255},
-	black = {r=0, g=0, b=0, a=150},
+	black = {r=0, g=0, b=0, a=200},
 	blue = {r=137, g=196, b=244, a=255}
 }
 
@@ -10,6 +10,7 @@ LuaUI = {
 	Options = { 
 		 scroll = 0,
 		 maxScroll = 0,
+		 drawScroll = 0,
 		 menuWH = v2(),
 		 menuPos = v2(),
 		 currentMenu = "",
@@ -48,29 +49,23 @@ function LuaUI.drawOutline(title, scale, x, y, w, h, borderColour, fillColour, f
 	end
 end
 
-local function RGBAToInt(R, G, B, A) --Borrowed from gif.lua
+function LuaUI.RGBAToInt(R, G, B, A) --Borrowed from gif.lua
 	A = A or 255
 	return ((R&0x0ff)<<0x00)|((G&0x0ff)<<0x08)|((B&0x0ff)<<0x10)|((A&0x0ff)<<0x18)
-end
-
-local function logging(text)
-	print(text)
-	menu.notify(text)
 end
 
 local sprite
 function LuaUI.setUpBanner(pathToBanner)
 	local appdata = utils.get_appdata_path("PopstarDevs", "").."\\2Take1Menu\\"
-	if pathToBanner == nil then
-		logging("Couldnt find path "..pathToBanner)
+	if pathToBanner == nil or not pathToBanner then
+		print("Couldnt find path "..pathToBanner)
 	else
 		sprite = scriptdraw.register_sprite(appdata..pathToBanner)
 	end
 end
 
 function LuaUI.drawBanner(x, y, borderColour)
-	scriptdraw.draw_sprite(sprite, v2(x-0.50, y-0.03), 0.25, 0, RGBAToInt(Colour.white.r, Colour.white.g, Colour.white.b, Colour.white.a))
-
+	scriptdraw.draw_sprite(sprite, v2(x-0.50, y-0.03), 0.25, 0, LuaUI.RGBAToInt(Colour.white.r, Colour.white.g, Colour.white.b, Colour.white.a))
 	LuaUI.drawOutline("", 0, x, y-0.07, LuaUI.Options.menuWH.x, 0.12, borderColour, borderColour, false, false)
 end
 
@@ -110,7 +105,7 @@ end
 
 function LuaUI.drawStringSlider(text, num, option, sliderValue, font)
 	font = font or 1
-	LuaUI.drawText("<"..tostring(option[sliderValue + 1])..">", LuaUI.Options.menuPos.x + 0.06, LuaUI.Options.menuPos.y + 0.035 + (0.34 * num/10) + 0.005, 0, 0.3, true, false)
+	LuaUI.drawText("< "..tostring(option[sliderValue + 1]).." >", LuaUI.Options.menuPos.x + 0.065, LuaUI.Options.menuPos.y + 0.035 + (0.34 * num/10) + 0.005, 0, 0.3, true, false)		
 	LuaUI.drawText(tostring(text), LuaUI.Options.menuPos.x, LuaUI.Options.menuPos.y + 0.035 + (0.34 * num/10), font, 0.5, true, false)
 end
 

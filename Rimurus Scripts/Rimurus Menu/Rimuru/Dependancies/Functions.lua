@@ -9,54 +9,20 @@ function loaded()
     ui.notify_above_map("Controls: \nF5 to open\nEnter to select option\nArrow keys to scroll", "Rimurus Menu", 140)
 end
 
-function AutoWaypoint(pid)
-    local pos = player.get_player_coords(pid)
-       local pos2 = v2()
-       pos2.x = pos.x
-       pos2.y = pos.y
-
-       ui.set_new_waypoint(pos2)
+local math = math or {}
+function math.pow(a, b)
+    return a ^ b
 end
 
-local function roationToDirection(rotation) --Credits fivem
-    local adjusted_rotation = v3()
-    
-    adjusted_rotation.x = (math.pi / 180) * rotation.x
-    adjusted_rotation.y = (math.pi / 180) * rotation.y
-    adjusted_rotation.z = (math.pi / 180) * rotation.z
-    
-    local direction = v3()
-    direction.x = -math.sin(adjusted_rotation.z) * math.abs(math.cos(adjusted_rotation.x))
-    direction.y = math.sin(adjusted_rotation.z) * math.abs(math.cos(adjusted_rotation.y))
-    direction.z = math.sin(adjusted_rotation.z)
-    
-    return direction
-end
-
-local function getPosFromCamera(dist)
-    local roation = cam.get_gameplay_cam_rot()
-    local postion = cam.get_gameplay_cam_pos()
-    local direction = roationToDirection(roation)
-    local destination = v3()
-     
-    destination.x = postion.x - direction.x * dist
-    destination.y = postion.y - direction.y * dist
-    destination.z = postion.z - direction.z * dist + 1000
-
-    return destination
-end
-
-function GrappleGun()
-    local boolrtn, impact = ped.get_ped_last_weapon_impact(player.get_player_ped(player.player_id()), v3())
-    local loc = player.get_player_coords(player.player_id())
-    impact.x = impact.x - loc.x
-    impact.y = impact.y - loc.y
-    impact.z = impact.z - loc.z + 25
-    
-    if boolrtn then       
-        entity.set_entity_velocity(player.get_player_ped(player.player_id()), impact)
-        ai.task_sky_dive(player.get_player_ped(player.player_id()), true)
-    end
+local function applyForce(playerCoord, sentity) --from gta5-mods
+    local force = 50
+	local coord = entity.get_entity_coords(sentity)
+	local dx = coord.x - playerCoord.x
+	local dy = coord.y - playerCoord.y
+	local dz = coord.z - playerCoord.z
+	local distance = math.sqrt(dx*dx+dy*dy+dz*dz)
+	local distanceRate=(force/distance)*math.pow(1.04,1-distance)
+	entity.apply_force_to_entity(sentity, 1, distanceRate*dx,distanceRate*dy,distanceRate*dz, math.random()*math.random(-1,1),math.random()*math.random(-1,1),math.random()*math.random(-1,1), true, false, true, true, true, true)
 end
 
 function ObjectGun()
@@ -89,15 +55,107 @@ local function distBetween(startPos, endPos)
     return result
 end
 
-function RopeGun()
-    local boolrtn, impact = ped.get_ped_last_weapon_impact(player.get_player_ped(player.player_id()))
-    local firstRope, secondRope = player.get_player_ped(player.player_id())
+function GrappleGun()
+    local boolrtn, impact = ped.get_ped_last_weapon_impact(player.get_player_ped(player.player_id()), v3())
+    local loc = player.get_player_coords(player.player_id())
+    impact.x = impact.x - loc.x
+    impact.y = impact.y - loc.y
+    impact.z = impact.z - loc.z + 25
+    
+    if boolrtn then       
+        entity.set_entity_velocity(player.get_player_ped(player.player_id()), impact)
+        ai.task_sky_dive(player.get_player_ped(player.player_id()), true)
+    end
+end
 
-    if boolrtn then
-        rope.rope_load_textures()
-        firstRope = rope.add_rope(impact, v3(0,0,0), 100, 1, 300,  0.5, 0.5, false, true, true, 1.0, false)
-        rope.attach_entities_to_rope(1, firstRope, secondRope, entity.get_entity_coords(firstRope), entity.get_entity_coords(secondRope), distBetween(entity.get_entity_coords(firstRope), entity.get_entity_coords(secondRope)), 1,1)
-        rope.activate_physics(firstRope)       
+function RopeGun2()
+    local ropeTestpos1,ropeTestpos2
+    local ropeTestpos1announced = false
+    local ropeTestpos2announced = false
+    local lastshoot = nil
+
+  local a,b = ped.get_ped_last_weapon_impact(player.get_player_ped(player.player_id())) 
+  
+  if(ropeTestpos1 == nil and ropeTestpos1announced == false) then
+    menu.notify("Please Shoot somewhere for startpos of the rope","ZeroMenu",5,140)
+    ropeTestpos1announced = true
+  end
+  local a,b = ped.get_ped_last_weapon_impact(player.get_player_ped(player.player_id()))
+    if(a and ropeTestpos1 == nil) then
+      ropeTestpos1 = b
+      return HANDLER_CONTINUE
+    end
+  
+  if(ropeTestpos2 == nil and ropeTestpos2announced == false) then
+    menu.notify("Please Shoot an entity","ZeroMenu",5,140)  
+    ropeTestpos2announced = true
+  end
+  local a,b = ped.get_ped_last_weapon_impact(player.get_player_ped(player.player_id()))
+  local hit_ent
+    if(a) then
+      menu.notify("Set target entity","ZeroMenu",5,140)
+      
+      hit_ent = player.get_entity_player_is_aiming_at(player.player_id())
+      if(hit_ent ~= nil) then        
+        menu.notify("Hit an entity","ZeroMenu",5,140)
+      ropeTestpos2 = b
+      else
+        menu.notify("no hit ","ZeroMenu",5,140)
+        ropeTestpos2announced = false
+      end
+      
+    end
+  
+  if(ropeTestpos1 ~= nil and ropeTestpos2 ~= nil) then
+    menu.notify("Creating a Rope between (" .. ropeTestpos1.x .. "," .. ropeTestpos1.y .. "," .. ropeTestpos1.z .. ") "  .. " and (" .. ropeTestpos2.x .. "," .. ropeTestpos2.y .. "," .. ropeTestpos2.z ..") ","ZeroMenu",5,140)
+    
+    local newRope = rope.add_rope(ropeTestpos1,v3(0,0,0),1000,1,10,10,10,false,false,false,1.0,false)
+    
+    rope.attach_rope_to_entity(newRope,hit_ent,v3(0,0,0),true)
+    --rope.attach_rope_to_entity(newRope,player.get_player_vehicle(player.player_id()),v3(0,0,0),true)
+    local ent1 = player.get_player_vehicle(player.player_id())
+    local length = (entity.get_entity_coords(ent1).magnitude(entity.get_entity_coords(hit_ent)))*10
+    rope.attach_entities_to_rope(newRope,ent1,hit_ent,entity.get_entity_coords(player.get_player_vehicle(player.player_id())),entity.get_entity_coords(hit_ent),length ,0,0,"Center","Center")
+    rope.activate_physics(player.get_player_vehicle(player.player_id()))
+    rope.activate_physics(hit_ent)
+    ropeTestpos1 = nil
+    ropeTestpos2 = nil
+    ropeTestpos1announced = false
+    ropeTestpos2announced = false
+    return HANDLER_POP 
+  else
+    return HANDLER_CONTINUE
+  end
+  
+end
+
+function RopeGun()
+    local boolRtn, Pos = ped.get_ped_last_weapon_impact(player.get_player_ped(player.player_id())) 
+    local boolRtn1, Pos1
+    local startPoint 
+    local secondPoint 
+    local enti 
+    
+    local announcedFirst = false
+    local announcedSecond = false
+
+    if(boolRtn and not announcedFirst) then
+        print(string.format("Start point set at %.f : %.f : %.f", Pos.x, Pos.y, Pos.z))
+        startPoint = Pos
+        menu.notify("Now shoot an entity")
+        announcedFirst = true
+    end
+
+    if(announcedFirst and not announcedSecond) then
+        print("announcedSecond\n")
+        announcedFirst = true
+        system.yield(1000)
+        boolRtn1, Pos1 = ped.get_ped_last_weapon_impact(player.get_player_ped(player.player_id())) 
+        if(boolRtn1) then
+            secondPoint = Pos1  
+            print(string.format("Second point set at %.f : %.f : %.f", Pos1.x, Pos1.y, Pos1.z))
+        end
+        announcedSecond = true
     end
 end
 
@@ -148,29 +206,41 @@ function SpawnProp(val)
 end
 
 function SpawnPed(val, health)
-    local hash = gameplay.get_hash_key(pedList[val+1])
-    local ptype = 0
+    if val ~= nil then
+        local hash = gameplay.get_hash_key(pedList[val+1])
 
-    streaming.request_model(hash)
+        streaming.request_model(hash)
     
-    while(not streaming.has_model_loaded(hash) and utils.time_ms() + 450 > utils.time_ms()) do
-       system.wait(0)
-    end
+        while(not streaming.has_model_loaded(hash) and utils.time_ms() + 450 > utils.time_ms()) do
+            system.wait(0)
+        end
 
-    if(streaming.is_model_valid(hash)) then
-        for i=1, #animals do
-            if pedList[val] == animals[i] then
-                ptype = 28
-            else
-                ptype = 26
-            end
-        
-            local p = ped.create_ped(ptype, hash, player.get_player_coords(player.player_id()), 0, true, false)
+        if(streaming.is_model_valid(hash)) then
+            local p = ped.create_ped(26, hash, player.get_player_coords(player.player_id()), 0, true, false)
             ped.set_ped_health(p, tonumber(health))
         end
-    end
 
-    streaming.set_model_as_no_longer_needed(hash) 
+        streaming.set_model_as_no_longer_needed(hash) 
+    end
+end
+
+function SpawnAnimal(val, health)
+    if val ~= nil then
+        local hash = gameplay.get_hash_key(animalsPeds[val+1])
+
+        streaming.request_model(hash)
+    
+        while(not streaming.has_model_loaded(hash) and utils.time_ms() + 450 > utils.time_ms()) do
+            system.wait(0)
+        end
+
+        if(streaming.is_model_valid(hash)) then
+            local p = ped.create_ped(28, hash, player.get_player_coords(player.player_id()), 0, true, false)
+            ped.set_ped_health(p, tonumber(health))
+        end
+
+        streaming.set_model_as_no_longer_needed(hash) 
+    end
 end
 
 function Wings()
@@ -296,28 +366,41 @@ function GetIniVehicles()
 end
 GetIniVehicles()
 
-function CreateModdedVehicle(hash, primary, secondary, pearl, tireColour, numPlate)
+function CreateModdedVehicle(hash, primary, secondary, pearl, tireColour, numPlate, objHash, objPos, objRot)
     primary = primary or 0
     secondary = secondary or 0
     pearl = pearl or 0
     tireColour = tireColour or 0
     numPlate = numPlate or ""
- 
-    local objetProperties = {
-        hash = 0,
-        pos = v3(),
-        offset = v3(),
-        collision = 0
-    }
+
+    objHash = objHash or ""
+    objPos.x = objPos.x or 0
+    objPos.y = objPos.y or 0
+    objPos.z = objPos.z or 0
+
+    objRot.x = objRot.x or 0
+    objRot.y = objRot.y or 0
+    objRot.z = objRot.z or 0
+
+    local mVeh
     local vHash = hash
     local mPos = player.get_player_coords(player.player_id())
     mPos.x = mPos.x - 6
     
     streaming.request_model(vHash)
     if (streaming.has_model_loaded(vHash)) then
-        local mVeh = vehicle.create_vehicle(hash, mPos, 1.0, true, false)
+        mVeh = vehicle.create_vehicle(hash, mPos, 1.0, true, false)
         vehicle.set_vehicle_color(mVeh, primary, secondary, pearl, tireColour)
         vehicle.set_vehicle_number_plate_text(mVeh, numPlate)
+    end
+
+    if objHash == 0 or objHash == "" then
+    else
+        streaming.request_model(objHash)
+        if (streaming.has_model_loaded(objHash)) then
+            local obj = object.create_world_object(objHash, objPos, true, false)
+            entity.attach_entity_to_entity(obj, mVeh, 1, v3(0,0,0), objRot, true, true, false, 1, true)
+        end
     end
 end
 
@@ -325,16 +408,48 @@ function ParseIniVehicle()
     local ini = require("Rimuru\\Dependancies\\ini_parser")
     local cfg = ini.parse("Rimuru\\IniVehicles\\"..IniVehicle[LuaUI.Options.scroll+1])
 
-    if (not ini) then
-       menu.notify("Unable to find ini_parser", "Rimurus Menu") 
+    local rotPos = v3()
+    if(cfg["0"]["RotX"] and cfg["0"]["RotY"] or cfg["0"]["RotZ"]) then
+        rotPos.x = cfg["0"]["RotX"]
+        rotPos.y = cfg["0"]["RotY"]
+        rotPos.z = cfg["0"]["RotZ"]
+    else 
+        rotPos.x = 0
+        rotPos.y = 0
+        rotPos.z = 0
     end
 
-    CreateModdedVehicle(cfg.Vehicle.model, 
-    cfg.Vehicle["primary paint"], 
-    cfg.Vehicle["secondary paint"], 
-    cfg.Vehicle["pearlescent colour"], 
-    cfg.Vehicle["wheel colour"],
-    cfg.Vehicle["plate text"])  
+    local i
+    local objPos = v3()
+    if(cfg["0"]["x"] or cfg["0"]["y"] or cfg["0"]["z"]) then
+        objPos.x = cfg["0"]["x"]
+        objPos.y = cfg["0"]["y"]
+        objPos.z = cfg["0"]["z"]
+    else if (cfg["0"]["X"] or cfg["0"]["Y"] or cfg["0"]["Z"]) then
+        objPos.x = cfg["0"]["X"]
+        objPos.y = cfg["0"]["Y"]
+        objPos.z = cfg["0"]["Z"]
+    else
+        objPos.x = 0
+        objPos.y = 0
+        objPos.z = 0
+        end
+    end
+
+   local modelHash 
+   if(cfg["0"]["model"]) then
+       modelHash = cfg["0"]["model"]
+   else if(cfg["0"]["Model"]) then
+        modelHash = cfg["0"]["Model"]
+    else
+        modelHash = 0
+        end
+   end
+
+    CreateModdedVehicle(cfg.Vehicle.Model, cfg.Vehicle.PrimaryPaint, 
+    cfg.Vehicle.SecondaryPaint, cfg.Vehicle.Pearlescent,
+    cfg.Vehicle.WheelsColor, cfg.Vehicle.PlateText, modelHash, 
+    objPos, rotPos)
 end
 
 function PedFlop()
@@ -391,3 +506,39 @@ function AttachPlayerVehicle()
        menu.notify("You are not in a vehicle", "", 10, 2)
    end
 end
+
+function doPTFX()
+    graphics.set_next_ptfx_asset("scr_powerplay")
+    
+    local trail, ptfx = graphics.start_networked_ptfx_non_looped_on_entity("sp_powerplay_beast_appear_trails", player.get_player_ped(player.player_id()), v3(0, 0.07, 0.625), v3(-90, 0, 0), 1.5)
+ end
+
+function isKeyDown(keyNum)
+    local key = MenuKey()
+    key:push_vk(keyNum)
+    return key:is_down()
+  end
+
+  function doKey(time, key, doLoopedFunction, functionToDo)
+    if isKeyDown(key) then
+      functionToDo()
+      local timer = utils.time_ms() + time
+      while timer > utils.time_ms() and isKeyDown(key) do
+        system.wait(0)
+        UI()
+        functions()
+      end
+      while timer < utils.time_ms() and isKeyDown(key) do
+        if doLoopedFunction then
+          functionToDo()
+        end
+        local timer = utils.time_ms() + 125
+        while timer > utils.time_ms() do
+          system.wait(0)
+          UI()
+          functions()
+        end
+      end
+    end
+  end
+  
