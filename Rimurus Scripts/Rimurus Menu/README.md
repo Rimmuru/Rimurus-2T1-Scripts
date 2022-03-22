@@ -14,13 +14,12 @@ Extract the rar to the scripts folder.<br/>
 
 DO NOT take the contents of the rimuru folder out of the folder
 
-<h1 align="center">Controls</h1>
+<h1 align="center">Default Controls</h1>
 
 F5 to open/close<br/> 
 Arrow keys to scroll<br/> 
 Enter to select<br/> 
 Backspace to go back<br/> 
-Custom controls is planned to be added in the near future
 
 <h1 align="center">Preview</h1>
 
@@ -33,10 +32,9 @@ Custom controls is planned to be added in the near future
  Teaching me some basics    
  
  GhostOne(CheeseOne)<br/>
- Various help over the course of the project
+ Various help 
 
  Thanks to the following for help with globals:
- 
  jhowkNx<br/> 
  UnknownHax<br/> 
  Kektram
