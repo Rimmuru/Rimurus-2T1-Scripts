@@ -7,11 +7,7 @@
 <h1 align="center">Installation</h1>
 
 Navigate to the [Releases Panel](https://github.com/Rimmuru/Rimurus-2T1-Scripts/releases/) and download the release titled Rimurus Menu<br/>
-
-Make sure to not download the source, or you risk downloading a version that can crash you.<br/>
-
 Extract the rar to the scripts folder.<br/>
-
 DO NOT take the contents of the rimuru folder out of the folder
 
 <h1 align="center">Default Controls</h1>
@@ -23,7 +19,7 @@ Backspace to go back<br/>
 
 <h1 align="center">Preview</h1>
 
-[![GTA5-Npk-Ky6kb4-Z.png](https://i.postimg.cc/C14Ws8p0/GTA5-Npk-Ky6kb4-Z.png)](https://postimg.cc/phpG2pdc)
+[![GTA5-Npk-Ky6kb4-Z.png](https://i.postimg.cc/zXhJd7X0/Application-Frame-Host-3-Vri7-A74-EI.png)](https://postimg.cc/bszcrQnt))
 
 
 <h1 align="center">Credits</h1>
