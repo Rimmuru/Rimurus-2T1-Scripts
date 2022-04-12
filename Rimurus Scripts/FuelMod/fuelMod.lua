@@ -1,37 +1,92 @@
 require("fuelMod\\LuaUI")
+require("fuelMod\\stations")
 
-local maxFuelLevel = 100
-local fuelLevel = maxFuelLevel
-local fuelFill = 5
+local fuelStates = {
+    maxFuelLevel = 100,
+    fuelLevel = 6,
+    fuelFill = 0.5,
+    depreciation = 0.001,
+    canFuel = false
+}
 
-function fuelLevelDecreaseLevel()
-    if player.is_player_in_any_vehicle(player.player_id()) then
-           if utils.time_ms() + 900000 > utils.time_ms() then
-            if(fuelLevel >= 0 and entity.get_entity_speed(ped.get_vehicle_ped_is_using(player.get_player_ped(player.player_id()))) > 4) then
-                fuelLevel = fuelLevel - 0.003
+
+local usedVehicles = {}
+
+local function getMyCurrentVehicle()
+    return ped.get_vehicle_ped_is_using(player.get_player_ped(player.player_id()))
+end
+
+local function insertCurrentVehicleInfomation()
+    if usedVehicles.hash ~= getMyCurrentVehicle() then
+        table.insert(usedVehicles, {hash = getMyCurrentVehicle(), fuelLevel = fuelStates.fuelLevel})
+    end
+end
+
+local function Get_Distance_Between_Coords(first, second)
+    local x = second.x - first.x
+    local y = second.y - first.y
+    local z = second.z - first.z
+    return math.sqrt(x * x + y * y + z * z)
+end
+
+local function fuelLevelDecreaseLevel()
+    if utils.time_ms() + 900000 > utils.time_ms() then
+        if(fuelStates.fuelLevel > 0 and entity.get_entity_speed(getMyCurrentVehicle()) > 4) then
+            fuelStates.fuelLevel = fuelStates.fuelLevel - fuelStates.depreciation
+          
+            if fuelStates.fuelLevel < 0 then --should fix -1 fuelLevel
+                fuelStates.fuelLevel = 0
             end
         end
     end
 end
 
-local orange2 = {r=255, g=128, b=0, a=255}
-function drawFuelBar()
-    fuelLevelDecreaseLevel()
-    if(ped.is_ped_in_any_vehicle(player.get_player_ped(player.player_id()))) then
-        LuaUI.drawRect(0.5, 0.98, fuelLevel/400, 0.02, orange2)
-        LuaUI.drawText(string.format("Fuel: %i/%i", math.floor(fuelLevel), maxFuelLevel), 0.5, 0.945, 0, 0.3, true, false)
+local function checkIfCanRefuel()
+    if Get_Distance_Between_Coords(player.get_player_coords(player.player_id()), Stations.Davis) <= 2.4 
+    or Get_Distance_Between_Coords(player.get_player_coords(player.player_id()), Stations.GroveStreet) <= 2.4
+    or Get_Distance_Between_Coords(player.get_player_coords(player.player_id()), Stations.SandyShores) <= 2.4
+    or Get_Distance_Between_Coords(player.get_player_coords(player.player_id()), Stations.Paleto) <= 2.4
+    or Get_Distance_Between_Coords(player.get_player_coords(player.player_id()), Stations.Strawberry) <= 2.4 then
+        fuelStates.canFuel = true
     end
 end
 
-function fuelMod()
-    drawFuelBar()
-    if(fuelLevel <= 0) then
-        vehicle.set_vehicle_engine_on(player.get_player_vehicle(player.player_id()), false, true, true)
-    end    
+local function fuelLevelIncreaseLevel()
+    if fuelStates.canFuel then 
+        if fuelStates.fuelLevel < 100 and entity.get_entity_speed(getMyCurrentVehicle()) == 0 then
+            fuelStates.fuelLevel = fuelStates.fuelLevel + fuelStates.fuelFill
+        end
+    end
 end
 
-menu.add_feature("Toggle FuelMod", "toggle", 0, function(tog)
-    while tog do
+local function drawFuelBar()
+    if fuelStates.fuelLevel <= 10 then
+        LuaUI.drawText(string.format("Low Fuel: %i/%i", math.floor(fuelStates.fuelLevel), fuelStates.maxFuelLevel), 0.5, 0.945, 0, 0.3, true, false)
+        LuaUI.drawRect(0.5, 0.98, fuelStates.fuelLevel/400, 0.02, Colour.red)
+    else
+        LuaUI.drawRect(0.5, 0.98, fuelStates.fuelLevel/400, 0.02, Colour.orange2)
+        LuaUI.drawText(string.format("Fuel: %i/%i", math.floor(fuelStates.fuelLevel), fuelStates.maxFuelLevel), 0.5, 0.945, 0, 0.3, true, false)
+    end
+end
+
+local toggle = false
+local function fuelMod()
+    if(ped.is_ped_in_any_vehicle(player.get_player_ped(player.player_id()))) then
+        drawFuelBar()
+        drawFuelMarkers()
+        fuelLevelDecreaseLevel()
+        fuelLevelIncreaseLevel()
+        insertCurrentVehicleInfomation()
+        checkIfCanRefuel()
+    
+        if fuelStates.fuelLevel == 0 then
+            vehicle.set_vehicle_engine_on(getMyCurrentVehicle(), false, true, true)
+        end 
+    end
+end
+
+menu.add_feature("Realistic FuelMod", "toggle", 0, function(tog)
+    while tog.on do
         fuelMod()
         system.wait(0)
     end

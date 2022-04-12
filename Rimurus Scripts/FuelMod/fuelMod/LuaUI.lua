@@ -1,10 +1,11 @@
-
 Colour = {
 	pastelGreen = {r=167, g=244, b=163, a=255},
 	white = {r=255, g=255, b=255, a=255},
 	black = {r=0, g=0, b=0, a=150},
 	blue = {r=137, g=196, b=244, a=255},
-	orange = {r=243, g=156, b=18, a=255}
+	orange = {r=243, g=156, b=18, a=255},
+	orange2 = {r=255, g=128, b=0, a=255},
+	red = {r=255, g=0, b=0, a=255}
 }
 
 LuaUI = { 
