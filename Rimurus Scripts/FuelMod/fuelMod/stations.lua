@@ -1,18 +1,25 @@
-require("fuelMod\\LuaUI")
-
 Stations = {
     GroveStreet = v3(-67.300, -1761.404, 28.314),
-    Strawberry = v3(-720.801, -934.966, 18.017),
+    LindsayCircus = v3(-720.801, -934.966, 18.017),
     Davis = v3(172.266, -1563.212, 27.623),
     SandyShores = v3(2007.918, 3772.873, 30.533),
     Paleto = v3(174.811, 6601.134, 30.334),
-    Chilliad = v3(1702.809, 6418.350, 31.125),
+    SenoraFreeway = v3(1702.809, 6418.350, 31.125),
     LittleSeoul = v3(-527.469, -1208.325, 16.671),
     PopularStreet = v3(821.748, -1028.274, 24.871),
     Harmony = v3(263.967, 2608.679, 44.269),
     MirrorPark = v3(1181.554, -332.793, 67.596),
     Morningwood = v3(-1430.680, -280.017, 44.627),
-    Vinewood = v3(614.969, 264.504, 101.509)
+    Vinewood = v3(614.969, 264.504, 101.509),
+    PacificBluffs = v3(-2099.512, -320.867, 11.523),
+    LagoZancudo = v3(-2558.103, 2331.768, 31.558),
+    SandyShoresAirfield = v3(1784.108, 3329.823, 39.769),
+    SandyShoresMotel = v3(1043.171, 2670.477, 38.046),
+    SandyShoresLSC = v3(1209.234, 2662.301, 36.306),
+    PalominoFreeway = v3(2578.465, 361.363, 106.955),
+    Grapeseed = v3(1688.766, 4929.291, 40.575),
+    RichmanGlen = v3(-1802.732, 797.043, 137.010),
+    Strawberry = v3(267.748, -1263.358, 27.640)
 }
 
 local function drawMarker(pos)
@@ -28,34 +35,18 @@ end
 
 local blips = {}
 local function drawFuelBlips()
-    blips[0] = drawBlip(Stations.SandyShores)
-    blips[1] = drawBlip(Stations.GroveStreet)
-    blips[2] = drawBlip(Stations.Strawberry)
-    blips[3] = drawBlip(Stations.Davis)
-    blips[4] = drawBlip(Stations.Paleto)
-    blips[5] = drawBlip(Stations.Chilliad)
-    blips[6] = drawBlip(Stations.LittleSeoul)
-    blips[7] = drawBlip(Stations.PopularStreet)
-    blips[8] = drawBlip(Stations.Harmony)
-    blips[9] = drawBlip(Stations.MirrorPark)
-    blips[10] = drawBlip(Stations.Morningwood)
-    blips[11] = drawBlip(Stations.Vinewood)
+    local BlipsCount = 0;
+    for name, coords in pairs(Stations) do
+        blips[BlipsCount] = drawBlip(coords)
+        BlipsCount = BlipsCount + 1
+    end
 end
 drawFuelBlips()
 
 function drawFuelMarkers()
-    drawMarker(Stations.SandyShores)
-    drawMarker(Stations.GroveStreet)
-    drawMarker(Stations.Strawberry)
-    drawMarker(Stations.Davis)
-    drawMarker(Stations.Paleto)
-    drawMarker(Stations.Chilliad)
-    drawMarker(Stations.LittleSeoul)
-    drawMarker(Stations.PopularStreet)
-    drawMarker(Stations.Harmony)
-    drawMarker(Stations.MirrorPark)
-    drawMarker(Stations.Morningwood)
-    drawMarker(Stations.Vinewood)
+    for name, coords in pairs(Stations) do
+        drawMarker(coords)
+    end
 end
 
 local function clearblips()
