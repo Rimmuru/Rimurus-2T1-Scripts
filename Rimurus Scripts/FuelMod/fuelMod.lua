@@ -1,4 +1,3 @@
-require("fuelMod\\LuaUI")
 require("fuelMod\\stations")
 
 local usedVehicles = {}
@@ -6,7 +5,7 @@ local usedVehicles = {}
 local fuelStates = {
     maxFuelLevel = 100,
     fuelLevel = math.random(10, 35),
-    fuelFill = 0.5,
+    fuelFill = 0.25,
     canFuel = false
 }
 
@@ -85,7 +84,7 @@ end
 local function fuelLevelIncreaseLevel()
     if fuelStates.canFuel then 
         if fuelStates.fuelLevel < 100 and entity.get_entity_speed(getMyCurrentVehicle()) == 0 then
-            fuelStates.fuelLevel = fuelStates.fuelLevel + fuelStates.fuelFill
+            fuelStates.fuelLevel = fuelStates.fuelLevel + 0.15
         end
     end
 end
@@ -116,12 +115,12 @@ local function fuelMod()
         if fuelStates.fuelLevel == 0 then
             vehicle.set_vehicle_engine_on(getMyCurrentVehicle(), false, true, true)
         end 
---   else
---      if fuelStates.fuelLevel < 100 and ped.get_current_ped_weapon(player.get_player_ped(player.player_id())) == 883325847 
---          and Get_Distance_Between_Coords(player.get_player_coords(player.player_id()), entity.get_entity_coords(usedVehicles.hash)) <= 2 
---      then
---          fuelStates.fuelLevel = fuelStates.fuelLevel + fuelStates.fuelFill
---      end
+
+    end
+    if fuelStates.fuelLevel < 100 and ped.get_current_ped_weapon(player.get_player_ped(player.player_id())) == 883325847 
+        and Get_Distance_Between_Coords(player.get_player_coords(player.player_id()), player.get_player_coords(player.player_id())) <= 1
+    then
+        fuelStates.fuelLevel = fuelStates.fuelLevel + fuelStates.fuelFill/1.5
     end
 end
 

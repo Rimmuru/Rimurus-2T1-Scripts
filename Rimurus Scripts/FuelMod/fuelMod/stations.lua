@@ -1,3 +1,5 @@
+require("fuelMod\\LuaUI")
+
 Stations = {
     GroveStreet = v3(-67.300, -1761.404, 28.314),
     Strawberry = v3(-720.801, -934.966, 18.017),
@@ -17,19 +19,27 @@ local function drawMarker(pos)
     graphics.draw_marker(1, pos, v3(0,0,0), v3(0,0,0), v3(2,2,2), 240, 200, 80, 200, false, true, 2, false, nil, "MarkerTypeVerticalCylinder", false)       
 end
 
+local function drawBlip(pos)
+    local blip = ui.add_blip_for_coord(pos)
+    ui.set_blip_sprite(blip, 361)
+    ui.set_blip_colour(blip, 23)
+    return blip
+end
+
+local blips = {}
 local function drawFuelBlips()
-    ui.add_blip_for_coord(Stations.SandyShores)
-    ui.add_blip_for_coord(Stations.GroveStreet)
-    ui.add_blip_for_coord(Stations.Strawberry)
-    ui.add_blip_for_coord(Stations.Davis)
-    ui.add_blip_for_coord(Stations.Paleto)
-    ui.add_blip_for_coord(Stations.Chilliad)
-    ui.add_blip_for_coord(Stations.LittleSeoul)
-    ui.add_blip_for_coord(Stations.PopularStreet)
-    ui.add_blip_for_coord(Stations.Harmony)
-    ui.add_blip_for_coord(Stations.MirrorPark)
-    ui.add_blip_for_coord(Stations.Morningwood)
-    ui.add_blip_for_coord(Stations.Vinewood)
+    blips[0] = drawBlip(Stations.SandyShores)
+    blips[1] = drawBlip(Stations.GroveStreet)
+    blips[2] = drawBlip(Stations.Strawberry)
+    blips[3] = drawBlip(Stations.Davis)
+    blips[4] = drawBlip(Stations.Paleto)
+    blips[5] = drawBlip(Stations.Chilliad)
+    blips[6] = drawBlip(Stations.LittleSeoul)
+    blips[7] = drawBlip(Stations.PopularStreet)
+    blips[8] = drawBlip(Stations.Harmony)
+    blips[9] = drawBlip(Stations.MirrorPark)
+    blips[10] = drawBlip(Stations.Morningwood)
+    blips[11] = drawBlip(Stations.Vinewood)
 end
 drawFuelBlips()
 
@@ -47,3 +57,11 @@ function drawFuelMarkers()
     drawMarker(Stations.Morningwood)
     drawMarker(Stations.Vinewood)
 end
+
+local function clearblips()
+    event.add_event_listener("exit", function()
+       for i=0, #blips do
+            ui.remove_blip(blips[i])
+       end 
+    end)
+end clearblips()
