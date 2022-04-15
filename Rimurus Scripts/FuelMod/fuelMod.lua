@@ -84,7 +84,7 @@ end
 local function fuelLevelIncreaseLevel()
     if fuelStates.canFuel then 
         if fuelStates.fuelLevel < 100 and entity.get_entity_speed(getMyCurrentVehicle()) == 0 then
-            fuelStates.fuelLevel = fuelStates.fuelLevel + 0.15
+            fuelStates.fuelLevel = fuelStates.fuelLevel + fuelStates.fuelFill
         end
     end
 end
