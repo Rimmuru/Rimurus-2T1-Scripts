@@ -1,3 +1,4 @@
+require("fuelMod\\LuaUI")
 require("fuelMod\\stations")
 
 local usedVehicles = {}
@@ -5,8 +6,7 @@ local usedVehicles = {}
 local fuelStates = {
     maxFuelLevel = 100,
     fuelLevel = math.random(10, 35),
-    fuelFill = 0.25,
-    canFuel = false
+    fuelFill = 0.25
 }
 
 local fuelDepreciations = {}
@@ -62,27 +62,19 @@ local function fuelLevelDecreaseLevel()
     end
 end
 
-local function checkIfCanRefuel()
-    if Get_Distance_Between_Coords(player.get_player_coords(player.player_id()), Stations.Davis) <= 2.4 
-    or Get_Distance_Between_Coords(player.get_player_coords(player.player_id()), Stations.GroveStreet) <= 2.4
-    or Get_Distance_Between_Coords(player.get_player_coords(player.player_id()), Stations.SandyShores) <= 2.4
-    or Get_Distance_Between_Coords(player.get_player_coords(player.player_id()), Stations.Paleto) <= 2.4
-    or Get_Distance_Between_Coords(player.get_player_coords(player.player_id()), Stations.Chilliad) <= 2.4
-    or Get_Distance_Between_Coords(player.get_player_coords(player.player_id()), Stations.Strawberry) <= 2.4
-    or Get_Distance_Between_Coords(player.get_player_coords(player.player_id()), Stations.LittleSeoul) <= 2.4
-    or Get_Distance_Between_Coords(player.get_player_coords(player.player_id()), Stations.PopularStreet) <= 2.4
-    or Get_Distance_Between_Coords(player.get_player_coords(player.player_id()), Stations.Harmony) <= 2.4
-    or Get_Distance_Between_Coords(player.get_player_coords(player.player_id()), Stations.MirrorPark) <= 2.4 
-    or Get_Distance_Between_Coords(player.get_player_coords(player.player_id()), Stations.Morningwood) <= 2.4
-    or Get_Distance_Between_Coords(player.get_player_coords(player.player_id()), Stations.Vinewood) <= 2.4 then
-        fuelStates.canFuel = true
-    else
-        fuelStates.canFuel = false
+local function CAN_REFUEL_CHECK()
+    local isNearAnyStation = false
+    
+    for name, coords in pairs(Stations) do
+        if Get_Distance_Between_Coords(player.get_player_coords(player.player_id()), coords) <= 2.4 then 
+            isNearAnyStation = true
+        end
     end
+    return isNearAnyStation
 end
 
 local function fuelLevelIncreaseLevel()
-    if fuelStates.canFuel then 
+    if CAN_REFUEL_CHECK() then 
         if fuelStates.fuelLevel < 100 and entity.get_entity_speed(getMyCurrentVehicle()) == 0 then
             fuelStates.fuelLevel = fuelStates.fuelLevel + fuelStates.fuelFill
         end
@@ -102,7 +94,6 @@ local function drawFuelBar()
     end
 end
 
-local toggle = false
 local function fuelMod()
     if(ped.is_ped_in_any_vehicle(player.get_player_ped(player.player_id()))) then
         drawFuelBar()
@@ -110,8 +101,7 @@ local function fuelMod()
         fuelLevelDecreaseLevel()
         fuelLevelIncreaseLevel()
         insertCurrentVehicleInfomation()
-        checkIfCanRefuel()
-    
+
         if fuelStates.fuelLevel == 0 then
             vehicle.set_vehicle_engine_on(getMyCurrentVehicle(), false, true, true)
         end 
