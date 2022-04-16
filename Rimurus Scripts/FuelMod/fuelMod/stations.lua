@@ -19,7 +19,9 @@ Stations = {
     PalominoFreeway = v3(2578.465, 361.363, 106.955),
     Grapeseed = v3(1688.766, 4929.291, 40.575),
     RichmanGlen = v3(-1802.732, 797.043, 137.010),
-    Strawberry = v3(267.748, -1263.358, 27.640)
+    Strawberry = v3(267.748, -1263.358, 27.640),
+    ElBurroHeights = v3(1210.197, -1404.031, 33.721),
+    LaPuerta = v3(-320.708, -1466.867, 29.043)
 }
 
 local function drawMarker(pos)
@@ -40,7 +42,7 @@ local function drawFuelBlips()
         blips[BlipsCount] = drawBlip(coords)
         BlipsCount = BlipsCount + 1
     end
-end
+end 
 drawFuelBlips()
 
 function drawFuelMarkers()
@@ -55,4 +57,5 @@ local function clearblips()
             ui.remove_blip(blips[i])
        end 
     end)
-end clearblips()
+end 
+clearblips()

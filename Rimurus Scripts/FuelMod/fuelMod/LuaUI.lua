@@ -3,8 +3,8 @@ Colour = {
 	white = {r=255, g=255, b=255, a=255},
 	black = {r=0, g=0, b=0, a=150},
 	blue = {r=137, g=196, b=244, a=255},
-	orange = {r=243, g=156, b=18, a=255},
-	orange2 = {r=255, g=128, b=0, a=255},
+	orange = {r=245, g=128, b=0, a=255},
+	orange2 = {r=243, g=156, b=18, a=255},
 	red = {r=245, g=5, b=50, a=255}
 }
 
@@ -21,8 +21,8 @@ function LuaUI.drawRect(x, y, width, height, colour)
 end
 
 --Text Stuffs
-function LuaUI.drawText(text, x, y, font, scale, center, alignRight)
-	ui.set_text_color(Colour.white.r, Colour.white.g, Colour.white.b, Colour.white.a)
+function LuaUI.drawText(text, x, y, font, scale, R, G, B, center, alignRight)
+	ui.set_text_color(R, G, B, 255)
 	ui.set_text_font(font)
 	ui.set_text_scale(scale, scale)
 	ui.set_text_outline(1)
