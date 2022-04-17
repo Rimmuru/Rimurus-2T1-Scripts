@@ -279,13 +279,13 @@ FuelModFillTime.mod = 0.05
 FuelModFillTime.value = fuelSettings.fuelFill
 
 -- BASE FUEL LEVEL
-local FuelModBaseFuel = menu.add_feature("Base fuel level", "action_value_i", MainID, function(f)
+local FuelModBaseFuel = menu.add_feature("Base fuel level", "autoaction_value_i", MainID, function(f)
     fuelSettings.baseFuelLevel = f.value
 end)
 FuelModBaseFuel.min = 0
-FuelModFillTime.max = 1000
-FuelModFillTime.mod = 10
-FuelModFillTime.value = fuelSettings.baseFuelLevel
+FuelModBaseFuel.max = 1000
+FuelModBaseFuel.mod = 10
+FuelModBaseFuel.value = fuelSettings.baseFuelLevel
 
 local function saveConfig()
     local file = io.open(PATHS.settings, "w")
