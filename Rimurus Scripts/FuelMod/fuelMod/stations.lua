@@ -1,4 +1,4 @@
-Stations = {
+stationsList = {
     GroveStreet = v3(-67.300, -1761.404, 28.314),
     LindsayCircus = v3(-720.801, -934.966, 18.017),
     Davis = v3(172.266, -1563.212, 27.623),
@@ -21,11 +21,12 @@ Stations = {
     RichmanGlen = v3(-1802.732, 797.043, 137.010),
     Strawberry = v3(267.748, -1263.358, 27.640),
     ElBurroHeights = v3(1210.197, -1404.031, 33.721),
-    LaPuerta = v3(-320.708, -1466.867, 29.043)
+    LaPuerta = v3(-320.708, -1466.867, 29.043),
+    EarlsMiniMart = v3(2676.836, 3263.114, 53.817)
 }
 
 local function drawMarker(pos)
-    graphics.draw_marker(1, pos, v3(0,0,0), v3(0,0,0), v3(2,2,2), 240, 200, 80, 200, false, true, 2, false, nil, "MarkerTypeVerticalCylinder", false)       
+    graphics.draw_marker(1, pos, v3(0, 0, 0), v3(0, 0, 0), v3(2, 2, 2), 240, 200, 80, 200, false, true, 2, false, nil, "MarkerTypeVerticalCylinder", false)
 end
 
 local function drawBlip(pos)
@@ -38,24 +39,24 @@ end
 local blips = {}
 local function drawFuelBlips()
     local BlipsCount = 0;
-    for name, coords in pairs(Stations) do
+    for name, coords in pairs(stationsList) do
         blips[BlipsCount] = drawBlip(coords)
         BlipsCount = BlipsCount + 1
     end
-end 
+end
 drawFuelBlips()
 
 function drawFuelMarkers()
-    for name, coords in pairs(Stations) do
+    for name, coords in pairs(stationsList) do
         drawMarker(coords)
     end
 end
 
 local function clearblips()
     event.add_event_listener("exit", function()
-       for i=0, #blips do
+        for i=0, #blips do
             ui.remove_blip(blips[i])
-       end 
+        end
     end)
-end 
+end
 clearblips()
