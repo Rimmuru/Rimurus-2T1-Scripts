@@ -1,14 +1,19 @@
+if REALISTIC_FUELMOD_LOADED  then
+	ui.notify_above_map("Realistic FuelMod is already loaded", "Realistic FuelMod", 6)
+	return
+end
+
 require("fuelMod\\LuaUI")
 require("fuelMod\\stations")
 local ini = require("fuelMod\\ini_parser")
 
 local SCRIPT = {
     NAME = "Realistic FuelMod",
-    VERSION = "2.0.0"
+    VERSION = "2.0.0",
+    CONFIG_LOADED = false
 }
 
 local usedVehicles = {}
-
 local PATHS = {}
 PATHS.root = utils.get_appdata_path("PopstarDevs", "2Take1Menu")
 PATHS.fuelMod = PATHS.root .. "\\scripts\\fuelMod"
@@ -23,8 +28,8 @@ local fuelSettings = {
     textposY = 0.97,
     stationsRange = 2.5,
     baseFuelLevel = 30,
-    refuel = 0.5,
-    manualRefuel = 0.25,
+    refuel = 1,
+    manualRefuel = 0.5,
     consumptionRate = 1.0
 }
 
@@ -43,26 +48,26 @@ fuelConsumption[3] = {8.5, 70} -- Coupes
 fuelConsumption[4] = {10, 75} -- Muscle
 fuelConsumption[5] = {8.5, 65} -- Sports Classics
 fuelConsumption[6] = {7.5, 70} -- Sports
-fuelConsumption[7] = {12.5, 100} -- Super
+fuelConsumption[7] = {14.5, 100} -- Super
 fuelConsumption[8] = {2.5, 25} -- Motorcycles
 fuelConsumption[9] = {8.5, 75} -- Off-road
 fuelConsumption[10] = {25, 300} -- Industrial
-fuelConsumption[11] = {5, 350} -- Utility
-fuelConsumption[12] = {8.5, 105} -- Vans
+fuelConsumption[11] = {12.5, 150} -- Utility
+fuelConsumption[12] = {9.5, 105} -- Vans
 fuelConsumption[13] = {0, 0} -- Cycles
 fuelConsumption[14] = {0, 0} -- Boats
 fuelConsumption[15] = {0, 0} -- Helicopters
 fuelConsumption[16] = {0, 0} -- Planes
-fuelConsumption[17] = {6.5, 100} -- Service
-fuelConsumption[18] = {5, 70} -- Emergency
+fuelConsumption[17] = {7.5, 100} -- Service
+fuelConsumption[18] = {4.5, 70} -- Emergency
 fuelConsumption[19] = {6.5, 150} -- Military
-fuelConsumption[20] = {35, 350} -- Commercial
+fuelConsumption[20] = {30, 350} -- Commercial
 fuelConsumption[21] = {0, 0} -- Trains 
 fuelConsumption[22] = {25, 115} -- Open Wheel
 fuelConsumption.electrics = {6.5, 100} -- Electric
 
 local function notify(msg, title, seconds, color)
-    title = title or SCRIPT.NAME
+    --title = title or SCRIPT.NAME
     menu.notify(msg, title, seconds, color)
     print(msg)
 end
@@ -137,23 +142,20 @@ end
 
 local AUTO_REFUEL_LOCK = false
 local function fuelLevelIncreaseLevel()
-    --[[
     if CAN_REFUEL_CHECK() then
         if current.FuelLevel < current.TankSize and entity.get_entity_speed(currentVehicle()) == 0 and AUTO_REFUEL_LOCK == false then
             AUTO_REFUEL_LOCK = true
             current.FuelLevel = usedVehicles[currentVehicle()] + fuelSettings.refuel
             usedVehicles[currentVehicle()] = current.FuelLevel
             menu.create_thread(function()
-                system.yield(1000)
+                system.yield(250)
                 AUTO_REFUEL_LOCK = false
             end, nil)
         end
         if (current.FuelLevel > current.TankSize) then current.FuelLevel = current.TankSize end
     end
-    --]]
 end
 
-print("[RFUEL] 4")
 local function drawFuelBar()
     if fuelSettings.displayMode == 1 then
         local posX = fuelSettings.posX
@@ -196,10 +198,11 @@ local function MANUAL_REFUELLING()
         if usedVehicles[current.latestHash] < current.TankSize and ped.get_current_ped_weapon(player.get_player_ped(player.player_id())) == 883325847 and
             Get_Distance_Between_Coords(player.get_player_coords(player.player_id()), player.get_player_coords(player.player_id())) <= 1 then
             usedVehicles[current.latestHash] = usedVehicles[current.latestHash] + fuelSettings.manualRefuel
-            notify("Vehicle manually refuelled at " .. Round(usedVehicles[current.latestHash], 2) .. "/" .. Round(current.TankSize, 0) .. ".", nil, 2, LuaUI.RGBAToInt(245, 128, 0, 255))
+            if (usedVehicles[current.latestHash] > current.TankSize) then usedVehicles[current.latestHash] = current.TankSize end
+            notify("Vehicle manually refuelled at " .. Round(usedVehicles[current.latestHash], 2) .. "/" .. Round(current.TankSize, 0) .. ".", nil, 1, LuaUI.RGBAToInt(245, 128, 0, 255))
         end
         menu.create_thread(function()
-            system.yield(1000)
+            system.yield(500)
             MANUAL_REFUEL_LOCK = false
         end, nil)
     end
@@ -221,7 +224,7 @@ local function fuelMod()
     end
     if not isEmpty(current.latestHash) then MANUAL_REFUELLING() end
 end
-print("[RFUEL] 3")
+
 local Realistic_FuelMod = menu.add_feature("Realistic FuelMod", "toggle", 0, function(tog)
     while tog.on do
         fuelMod()
@@ -322,7 +325,7 @@ end)
 ConsumptionRate.min = 0.1
 ConsumptionRate.max = 2.5
 ConsumptionRate.mod = 0.1
-print("[RFUEL] 2")
+
 local function saveConfig()
     local file = io.open(PATHS.settings, "w")
     for k,v in pairs(fuelSettings) do
@@ -344,12 +347,11 @@ local function defineSettingsValues()
     ManualRefuel.value = fuelSettings.manualRefuel
     BaseFuel.value = fuelSettings.baseFuelLevel
     ConsumptionRate.value = fuelSettings.consumptionRate
-end
-defineSettingsValues()
+end defineSettingsValues()
 
 local function loadConfig()
     if file_exists(PATHS.fuelMod .. "\\config.ini") then
-        local cfg = ini.parse "fuelMod\\config.ini"
+        local cfg = ini.parse("fuelMod\\config.ini")
         fuelSettings.displayMode = cfg.displayMode
         fuelSettings.posX = cfg.posX
         fuelSettings.posY = cfg.posY
@@ -362,24 +364,31 @@ local function loadConfig()
         fuelSettings.manualRefuel = cfg.manualRefuel
         fuelSettings.baseFuelLevel = cfg.baseFuelLevel
         fuelSettings.consumptionRate = cfg.consumptionRate
-        notify(SCRIPT.NAME .. " v" .. SCRIPT.VERSION .. " successfully loaded.", nil, nil, LuaUI.RGBAToInt(245, 128, 0, 255))
         defineSettingsValues()
     else
         notify("Failed to find the config file, creating the default one !", nil, nil, LuaUI.RGBAToInt(245, 5, 50, 255))
         saveConfig()
+        defineSettingsValues()
     end
 end
-loadConfig()
 
 menu.add_feature("Save config", "action", MainID, function()
     saveConfig()
-    notify("Saved settings.", nil, nil, LuaUI.RGBAToInt(0, 255, 0, 255))
+    notify("Saved settings.", nil, nil, LuaUI.RGBAToInt(5, 245, 50, 255))
     loadConfig()
 end)
 
 menu.add_feature("Reload config", "action", MainID, function()
     loadConfig()
+    notify("Config file reloaded.", nil, nil, LuaUI.RGBAToInt(5, 245, 50, 255))
 end)
 
-Realistic_FuelMod.on = true
-print("[RFUEL] 1")
+menu.create_thread(function()
+    system.yield(10)
+	Realistic_FuelMod.on = true
+    notify(SCRIPT.NAME .. " v" .. SCRIPT.VERSION .. " successfully loaded.", nil, nil, LuaUI.RGBAToInt(245, 128, 0, 255))
+    loadConfig()
+end, nil)
+
+REALISTIC_FUELMOD_LOADED = true
+
