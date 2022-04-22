@@ -17,6 +17,12 @@ Please do not modify any of the files unless you know what you are doing
 [![GTA5-Npk-Ky6kb4-Z.png](https://i.postimg.cc/zXhJd7X0/Application-Frame-Host-3-Vri7-A74-EI.png)](https://postimg.cc/bszcrQnt)
 
 
+<h1 align="center">Default Controls</h1>
+F5 to open/close<br/>
+Arrow keys to scroll<br/>
+Enter to select<br/>
+Backspace to go back
+
 <h1 align="center">Credits</h1>
 
  Shout out to the following for everything theyve done to help:<br/>
