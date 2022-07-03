@@ -15,7 +15,7 @@ if Rimuru_menu then
     return
 end
 
-if not menu.is_trusted_mode_enabled(4) then
+if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then
 	func.notification("Trusted mode is not enabled")
 	return
 end
@@ -482,11 +482,11 @@ function func.DrawCurrentMenu()
 	end
 
 	func.draw_text(stuff.scroll.." / "..#currentMenu, v2(stuff.menuData.x+stuff.menuData.width/2.5,  stuff.menuData.y + stuff.menuData.height/2.02), 0, 0.32, white, 1)
-	func.draw_text("v2.0.0 dev6", v2(stuff.menuData.x-stuff.menuData.width/3,  stuff.menuData.y + stuff.menuData.height/2.02), 0, 0.32, white, 1)
+	func.draw_text("v2.0.0", v2(stuff.menuData.x-stuff.menuData.width/2.5,  stuff.menuData.y + stuff.menuData.height/2.02), 0, 0.32, white, 1)
 
 	
 	--Background
-	ui.draw_rect(stuff.menuData.x, stuff.menuData.y, stuff.menuData.width, stuff.menuData.height + stuff.menuData.maxOptions/200, stuff.menuData.backColour.r, stuff.menuData.backColour.g, stuff.menuData.backColour.b, stuff.menuData.backColour.a)
+	ui.draw_rect(stuff.menuData.x, stuff.menuData.y, stuff.menuData.width, stuff.menuData.height, stuff.menuData.backColour.r, stuff.menuData.backColour.g, stuff.menuData.backColour.b, stuff.menuData.backColour.a)
 	--header
 	ui.draw_rect(stuff.menuData.x, stuff.menuData.y - stuff.menuData.height/1.85, stuff.menuData.width, 0.030, 0, 0, 0, stuff.menuData.mainColour.a)
 	--header line
@@ -536,7 +536,7 @@ end
 --End of functions
 
 -- Threads
-menu.create_thread(function()
+stuff.threads[#stuff.threads + 1] = menu.create_thread(function()
 	loaded()
 	
 	while true do
@@ -570,7 +570,7 @@ menu.create_thread(function()
 	end
 end, nil)
 
-menu.create_thread(function()
+stuff.threads[#stuff.threads + 1] = menu.create_thread(function()
 	while true do
 		RGBFade()	
 		system.wait(30)
@@ -936,7 +936,7 @@ func.add_feature("Ped Gun", "toggle", weapOpt.id, function(toggle)
 end)
 
 func.add_feature("Paint Gun", "toggle", weapOpt.id, function(toggle)
-	func.notification("Thanks so much to proddy for help")
+	func.notification("kick the ped out the car first")
 	while toggle.on do
 		local rtrn, ent = ENTITY.GET_ENTITY_PLAYER_IS_FREE_AIMING_AT(player.player_id())
 	
@@ -1106,7 +1106,7 @@ for k,v in pairs(Slots) do
 	end)
 end
 
-func.add_feature("Vehicle No Grip", "toggle", vehOpt.id, function(feat)
+func.add_feature("No Grip", "toggle", vehOpt.id, function(feat)
     local veh = player.get_player_vehicle(player.player_id())
     if feat.on then
         VEHICLE.SET_VEHICLE_REDUCE_GRIP(veh, true)
@@ -1521,7 +1521,7 @@ func.add_feature("Force Lobby Into Cutscene", "action", lobbyMalic.id, function(
 	end
 end)
 
-func.add_feature("Kick Lobby", "action", lobbyMalic.id, function()
+func.add_feature("SE Lobby Kick", "action", lobbyMalic.id, function()
 	for i=0, 31 do
 		if i ~= player.player_id() then
 			script.trigger_script_event(scriptEvents.kick.hash, i, {i, -1, -1, -1, -1})
@@ -1529,7 +1529,7 @@ func.add_feature("Kick Lobby", "action", lobbyMalic.id, function()
 	end
 end)
 
-func.add_feature("Kick Lobby v2", "action", lobbyMalic.id, function()
+func.add_feature("SE Lobby Kick v2", "action", lobbyMalic.id, function()
 	for i=0, 31 do
 		if i ~= player.player_id() then
 			script.trigger_script_event(scriptEvents.kickv2.hash, i, {i, 420, 69})

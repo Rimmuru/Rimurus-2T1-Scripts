@@ -155,9 +155,14 @@ alphaV.mod = 1
 alphaV.value = stuff.menuData.backColour.a
 
 registerBanner("scripts\\Rimuru\\UI\\Banners\\" .. bannerList[1])
-local headerList = func.add_feature("Headers", "action_value_str", menuUISub.id, function(f)
-	registerBanner("scripts\\Rimuru\\UI\\Banners\\" .. bannerList[f.value+1])
-end):set_str_data(bannerList)
+
+local headers = func.add_feature("Headers", "parent", menuUISub.id)
+
+for i=1, #bannerList do
+	func.add_feature(bannerList[i], "action", headers.id, function()
+		registerBanner("scripts\\Rimuru\\UI\\Banners\\" .. bannerList[stuff.scroll])
+	end)
+end
 
 func.add_feature("Save UI Profile", "action", menuUISub.id, function()
     local status, inputString = input.get("Give your profile a name", "", 100, 0)    
@@ -176,6 +181,8 @@ func.add_feature("Save UI Profile", "action", menuUISub.id, function()
 	file:write("blue="..stuff.menuData.backColour.b)
 	
 	file:close()
+
+	func.notification(inputString.." was saved")
 end)
 
 local themesSub = func.add_feature("UI Profiles", "parent", menuUISub.id)
