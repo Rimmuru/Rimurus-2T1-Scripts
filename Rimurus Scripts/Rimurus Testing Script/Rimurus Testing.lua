@@ -11,9 +11,32 @@ menu.add_feature("Instantly Exit Vehicle", "toggle", scriptMain.id, function(f)
     end
 end)
 
+local function Get_Distance_Between_Coords(first, second)
+    local x = second.x - first.x
+    local y = second.y - first.y
+    local z = second.z - first.z
+    return math.sqrt(x * x + y * y + z * z)
+end
+
+local function get_closest_vehicle()
+	local vehicles = vehicle.get_all_vehicles()
+
+	for i=1, #vehicles do
+        if Get_Distance_Between_Coords(entity.get_entity_coords(vehicles[i]), entity.get_entity_coords(player.get_player_ped(player.player_id()))) <= 3 then
+            return vehicles[i]
+        end     
+	end
+	return 0
+end
+
 menu.add_feature("Instantly Enter Vehicle", "toggle", scriptMain.id, function(f)
     while f.on do
-    
+        local veh = get_closest_vehicle()
+        if controls.is_control_just_pressed(2, 75) then
+            if veh ~= 0 then
+                ped.set_ped_into_vehicle(player.get_player_ped(player.player_id()), veh, -1)
+            end
+        end
         system.wait(0)
     end
 end)
