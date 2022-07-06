@@ -41,6 +41,34 @@ menu.add_feature("Instantly Enter Vehicle", "toggle", scriptMain.id, function(f)
     end
 end)
 
+menu.add_feature("Vehicle Reduced Collision", "toggle", scriptMain.id, function(toggle)
+    while toggle.on do
+        local veh = player.get_player_vehicle(player.player_id())
+        local nearbyvehicles = vehicle.get_all_vehicles()
+        for i = 1, #nearbyvehicles do
+            entity.set_entity_no_collision_entity(nearbyvehicles[i], veh, true)
+        end
+        system.wait(0)
+    end
+end)
+
+menu.add_feature("Reduced Collision", "toggle", scriptMain.id, function(toggle)
+    while toggle.on do
+        local objects = object.get_all_objects() 
+        local vehs = vehicle.get_all_vehicles()
+
+        for i = 1, #objects do
+            entity.set_entity_no_collision_entity(objects[i], player.get_player_ped(player.player_id()), true)
+        end
+        
+        for i = 1, #vehs do
+            entity.set_entity_no_collision_entity(vehs[i], player.get_player_ped(player.player_id()), true)
+        end
+
+        system.wait(0)
+    end
+end)
+
 local function drawtext(text, pos)
     ui.set_text_scale(0.32)
     ui.set_text_font(0)
@@ -50,24 +78,27 @@ local function drawtext(text, pos)
     ui.draw_text(text, v2(pos.x, pos.y)) 
 end
 
---void draw_rect(float x, float y, float width, float height, int r, int g, int b, int a)⚓︎
-local function wheel(pos, text, text1, text2, text3, text4, text5)
+local function drawtextbox(text, posX, posY)
+    ui.draw_rect(posX/graphics.get_screen_width(), posY/graphics.get_screen_height(), 0.05, 0.05, 0, 0, 0, 205)
+    drawtext(text, v2(posX/graphics.get_screen_width(), posY/graphics.get_screen_height()-0.02)) 
+end
+
+local function wheel(pos, text, text1, text2, text3, text4)
     text = text or "empty" text1 = text1 or "empty" 
     text2 = text2 or "empty" text3 = text3 or "empty"
-    text4 = text4 or "empty" text5 = text5 or "empty"
 
     while true do
         local retrn, screen = graphics.project_3d_coord(pos)
     
         if retrn then
             --box 1
-            ui.draw_rect(screen.x/graphics.get_screen_width(), screen.y/graphics.get_screen_height(), 0.05, 0.05, 0, 0, 0, 205)
-            drawtext(text, v2(screen.x/graphics.get_screen_width(), screen.y/graphics.get_screen_height())) 
-            
+            drawtextbox(text, screen.x, screen.y)
             --box 2
-            ui.draw_rect(screen.x/graphics.get_screen_width(), screen.y/graphics.get_screen_height()+0.08, 0.05, 0.05, 0, 0, 0, 205)
-            drawtext(text1, v2(screen.x/graphics.get_screen_width(), screen.y/graphics.get_screen_height()+0.08)) 
-
+            drawtextbox(text1, screen.x, screen.y+0.08) 
+            --box 3
+            drawtextbox(text2, screen.x, screen.y+0.08) 
+            --box 4
+            drawtextbox(text3, screen.x, screen.y+0.08) 
         end
     
         system.wait(0)
