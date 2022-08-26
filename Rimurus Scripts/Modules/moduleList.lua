@@ -1,5 +1,5 @@
 local moduleList = {
-    {"poc", "link"},
-    {"poc1", "link"},
-    {"poc2", "link"}
+    {name = "poc", link = "link"},
+    {name = "poc1", link = "link1"},
+    {name = "poc2", link = "link2"}
 }
