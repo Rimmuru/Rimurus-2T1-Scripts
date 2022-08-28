@@ -1,6 +1,6 @@
 local moduleList = {
-    {name = "poc", link = "link"},
-    {name = "poc1", link = "link1"},
-    {name = "poc2", link = "link2"}
+    {name = "Rimurus Module", link = "link"},
+    {name = "Deccos Module", link = "link1"},
+    {name = "Kittys Module", link = "link2"}
 }
 return moduleList
