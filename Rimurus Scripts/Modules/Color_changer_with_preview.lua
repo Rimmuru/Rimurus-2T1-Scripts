@@ -1,9 +1,9 @@
-local colorchanger = menu.add_feature("Color Changer", "action_value_str", 0, function(f, data)
+local colorchanger = func.add_feature("Color Changer", "action_value_str", 0, function(f, data)
 	local veh = player.get_player_vehicle(player.player_id())
 	if veh ~= 0 then
 		vehicle.set_vehicle_colors(veh, f.value, f.value)
 		data.originalp, data.originals = f.value, f.value
-		menu.notify("Applied color")
+		func.notification("Applied color")
 	end
 end)
 colorchanger.hl_func = function(f, data)
