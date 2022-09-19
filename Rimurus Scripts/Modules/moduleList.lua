@@ -8,6 +8,7 @@ local moduleList = {
     {name = "Shitty crash methods", link = "https://raw.githubusercontent.com/Rimmuru/Rimurus-2T1-Scripts/main/Rimurus%20Scripts/Modules/Shitty%20crash%20methods.lua", author = "unknown"},
     {name = "Rain Spawner", link = "https://raw.githubusercontent.com/Rimmuru/Rimurus-2T1-Scripts/main/Rimurus%20Scripts/Modules/Rain%20Spawner.lua", author = "GhostOne#0991"},
     {name = "Escort", link = "https://raw.githubusercontent.com/Rimmuru/Rimurus-2T1-Scripts/main/Rimurus%20Scripts/Modules/Escort.lua", author = "INI2Moist"},
-    {name = "RC Troll", link = "https://raw.githubusercontent.com/Rimmuru/Rimurus-2T1-Scripts/main/Rimurus%20Scripts/Modules/RC%20Troll.lua", author = "unknown"}
+    {name = "RC Troll", link = "https://raw.githubusercontent.com/Rimmuru/Rimurus-2T1-Scripts/main/Rimurus%20Scripts/Modules/RC%20Troll.lua", author = "unknown"},
+    {name = "Infinite Money Generator", link = "https://github.com/racistnoob/2take1/blob/main/crash%20(2).lua", author = "Jesus H. Christ Himself"},
 }
 return moduleList
