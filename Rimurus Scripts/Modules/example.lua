@@ -1,6 +1,6 @@
-local testParent = func.add_feature("Rimurus Hospital Module", "parent", 0)
+local testParent = menu.add_feature("Rimurus Hospital Module", "parent", 0)
 
-func.add_feature("Disable Health Regen", "toggle", testParent.id, function(f)
+menu.add_feature("Disable Health Regen", "toggle", testParent.id, function(f)
     if f.on then
         native.call(0x5DB660B38DD98A31, player.player_id(), 0.0)
     else
