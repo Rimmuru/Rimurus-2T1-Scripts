@@ -33,16 +33,6 @@ cc.features.colourfix = mad("GTA Colour Correction", "toggle", cc.features.paren
         mn("This feature will darken the colours to make them more accurate", "Vehicle Colour Changer")
     end
 end)
-cc.features.primary = mad("Primary", "parent", cc.features.parent).id
-cc.features.secondary = mad("Secondary", "parent", cc.features.parent).id
-cc.features.pearlescent = mad("Pearlescent", "parent", cc.features.parent).id
-cc.features.wheel = mad("Wheel", "parent", cc.features.parent).id
-cc.features.misc = mad("Miscellaneous", "parent", cc.features.parent).id
-cc.features.rgb = mad("Rainbow Options", "parent", cc.features.misc).id
-cc.features.dirt = mad("Dirt Options", "parent", cc.features.misc).id
-cc.features.neon = mad("Neons", "parent", cc.features.rgb).id
-cc.features.xenons = mad("Headlights", "parent", cc.features.rgb).id
-cc.features.tyresmoke = mad("Tyre Smoke", "parent", cc.features.rgb).id
 
 local lsccolours = { -- getting these took way too long and made me want to kill myself
     {"#080808"}, {"#0F0F0F"}, {"#1C1E21"}, {"#292C2E"}, {"#5A5E66"}, {"#777C87"}, {"#515459"}, {"#323B47"}, {"#333333"}, {"#1F2226"}, {"#23292E"}, {"#121110"}, {"#050505"}, {"#121212"}, {"#2F3233"}, {"#080808"}, {"#121212"}, {"#202224"}, {"#575961"}, {"#23292E"}, {"#323B47"}, {"#0F1012"}, {"#212121"}, {"#5B5D5E"}, {"#888A99"}, {"#697187"}, {"#3B4654"}, {"#690000"}, {"#8A0B00"}, {"#6B0000"}, {"#611009"}, {"#4A0A0A"}, {"#470E0E"}, {"#380C00"}, {"#26030B"}, {"#630012"}, {"#802800"}, {"#6E4F2D"}, {"#BD4800"}, {"#780000"}, {"#360000"}, {"#AB3F00"}, {"#DE7E00"}, {"#520000"}, {"#8C0404"}, {"#4A1000"}, {"#592525"}, {"#754231"}, {"#210804"}, {"#001207"}, {"#001A0B"}, {"#00211E"}, {"#1F261E"}, {"#003805"}, {"#0B4145"}, {"#418503"}, {"#0F1F15"}, {"#023613"}, {"#162419"}, {"#2A3625"}, {"#455C56"}, {"#000D14"}, {"#001029"}, {"#1C2F4F"}, {"#001B57"}, {"#3B4E78"}, {"#272D3B"}, {"#95B2DB"}, {"#3E627A"}, {"#1C3140"}, {"#0055C4"}, {"#1A182E"}, {"#161629"}, {"#0E316D"}, {"#395A83"}, {"#09142E"}, {"#0F1021"}, {"#152A52"}, {"#324654"}, {"#152563"}, {"#223BA1"}, {"#1F1FA1"}, {"#030E2E"}, {"#0F1E73"}, {"#001C32"}, {"#2A3754"}, {"#303C5E"}, {"#3B6796"}, {"#F5890F"}, {"#D9A600"}, {"#4A341B"}, {"#A2A827"}, {"#568F00"}, {"#57514B"}, {"#291B06"}, {"#262117"}, {"#120D07"}, {"#332111"}, {"#3D3023"}, {"#5E5343"}, {"#37382B"}, {"#221918"}, {"#575036"}, {"#241309"}, {"#3B1700"}, {"#6E6246"}, {"#998D73"}, {"#CFC0A5"}, {"#1F1709"}, {"#3D311D"}, {"#665847"}, {"#F0F0F0"}, {"#B3B9C9"}, {"#615F55"}, {"#241E1A"}, {"#171413"}, {"#3B372F"}, {"#3B4045"}, {"#1A1E21"}, {"#5E646B"}, {"#000000"}, {"#B0B0B0"}, {"#999999"}, {"#B56519"}, {"#C45C33"}, {"#47783C"}, {"#BA8425"}, {"#2A77A1"}, {"#243022"}, {"#6B5F54"}, {"#C96E34"}, {"#D9D9D9"}, {"#F0F0F0"}, {"#3F4228"}, {"#FFFFFF"}, {"#B01259"}, {"#8F2F55"}, {"#F69799"}, {"#8F2F55"}, {"#C26610"}, {"#69BD45"}, {"#00AEEF"}, {"#000108"}, {"#080000"}, {"#565751"}, {"#320642"}, {"#00080F"}, {"#080808"}, {"#320642"}, {"#050008"}, {"#6B0B00"}, {"#121710"}, {"#323325"}, {"#3B352D"}, {"#706656"}, {"#2B302B"}, {"#414347"}, {"#6690B5"}, {"#47391B"}, {"#47391B", "#FFD859"}
@@ -179,8 +169,47 @@ local function getHEXInput()
     end
 end
 
+mad("Paint type: ", "autoaction_value_str", cc.features.parent, function(f)
+    pcall(function()
+        if not pispiav(ppid()) then
+            mn("Please enter a vehicle","Vehicle Colour Changer")
+            return
+        end
+        local veh = pgpv(ppid())
+        if not nhcoe(veh) then
+            reqCtrl(veh)
+        end 
+
+        cc.colors.primary[3], cc.colors.primary[2], cc.colors.primary[1] = getVehRGB(veh,1)
+        cc.colors.secondary[3], cc.colors.secondary[2], cc.colors.secondary[1] = getVehRGB(veh,2)
+        local ptype = 0
+        if f.value == 2 then
+            ptype = 12
+        elseif f.value == 3 then
+            ptype = 118
+        elseif f.value == 4 then
+            ptype = 120
+        end
+        vehicle.set_vehicle_colors(veh, ptype, ptype)
+        vehicle.set_vehicle_custom_primary_colour(veh, RGBAToInt(cc.colors.primary[3], cc.colors.primary[2], cc.colors.primary[1]))
+        vehicle.set_vehicle_custom_secondary_colour(veh, RGBAToInt(cc.colors.secondary[3], cc.colors.secondary[2], cc.colors.secondary[1]))
+    end)
+end):set_str_data({"Classic/Metallic","Matte","Metals","Chrome"})
+
+cc.features.primary = mad("Primary", "parent", cc.features.parent).id
+cc.features.secondary = mad("Secondary", "parent", cc.features.parent).id
+cc.features.pearlescent = mad("Pearlescent", "parent", cc.features.parent).id
+cc.features.wheel = mad("Wheel", "parent", cc.features.parent).id
+cc.features.misc = mad("Miscellaneous", "parent", cc.features.parent).id
+cc.features.rgb = mad("Rainbow Options", "parent", cc.features.misc).id
+cc.features.dirt = mad("Dirt Options", "parent", cc.features.misc).id
+cc.features.neon = mad("Neons", "parent", cc.features.rgb).id
+cc.features.xenons = mad("Headlights", "parent", cc.features.rgb).id
+cc.features.tyresmoke = mad("Tyre Smoke", "parent", cc.features.rgb).id
+
 menu.create_thread(function()
     -- Primary
+
     mad("Set HEX value", "action", cc.features.primary, function()
         pcall(function()
             cc.colors.primary[3], cc.colors.primary[2], cc.colors.primary[1] = getVehRGB(pgpv(ppid()),1)
