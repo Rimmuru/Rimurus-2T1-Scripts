@@ -1,0 +1,3 @@
+v2.12.1
+- added cheese menu auto updater
+- menu will nolonger try to load if already loaded
