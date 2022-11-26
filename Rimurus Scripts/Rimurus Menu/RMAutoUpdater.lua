@@ -13,10 +13,10 @@ local filePaths = {
 	
 	--feats
 	playerOptions = appdata_path.."\\scripts\\Rimmuru\\libs\\feats\\playerOptions.luac",
-	Aimbot = appdata_path.."\\scripts\\Rimmuru\\libs\\feats\\Aimbot.luac",
-	Drone = appdata_path.."\\scripts\\Rimmuru\\libs\\feats\\Drone.luac",
-	World = appdata_path.."\\scripts\\Rimmuru\\libs\\feats\\World.luac",
-	editor = appdata_path.."\\scripts\\Rimmuru\\libs\\feats\\editor.luac",
+	--Aimbot = appdata_path.."\\scripts\\Rimmuru\\libs\\feats\\Aimbot.luac",
+	--Drone = appdata_path.."\\scripts\\Rimmuru\\libs\\feats\\Drone.luac",
+	--World = appdata_path.."\\scripts\\Rimmuru\\libs\\feats\\World.luac",
+	--editor = appdata_path.."\\scripts\\Rimmuru\\libs\\feats\\editor.luac",
 	
 }
 local files = {
