@@ -31,10 +31,10 @@ local files = {
 
 	-- feats
 	playerOptions = [[https://raw.githubusercontent.com/Rimmuru/Rimurus-2T1-Scripts/main/Rimurus%20Scripts/Rimurus%20Menu/Rimuru/libs/feats/playerOptions.luac]],
-	Aimbot = [[https://raw.githubusercontent.com/Rimurus-2T1-Scripts/tree/main/Rimurus%20Scripts/Rimurus%20Menu/Rimuru/libs/feats/Aimbot.luac]],
-	Drone = [[https://raw.githubusercontent.com/Rimurus-2T1-Scripts/tree/main/Rimurus%20Scripts/Rimurus%20Menu/Rimuru/libs/feats/Drone.luac]],
-	World = [[https://raw.githubusercontent.com/Rimurus-2T1-Scripts/tree/main/Rimurus%20Scripts/Rimurus%20Menu/Rimuru/libs/feats/World.luac]],
-	editor = [[https://raw.githubusercontent.com/Rimurus-2T1-Scripts/tree/main/Rimurus%20Scripts/Rimurus%20Menu/Rimuru/libs/feats/editor.luac]]
+	--Aimbot = [[https://raw.githubusercontent.com/Rimurus-2T1-Scripts/tree/main/Rimurus%20Scripts/Rimurus%20Menu/Rimuru/libs/feats/Aimbot.luac]],
+	--Drone = [[https://raw.githubusercontent.com/Rimurus-2T1-Scripts/tree/main/Rimurus%20Scripts/Rimurus%20Menu/Rimuru/libs/feats/Drone.luac]],
+	--World = [[https://raw.githubusercontent.com/Rimurus-2T1-Scripts/tree/main/Rimurus%20Scripts/Rimurus%20Menu/Rimuru/libs/feats/World.luac]],
+	--editor = [[https://raw.githubusercontent.com/Rimurus-2T1-Scripts/tree/main/Rimurus%20Scripts/Rimurus%20Menu/Rimuru/libs/feats/editor.luac]]
 }
 
 local all_files = 0
