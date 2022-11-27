@@ -2,7 +2,7 @@ local status = true
 local appdata_path = utils.get_appdata_path("PopstarDevs", "2Take1Menu")
 
 local filePaths = {
-	RimuruMenu = appdata_path.."\\scripts\\RimuruMenu.luac",
+	RimuruMenu = appdata_path.."\\scripts\\RimurusMenu.luac",
 
 	--libs
 	gltw = appdata_path.."\\scripts\\cheesemenu\\libs\\GLTW.lua",
