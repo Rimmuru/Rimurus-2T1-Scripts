@@ -110,7 +110,6 @@ local sel_mode = menu.add_feature("Style/Position", "parent", parent.id, cb)
 
 local driver = menu.add_feature("Escort as Driver", "parent", parent.id)
 local player_pos = menu.add_feature("set POS to Player ID:", "action_value_i", driver.id, goto_player)
-player_pos.threaded = false
  player_pos.max_i = 32
  player_pos.min_i = -1
  player_pos.value_i = -1
