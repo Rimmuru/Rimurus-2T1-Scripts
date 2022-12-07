@@ -3,6 +3,16 @@
 -- credit to Aren for teaching me Lua right at the start <3
 -- credit to GhostOne too because he nice af and wasn't mean to me when teaching me, unlike some others </3 <3
 
+local function NotifyMap(title, subtitle, msg, iconname, intcolor)
+    native.call(0x92F0DA1E27DB96DC, intcolor) --_THEFEED_SET_NEXT_POST_BACKGROUND_COLOR
+    native.call(0x202709F4C58A0424, "STRING") --BEGIN_TEXT_COMMAND_THEFEED_POST
+    native.call(0x6C188BE134E074AA, msg) --ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME
+    native.call(0x1CCD9A37359072CF, iconname, iconname, false, 0, title, subtitle) --END_TEXT_COMMAND_THEFEED_POST_MESSAGETEXT
+    native.call(0x2ED7843F8F801023, true, true) --END_TEXT_COMMAND_THEFEED_POST_TICKER
+end
+NotifyMap("Femboy Lua", "~h~~r~Femboy Lua Script", "~b~Script Loaded, head to Script Features to use it", "CHAR_MP_STRIPCLUB_PR", 140) -- https://wiki.gtanet.work/index.php?title=Notification_Pictures
+-- Thank you again Toph for this ^^
+
 local main = menu.add_feature("Femboy Script", "parent", 0)
 local popt = menu.add_feature("Player Options", "parent", main.id)
 local vehopt = menu.add_feature("Vehicle Options", "parent", main.id)
