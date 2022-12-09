@@ -88,6 +88,25 @@ RGBEyes.mod = 50
 -- vehicle options
 local dorctrl = menu.add_feature("Door Control", "parent", vehopt.id)
 local lightctrl = menu.add_feature("Light Control", "parent", vehopt.id)
+local vehaudio = menu.add_feature("Vehicle Audio", "parent", vehopt.id)
+
+local rattle = menu.add_feature("engine rattle", "value_f", vehaudio.id, function(f)
+    local veh = player.player_vehicle()
+    native.call(0x01BB4D577D38BD9E, veh, f.value, f.on)
+end)
+rattle.min = 0.0
+rattle.max = 1.0
+rattle.mod = 0.1
+rattle.value = 0.0
+
+local enginedmg = menu.add_feature("engine dmg rattle", "value_f", vehaudio.id, function(f)
+    local veh = player.player_vehicle()
+    native.call(0x59E7B488451F4D3A, veh, f.value, f.on)
+end)
+enginedmg.min = 0.0
+enginedmg.max = 1.0
+enginedmg.mod = 0.1
+enginedmg.value = 0.0
 
 menu.add_feature("Fix Vehicle", "action", vehopt.id, function()
 	vehicle.set_vehicle_fixed(player.get_player_vehicle(player.player_id()), true)
@@ -163,6 +182,13 @@ menu.add_feature("Launch Control", "toggle", vehopt.id, function(feat)
 	local veh = player.get_player_vehicle(player.player_id())
 	native.call(0xAA6A6098851C396F, feat.on)
 end)
+
+menu.add_feature("Exhaust backfire", "value_str", vehopt.id, function(f)
+    if player.is_player_in_any_vehicle(player.player_id()) then 
+        local veh = player.player_vehicle()
+        native.call(0x2BE4BC731D039D5A, veh, f.value)
+    end
+end):set_str_data({"Disable", "Enable"})
 
 local pwr = menu.add_feature("Power Increasinator", "value_i", vehopt.id, function(feat)
     local veh = player.get_player_vehicle(player.player_id())
