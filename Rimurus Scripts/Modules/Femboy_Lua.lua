@@ -73,18 +73,17 @@ RGBHair.min = 0
 RGBHair.max = 10000
 RGBHair.mod = 50 ------ Thank you Toph <3333
 
-local RGBEyes = menu.add_feature("Rainbow Eyes", "value_i", rgb.id, function(f)
-    while f.on do 
-        for i = 1, 32 do 
-            native.call(0x50B56988B170AFDF, player.get_player_ped(player.player_id()), i)
-            system.wait(f.value)
-        end
-    end
-end)
-RGBEyes.min = 0
-RGBEyes.max = 2000
-RGBEyes.mod = 50
+local wntedlvl = menu.get_feature_by_hierarchy_key("local.player_options.wanted")
+menu.add_feature("Report For Crime", "action_value_str", popt.id, function(f)
+    native.call(0xE9B09589827545E7, ped, f.value)
+    wntedlvl.value = 2
+    wntedlvl:toggle()
+    menu.notify("You have been reported for " .. f.str_data[f.value+1] .. " good luck escaping, criminal", "Femboy Lua")
+end):set_str_data({"firearms possesion", "running a red light", "reckless driving", "speeding", "traffic Violation", "riding without helmet", "vehicle Theft", "GTA", "???", "???", "assault on civ", "assaulting officer", "assault with weapon", "officer shot", "Ped struck by vehicle", "officer struck by vehicle", "helicopter down", "civ on fire", "officer on fire", "car on fire", "air unit down", "an explosion", "stabbing", "officer stabbed", "attack on a vehicle", "damage to property", "suspect threatening with gun", "shots fired (ohhhhh", "???", "???", "???", "???", "???", "2-45", "???", "9-25",})
 
+menu.add_feature("Mobile Radio", "toggle", popt.id, function(f)
+    gameplay.set_mobile_radio(f.on)
+end)
 -- vehicle options
 local dorctrl = menu.add_feature("Door Control", "parent", vehopt.id)
 local lightctrl = menu.add_feature("Light Control", "parent", vehopt.id)
@@ -112,6 +111,16 @@ menu.add_feature("Fix Vehicle", "action", vehopt.id, function()
 	vehicle.set_vehicle_fixed(player.get_player_vehicle(player.player_id()), true)
 end)
 
+menu.add_feature("Auto Repair", "toggle", vehopt.id, function(f)
+    while f.on do
+        local veh = player.player_vehicle()
+        if vehicle.is_vehicle_damaged(player.player_vehicle()) then
+            vehicle.set_vehicle_fixed(player.get_player_vehicle(player.player_id()), true)
+        end
+        system.wait(0.5)
+    end
+end)
+
 local dirtLevel = menu.add_feature("Dirt Level", "autoaction_value_f", vehopt.id, function(feat)
     local veh = player.get_player_vehicle(player.player_id())
     while feat.value do
@@ -127,6 +136,23 @@ menu.add_feature("Stay clean", "toggle", vehopt.id, function(feat)
     while feat.on do
         native.call(0x79D3B596FE44EE8B, player.get_player_vehicle(player.player_id()), 0)
         system.wait(0)
+    end
+end)
+
+menu.add_feature("Set Custom License Plate", "action", vehopt.id, function(f)
+    local veh = player.get_player_vehicle(player.player_id())
+
+    if player.is_player_in_any_vehicle(player.player_id()) then
+
+        repeat
+            rtn, plate = input.get("Command box", "", 50, eInputType.IT_ASCII)
+            if rtn == 2 then  rtn = 0 end
+            system.wait(0)
+        until rtn == 0
+        
+    vehicle.set_vehicle_number_plate_text(veh, plate)
+    else
+        menu.notify("You are not in a vehicle!", "Femboy Menu")
     end
 end)
 
@@ -238,17 +264,6 @@ menu.add_feature("Turn engine off", "action", vehopt.id, function()
 	local veh = player.get_player_vehicle(player.player_id())
 	native.call(0x2497C4717C8B881E, veh, 0, 0, true)
 end)
-
-menu.add_feature("Disable auto start", "toggle", vehopt.id, function(feat)
-    local veh = player.get_player_vehicle(player.player_id())
-    if feat.on then
-        native.call(0x2497C4717C8B881E, veh, 0, 1, 1)
-        menu.notify("auto start disabled, engine turned off" , "Femboy Script")
-    else 
-        native.call(0x2497C4717C8B881E, veh, 0, 0, 0)
-        menu.notify("auto start enabled" , "Femboy Script")
-    end
-end) -- thank you Toph
 	
 menu.add_feature("Kill engine", "action", vehopt.id, function()
 	menu.notify("next bit of damage will kill the car, gl", "Femboy Menu")
