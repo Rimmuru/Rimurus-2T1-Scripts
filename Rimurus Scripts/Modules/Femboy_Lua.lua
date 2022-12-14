@@ -73,14 +73,6 @@ RGBHair.min = 0
 RGBHair.max = 10000
 RGBHair.mod = 50 ------ Thank you Toph <3333
 
-local wntedlvl = menu.get_feature_by_hierarchy_key("local.player_options.wanted")
-menu.add_feature("Report For Crime", "action_value_str", popt.id, function(f)
-    native.call(0xE9B09589827545E7, ped, f.value)
-    wntedlvl.value = 2
-    wntedlvl:toggle()
-    menu.notify("You have been reported for " .. f.str_data[f.value+1] .. " good luck escaping, criminal", "Femboy Lua")
-end):set_str_data({"firearms possesion", "running a red light", "reckless driving", "speeding", "traffic Violation", "riding without helmet", "vehicle Theft", "GTA", "???", "???", "assault on civ", "assaulting officer", "assault with weapon", "officer shot", "Ped struck by vehicle", "officer struck by vehicle", "helicopter down", "civ on fire", "officer on fire", "car on fire", "air unit down", "an explosion", "stabbing", "officer stabbed", "attack on a vehicle", "damage to property", "suspect threatening with gun", "shots fired (ohhhhh", "???", "???", "???", "???", "???", "2-45", "???", "9-25",})
-
 menu.add_feature("Mobile Radio", "toggle", popt.id, function(f)
     gameplay.set_mobile_radio(f.on)
 end)
