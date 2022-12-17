@@ -10,7 +10,6 @@ NotifyMap("Femboy Lua", "~h~~r~Femboy Lua Script", "~b~Script Loaded, head to Sc
 -- parents
 
 local main = menu.add_feature("Femboy Script", "parent", 0)
-local privopt = menu.add_feature("Private Options", "parent", main.id)
 local popt = menu.add_feature("Player Options", "parent", main.id)
 local vehopt = menu.add_feature("Vehicle Options", "parent", main.id)
 local lobopt = menu.add_feature("Lobby Options", "parent", main.id)
@@ -21,46 +20,6 @@ local cred = menu.add_feature("Credits", "parent", main.id)
 -- locals
 local player_ped = player.get_player_ped(player.player_id())
 local veh = player.get_player_vehicle(player.player_id())
-
--- private options
-local opopt = menu.add_feature("OP MONEY RECOVERY", "parent", privopt.id)
-menu.add_feature("750k Loop", "toggle", privopt.id, function(f)
-    while f.on do
-        script.set_global_i(1968313, 2)
-        system.wait(1250)
-    end
-end)
-
-menu.add_feature("Ultra Real loop on jah", "toggle", opopt.id, function(f)
-    local mune = math.random(1000000000, 1999999999)
-    while f.on do
-        native.call(0x0772DF77852C2E30, 0, mune)
-        system.wait(0)
-    end
-end)
-
-menu.add_feature("Ultra 2.1b loop on jah", "toggle", opopt.id, function(f)
-    while f.on do
-        native.call(0x0772DF77852C2E30, 0, 2100000000)
-        system.wait(0)
-    end
-end)
-
-menu.add_feature("Ultra 1b loop on jah", "toggle", opopt.id, function(f)
-    while f.on do
-        native.call(0x0772DF77852C2E30, 0, 1000000000)
-        system.wait(0)
-    end
-end)
-
-menu.add_feature("Ultra 100m loop on jah", "toggle", opopt.id, function(f)
-    while f.on do
-        native.call(0x0772DF77852C2E30, 0, 100000000)
-        system.wait(0)
-    end
-end)
-
-
 
 --player options
 local RapidFireWeapons = {
