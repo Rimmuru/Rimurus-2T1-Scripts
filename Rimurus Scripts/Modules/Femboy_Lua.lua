@@ -1,8 +1,3 @@
--- so much credit to Toph for teaching me and working with me <3
--- credit to Rimuru for letting me learn on her script and teaching me a few things <3 (slightly skidded from too :sus:)
--- credit to Aren for teaching me Lua right at the start <3
--- credit to GhostOne too because he nice af and wasn't mean to me when teaching me, unlike some others </3 <3
-
 local function NotifyMap(title, subtitle, msg, iconname, intcolor)
     native.call(0x92F0DA1E27DB96DC, intcolor) --_THEFEED_SET_NEXT_POST_BACKGROUND_COLOR
     native.call(0x202709F4C58A0424, "STRING") --BEGIN_TEXT_COMMAND_THEFEED_POST
@@ -10,31 +5,36 @@ local function NotifyMap(title, subtitle, msg, iconname, intcolor)
     native.call(0x1CCD9A37359072CF, iconname, iconname, false, 0, title, subtitle) --END_TEXT_COMMAND_THEFEED_POST_MESSAGETEXT
     native.call(0x2ED7843F8F801023, true, true) --END_TEXT_COMMAND_THEFEED_POST_TICKER
 end
-NotifyMap("Femboy Lua", "~h~~r~Femboy Lua Script", "~b~Script Loaded, head to Script Features to use it", "CHAR_MP_STRIPCLUB_PR", 140) -- https://wiki.gtanet.work/index.php?title=Notification_Pictures
--- Thank you again Toph for this ^^
+NotifyMap("Femboy Lua", "~h~~r~Femboy Lua Script", "~b~Script Loaded, head to Script Features", "CHAR_MP_STRIPCLUB_PR", 140) --no_u = invalid image / does not exist
+
+-- parents
 
 local main = menu.add_feature("Femboy Script", "parent", 0)
 local popt = menu.add_feature("Player Options", "parent", main.id)
 local vehopt = menu.add_feature("Vehicle Options", "parent", main.id)
+local lobopt = menu.add_feature("Lobby Options", "parent", main.id)
 local wthopt = menu.add_feature("Weather Options", "parent", main.id)
 local miscopt = menu.add_feature("Misc Options", "parent", main.id)
+local cred = menu.add_feature("Credits", "parent", main.id)
+
+-- locals
+local player_ped = player.get_player_ped(player.player_id())
+local veh = player.get_player_vehicle(player.player_id())
 
 --player options
 local RapidFireWeapons = {
     [2982836145] = true,
     [1672152130] = true,
-    [2138347493] = true,
-    [2726580491] = true
+    [2138347493] = true
 }
 local rapidfire = menu.add_feature("RPG Rapid Fire", "value_i", popt.id, function(f)
     menu.notify("Thank you GhostOne for making very good feature")
     while f.on do
-        local player_ped = player.get_player_ped(player.player_id())
         local old_player_weapon = ped.get_current_ped_weapon(player_ped)
         if RapidFireWeapons[old_player_weapon] and controls.get_control_normal(0, 142) == 1 then
-            system.wait(0)
+            system.wait(100)
             weapon.give_delayed_weapon_to_ped(player_ped, 741814745, 0, true)
-            system.wait(0)
+            system.wait(100)
             weapon.give_delayed_weapon_to_ped(player_ped, old_player_weapon, 0, true)
             system.wait(f.value)
         end
@@ -44,6 +44,13 @@ end)
 rapidfire.max = 2500
 rapidfire.mod = 25
 rapidfire.value = 400 ----- Thank you ghost cause you're smart af <3333333333
+
+local RapidFireWeapons = {
+    [2982836145] = true,
+    [1672152130] = true,
+    [2138347493] = true,
+    [2726580491] = true
+}
 
 local rgb = menu.add_feature("RGB Player Features", "parent", popt.id)
 
@@ -73,17 +80,10 @@ RGBHair.min = 0
 RGBHair.max = 10000
 RGBHair.mod = 50 ------ Thank you Toph <3333
 
-local wntedlvl = menu.get_feature_by_hierarchy_key("local.player_options.wanted")
-menu.add_feature("Report For Crime", "action_value_str", popt.id, function(f)
-    native.call(0xE9B09589827545E7, ped, f.value)
-    wntedlvl.value = 2
-    wntedlvl:toggle()
-    menu.notify("You have been reported for " .. f.str_data[f.value+1] .. " good luck escaping, criminal", "Femboy Lua")
-end):set_str_data({"firearms possesion", "running a red light", "reckless driving", "speeding", "traffic Violation", "riding without helmet", "vehicle Theft", "GTA", "???", "???", "assault on civ", "assaulting officer", "assault with weapon", "officer shot", "Ped struck by vehicle", "officer struck by vehicle", "helicopter down", "civ on fire", "officer on fire", "car on fire", "air unit down", "an explosion", "stabbing", "officer stabbed", "attack on a vehicle", "damage to property", "suspect threatening with gun", "shots fired (ohhhhh", "???", "???", "???", "???", "???", "2-45", "???", "9-25",})
-
 menu.add_feature("Mobile Radio", "toggle", popt.id, function(f)
     gameplay.set_mobile_radio(f.on)
 end)
+
 -- vehicle options
 local dorctrl = menu.add_feature("Door Control", "parent", vehopt.id)
 local lightctrl = menu.add_feature("Light Control", "parent", vehopt.id)
@@ -185,9 +185,10 @@ local veh = player.get_player_vehicle(player.player_id())
             native.call(0x3A375167F5782A65, veh, true)
         end
     end
-end) -- Thank you again Toph, one day i will get it right :(
+end)
 
 menu.add_feature("Native Drifting", "toggle", vehopt.id, function(feat)
+	menu.notify("Slidy wheels equipped, Suspension dropped", "Femboy Menu")
 	local veh = player.get_player_vehicle(player.player_id())
 		native.call(0x3A375167F5782A65, veh, feat.on) -- SET_REDUCE_DRIFT_VEHICLE_SUSPENSION(veh, bool) 
 		native.call(0x5AC79C98C5C17F05, veh, feat.on) -- SET_DRIFT_TYRES_ENABLED(veh, bool)
@@ -339,6 +340,184 @@ menu.add_feature("Windows open/close", "toggle", dorctrl.id, function(feat)
 	end
 end)
 
+-- lobby options
+
+local racismfilter = {
+	"assnigger",
+    "assnigga",
+    "Assnigger",
+    "Assnigga", 
+    "beaner", 
+    "Beaner",
+    "coon", 
+    "Coon",  
+    "chink", 
+    "Chink", 
+    "chinc", 
+    "Chink", 
+    "gook", 
+    "Gook", 
+    "guido", 
+    "Guido", 
+    "jap", 
+    "Jap", 
+    "jigaboo", 
+    "Jigaboo", 
+    "junglebunny",
+    "Junglebunny",
+    "jungle bunny", 
+    "Jungle bunny", 
+    "Jungle Bunny", 
+    "negro", 
+    "Negro", 
+    "nigaboo", 
+    "Nigaboo", 
+    "niggaboo", 
+    "Niggaboo", 
+    "nigga", 
+    "Nigga", 
+    "nigger", 
+    "Nigger", 
+    "niggerish", 
+    "Niggerish",
+    "niggers", 
+    "Niggers", 
+    "niglet", 
+    "nigglet",
+    "Niglet", 
+    "Nigglet", 
+    "nignog", 
+    "Nignog", 
+    "paki", 
+    "Paki", 
+    "porch monkey", 
+    "Porch Monkey", 
+    "porchmonkey", 
+    "Porchmonkey", 
+    "sand nigger", 
+    "sandnigger", 
+    "Sand Nigger", 
+    "Sandnigger",
+    "spic", 
+    "spick", 
+    "Spic", 
+    "Spick",  
+    "wetback", 
+    "Wetback",  
+    "ASSNIGGER",
+    "ASSNIGGA",
+    "BEANER", 
+    "COON",
+    "CHINK", 
+    "CHINC", 
+    "GOOK", 
+    "JAP", 
+    "JIGABOO", 
+    "JUNGLEBUNNY",
+    "JUNGLE BUNNY", 
+    "NEGRO", 
+    "NIGABOO", 
+    "NIGGABOO", 
+    "NIGGA", 
+    "NIGGER", 
+    "NIGGERISH", 
+    "NIGGERS", 
+    "NIGLET", 
+    "NIGGLET", 
+    "NIGNOG", 
+    "PAKI",  
+    "PORCH MONKEY", 
+    "PORCHMONKEY",  
+    "SAND NIGGER", 
+    "SANDNIGGER",
+    "SPIC", 
+    "SPICK",  
+    "WETBACK"
+}
+local f = function(s)
+	for k,v in pairs(racismfilter) do
+		if s:find(v) then
+			return true
+		end
+	end
+	return false
+end
+menu.add_feature("Block Racism In Chat", "toggle", lobopt.id, function(func)
+    if func.on then
+        racism = event.add_event_listener("chat", function(e)
+	        if f(e.body) then
+		        menu.notify(player.get_player_name(e.sender) .. " was removed for being too much of an edgelord", "Femboy Menu")
+		        network.force_remove_player(e.sender)
+	        end
+        end)
+    else 
+        event.remove_event_listener("chat", racism)
+    end
+end)
+
+local homophobicfilter = {
+    "dike", 
+    "dyke", 
+    "fag", 
+    "faggit", 
+    "faggot", 
+    "fagtard", 
+    "fag tard", 
+    "gay fuck", 
+    "homo",
+    "tranny", 
+    "DIKE", 
+    "DYKE", 
+    "FAG", 
+    "FAGGIT", 
+    "FAGGOT", 
+    "FAGTARD", 
+    "FAG TARD", 
+    "GAY FUCK", 
+    "HOMO",
+    "TRANNY", 
+    "Dike", 
+    "Dyke", 
+    "Fag", 
+    "Faggit", 
+    "Faggot", 
+    "Fagtard", 
+    "Fag Tard", 
+    "Gay Fuck", 
+    "Homo",
+    "Tranny", 
+    "dIKE", 
+    "dYKE", 
+    "fAG", 
+    "fAGGIT", 
+    "fAGGOT", 
+    "fAGTARD", 
+    "fAG tARD", 
+    "gAY fUCK", 
+    "hOMO",
+    "tRANNY"
+}
+local f = function(s)
+	for k,v in pairs(homophobicfilter) do
+		if s:find(v) then
+			return true
+		end
+	end
+	return false
+end
+menu.add_feature("Block Homophobic/Transphobic messages", "toggle", lobopt.id, function(func)
+    if func.on then
+        homophobic = event.add_event_listener("chat", function(e)
+	        if f(e.body) then
+		        menu.notify(player.get_player_name(e.sender) .. " was removed for being too much of an edgelord, probably gets pegged :shrug:", "Femboy Menu")
+		        network.force_remove_player(e.sender)
+	        end
+        end)
+    else 
+        event.remove_event_listener("chat", homophobic)
+    end
+end)
+
 --weather options
 local rainlvl = menu.add_feature("Magic puddles", "autoaction_value_f", wthopt.id, function(feat)
     native.call(0x643E26EA6E024D92, feat.value)
@@ -353,26 +532,6 @@ end)
 windspd.min = 0.0
 windspd.max = 12.0
 windspd.mod = 0.5
-
-menu.add_feature("Really piss off Zeus (SEIZURE WARNING)", "toggle", wthopt.id, function(feat)
-menu.notify("Way to go, you upset a God, feel like a big man huh? Big man with his big insults?")
-while feat.on do
-        native.call(0xF6062E089251C898, true) -- forces lightning
-        system.wait(0)
-        if feat.on then
-            time.set_clock_time(23, 59, 0)
-            native.call(0x643E26EA6E024D92, 7.0) -- controls rain/puddles
-            native.call(0xEE09ECEDBABE47FC, 12.0) -- controls wind speed
-        else
-            time.set_clock_time(12, 0, 0)
-            native.call(0x643E26EA6E024D92, 0.0)
-            native.call(0xEE09ECEDBABE47FC, 0.0)
-            native.call(0xF6062E089251C898, false)
-            menu.notify("Zeus accepts your apology")
-            system.wait(0)
-        end
-    end   
-end)
 
 --misc options
 menu.add_feature("Show Player Talking", "toggle", miscopt.id, function(feat)
@@ -401,6 +560,15 @@ end, nil) -- thank you Ruly Pancake the whatever(th)
 
 menu.add_feature("Make Nearby NPCs Riot", "toggle", miscopt.id, function(feat)
     native.call(0x2587A48BC88DFADF, feat.on)
+end)
+
+menu.add_feature("Auto Skip Cutscene", "toggle", miscopt.id, function(f)
+    while f.on do
+        if cutscene.is_cutscene_playing() then
+            cutscene.stop_cutscene_immediately()
+        end
+        system.wait(0)
+    end
 end)
 
 local mmdisco = menu.add_feature("minimap disco" , "value_i" , miscopt.id, function(feat)
@@ -438,3 +606,37 @@ menu.add_feature("Weapon Hash", "action", miscopt.id, function()
     print(ped.get_current_ped_weapon(player_ped))
     menu.notify((ped.get_current_ped_weapon(player_ped)) .. " - Current Weapon Hash", "Femboy Menu")
 end)
+
+-- credits
+
+menu.add_feature("Toph", "action", cred.id, function()
+    local function NotifyMap(title, subtitle, msg, iconname, intcolor)
+        native.call(0x92F0DA1E27DB96DC, intcolor) --_THEFEED_SET_NEXT_POST_BACKGROUND_COLOR
+        native.call(0x202709F4C58A0424, "STRING") --BEGIN_TEXT_COMMAND_THEFEED_POST
+        native.call(0x6C188BE134E074AA, msg) --ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME
+        native.call(0x1CCD9A37359072CF, iconname, iconname, false, 0, title, subtitle) --END_TEXT_COMMAND_THEFEED_POST_MESSAGETEXT
+        native.call(0x2ED7843F8F801023, true, true) --END_TEXT_COMMAND_THEFEED_POST_TICKER
+end
+NotifyMap("Topher", "~h~~r~The Gopher", "~b~Helped an absolute BUNCH with understanding the API and helped with a lot of features!", "CHAR_HAO", 140) --no_u = invalid image / does not exist
+end)
+menu.add_feature("Rimuru", "action", cred.id, function()
+    local function NotifyMap(title, subtitle, msg, iconname, intcolor)
+        native.call(0x92F0DA1E27DB96DC, intcolor) --_THEFEED_SET_NEXT_POST_BACKGROUND_COLOR
+        native.call(0x202709F4C58A0424, "STRING") --BEGIN_TEXT_COMMAND_THEFEED_POST
+        native.call(0x6C188BE134E074AA, msg) --ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME
+        native.call(0x1CCD9A37359072CF, iconname, iconname, false, 0, title, subtitle) --END_TEXT_COMMAND_THEFEED_POST_MESSAGETEXT
+        native.call(0x2ED7843F8F801023, true, true) --END_TEXT_COMMAND_THEFEED_POST_TICKER
+end
+NotifyMap("Rimuru", "~h~~r~Wannabe Welsh", "~b~'let' me learn LUA using her script and gave me many helpful tips", "CHAR_WENDY", 140) --no_u = invalid image / does not exist
+end)
+menu.add_feature("Aren", "action", cred.id, function()
+    local function NotifyMap(title, subtitle, msg, iconname, intcolor)
+        native.call(0x92F0DA1E27DB96DC, intcolor) --_THEFEED_SET_NEXT_POST_BACKGROUND_COLOR
+        native.call(0x202709F4C58A0424, "STRING") --BEGIN_TEXT_COMMAND_THEFEED_POST
+        native.call(0x6C188BE134E074AA, msg) --ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME
+        native.call(0x1CCD9A37359072CF, iconname, iconname, false, 0, title, subtitle) --END_TEXT_COMMAND_THEFEED_POST_MESSAGETEXT
+        native.call(0x2ED7843F8F801023, true, true) --END_TEXT_COMMAND_THEFEED_POST_TICKER
+end
+NotifyMap("Aren", "~h~~r~Mostly Cringe", "~b~Helped me a lot with LUA at the beginning, taught me how to use natives", "CHAR_JIMMY", 140) --no_u = invalid image / does not exist
+end)
+
