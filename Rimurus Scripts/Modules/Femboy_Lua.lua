@@ -739,7 +739,7 @@ local f = function(s)
 	end
 	return false
 end
-feats.blockfrench = menu.add_feature("Block French In Chat", "toggle", 0, function(func)
+feats.blockfrench = menu.add_feature("Block French In Chat", "toggle", modopt.id, function(func)
     if func.on then
         french = event.add_event_listener("chat", function(e)
 	        if f(e.body) then
@@ -859,7 +859,7 @@ local f = function(s)
 	end
 	return false
 end
-feats.blockdutch = menu.add_feature("Block Dutch In Chat", "toggle", 0, function(func)
+feats.blockdutch = menu.add_feature("Block Dutch In Chat", "toggle", modopt.id, function(func)
     if func.on then
         dutch = event.add_event_listener("chat", function(e)
 	        if f(e.body) then
@@ -914,7 +914,7 @@ local f = function(s)
 	end
 	return false
 end
-feats.blockrussian = menu.add_feature("Block Russian In Chat", "toggle", 0, function(func)
+feats.blockrussian = menu.add_feature("Block Russian In Chat", "toggle", modopt.id, function(func)
     if func.on then
         russian = event.add_event_listener("chat", function(e)
 	        if f(e.body) then
