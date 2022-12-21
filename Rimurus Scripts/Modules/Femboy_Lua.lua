@@ -7,7 +7,7 @@ end
 local feats, feat_vals, feat_tv = {}, {}, {}
 local appdata = utils.get_appdata_path("PopstarDevs", "2Take1Menu")
 local INI = IniParser(appdata .. "\\scripts\\FemboyMenu.ini")
-local version = "v1.0.0-beta"
+local version = "v1.0.4"
 
 local function SaveSettings()
     for k, v in pairs(feats) do
@@ -418,6 +418,21 @@ end)
 
 -- online options
 
+menu.add_feature("Kick Low Priority Players", "action", onlopt.id, function(f)
+    local ped = player.player_id() -- get the player's ID
+    local host = player.get_player_host_priority(player.player_id()) -- get the player's host priority
+    for pid = 0, 31 do
+        if pid ~= ped and player.is_player_valid(pid) then -- skip the player's own ID and invalid players
+            local playerhost = player.get_player_host_priority(pid)
+            if playerhost < host then -- if the player has a lower host priority
+                network.force_remove_player(pid, true) -- kick the player (only host can kick)
+                menu.notify("You Are Now Host", "Femboy Menu")
+            end
+        end
+        system.wait(100)
+    end
+end)
+
 local autoaim = menu.add_feature("Aim Karma", "parent", onlopt.id)
 local function APv2(f)
     local PlayerPed = player.get_player_ped(player.player_id())
@@ -611,7 +626,7 @@ local homophobicfilter = {
 }
 local f = function(s)
 	for k,v in pairs(homophobicfilter) do
-		if s:find(v) then
+		if s:find(v .. " ") or s:find(" " .. v) or s:find("^" .. v .. "$") then
 			return true
 		end
 	end
@@ -733,13 +748,13 @@ local blockfrench= {
 }
 local f = function(s)
 	for k,v in pairs(blockfrench) do
-		if s:find(v) then
+		if s:find(v .. " ") or s:find(" " .. v) or s:find("^" .. v .. "$") then
 			return true
 		end
 	end
 	return false
 end
-feats.blockfrench = menu.add_feature("Block French In Chat", "toggle", 0, function(func)
+feats.blockfrench = menu.add_feature("Block French In Chat", "toggle", modopt.id, function(func)
     if func.on then
         french = event.add_event_listener("chat", function(e)
 	        if f(e.body) then
@@ -760,8 +775,6 @@ local blockdutch= {
     "te",
     "dat",
     "op",
-    "is",
-    "in",
     "en",
     "met",
     "aan",
@@ -771,16 +784,13 @@ local blockdutch= {
     "ze",
     "er",
     "bij",
-    "me",
     "dit",
     "ja",
     "nee",
     "wel",
     "maar",
-    "over",
     "als",
     "het",
-    "of",
     "zo",
     "om",
     "heb",
@@ -791,8 +801,6 @@ local blockdutch= {
     "Te",
     "Dat",
     "Op",
-    "Is",
-    "In",
     "En",
     "Met",
     "Aan",
@@ -802,16 +810,13 @@ local blockdutch= {
     "Ze",
     "Er",
     "Bij",
-    "Me",
     "Dit",
     "Ja",
     "Nee",
     "Wel",
     "Maar",
-    "Over",
     "Als",
     "Het",
-    "Of",
     "Zo",
     "Om",
     "Heb",
@@ -822,8 +827,6 @@ local blockdutch= {
     "TE",
     "DAT",
     "OP",
-    "IS",
-    "IN",
     "EN",
     "MET",
     "AAN",
@@ -833,16 +836,13 @@ local blockdutch= {
     "ZE",
     "ER",
     "BIJ",
-    "ME",
     "DIT",
     "JA",
     "NEE",
     "WEL",
     "MAAR",
-    "OVER",
     "ALS",
     "HET",
-    "OF",
     "ZO",
     "OM",
     "HEB",
@@ -853,13 +853,13 @@ local blockdutch= {
 }
 local f = function(s)
 	for k,v in pairs(blockdutch) do
-		if s:find(v) then
+		if s:find(v .. " ") or s:find(" " .. v) or s:find("^" .. v .. "$") then
 			return true
 		end
 	end
 	return false
 end
-feats.blockdutch = menu.add_feature("Block Dutch In Chat", "toggle", 0, function(func)
+feats.blockdutch = menu.add_feature("Block Dutch In Chat", "toggle", modopt.id, function(func)
     if func.on then
         dutch = event.add_event_listener("chat", function(e)
 	        if f(e.body) then
@@ -914,7 +914,7 @@ local f = function(s)
 	end
 	return false
 end
-feats.blockrussian = menu.add_feature("Block Russian In Chat", "toggle", 0, function(func)
+feats.blockrussian = menu.add_feature("Block Russian In Chat", "toggle", modopt.id, function(func)
     if func.on then
         russian = event.add_event_listener("chat", function(e)
 	        if f(e.body) then
