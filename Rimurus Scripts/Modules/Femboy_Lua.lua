@@ -306,9 +306,9 @@ feat_tv.pwr = menu.add_feature("Power Increasinator", "value_i", vehopt.id, func
     local veh = player.get_player_vehicle(player.player_id())
     vehicle.modify_vehicle_top_speed(veh, 1)
 end)
-feat_tv.pwr.min = 1
+feat_tv.pwr.min = 0
 feat_tv.pwr.max = 10000
-feat_tv.pwr.mod = 1
+feat_tv.pwr.mod = 10
 
 local veh_max_speed = menu.add_feature("Speed Limiter", "value_f", vehopt.id, function(f)
     while f.on do
@@ -441,18 +441,22 @@ end)
 
 -- online options
 
-menu.add_feature("Force Host", "action", onlopt.id, function(f)
-    local ped = player.player_id() -- get the player's ID
-    local host = player.get_player_host_priority(player.player_id()) -- get the player's host priority
-    for pid = 0, 31 do
-        if pid ~= ped and player.is_player_valid(pid) then -- skip the player's own ID and invalid players
-            local playerhost = player.get_player_host_priority(pid)
-            if playerhost < host then -- if the player has a lower host priority
-                network.force_remove_player(pid, true) -- kick the player (only host can kick)
-                menu.notify("You Are Now Host", "Femboy Menu")
+menu.add_feature("Force Host", "toggle", onlopt.id, function(f)
+    while f.on do
+        local ped = player.player_id() -- get the player's ID
+        if player.is_player_host(ped) then
+            menu.notify("You Are Host", "Femboy Menu")
+            f.on = false
+        else 
+            for pid = 0, 31 do
+                local host = player.get_host()
+                if host ~= ped then 
+                    network.force_remove_player(host)
+                    menu.notify("Getting Host", "Femboy Menu")
+                end
             end
         end
-        system.wait(100)
+        system.wait()
     end
 end)
 
@@ -947,6 +951,264 @@ feats.blockrussian = menu.add_feature("Block Russian In Chat", "toggle", modopt.
         end)
     else 
         event.remove_event_listener("chat", russian)
+    end
+end)
+
+local chinese = {
+	"汉字",
+    "字母",
+    "字符",
+    "拼音",
+    "介绍",
+    "区位码",
+    "字体",
+    "码位",
+    "码表",
+    "编码",
+    "编号",
+    "名称",
+    "类型",
+    "指针",
+    "结构",
+    "记录",
+    "技术",
+    "规范",
+    "标准",
+    "语言",
+    "文字",
+    "文化",
+    "历史",
+    "传统",
+    "文学",
+    "艺术",
+    "科学",
+    "技术",
+    "教育",
+    "培训",
+    "训练",
+    "知识",
+    "理解",
+    "能力",
+    "思维",
+    "创造",
+    "研究",
+    "研究所",
+    "博物馆",
+    "图书馆",
+    "学院",
+    "大学",
+    "校园",
+    "教室",
+    "教师",
+    "学生",
+    "课程",
+    "考试",
+    "成绩",
+    "学位",
+    "论文",
+    "题目",
+    "摘要",
+    "关键词",
+    "引用",
+    "参考文献",
+    "文献综述",
+    "书籍",
+    "论著",
+    "期刊",
+    "论文集",
+    "手册",
+    "指南",
+    "参考书",
+    "教材",
+    "教科书",
+    "词典",
+    "词汇",
+    "语"
+}
+local f = function(s)
+	for k,v in pairs(chinese) do
+		if s:find(v) then
+			return true
+		end
+	end
+	return false
+end
+feats.blockchinese = menu.add_feature("Block Chinese In Chat", "toggle", modopt.id, function(func)
+    if func.on then
+        china = event.add_event_listener("chat", function(e)
+	        if f(e.body) then
+		        menu.notify(player.get_player_name(e.sender) .. " was removed for speaking Chinese", "Femboy Menu")
+		        network.force_remove_player(e.sender)
+	        end
+        end)
+    else 
+        event.remove_event_listener("chat", china)
+    end
+end)
+
+local blockenglish= {
+    "the",
+    "be",
+    "to",
+    "of",
+    "and",
+    "a",
+    "in",
+    "that",
+    "have",
+    "I",
+    "it",
+    "for",
+    "not",
+    "on",
+    "with",
+    "he",
+    "as",
+    "you",
+    "do",
+    "at",
+    "this",
+    "but",
+    "his",
+    "by",
+    "from",
+    "they",
+    "we",
+    "say",
+    "her",
+    "she",
+    "or",
+    "an",
+    "will",
+    "my",
+    "one",
+    "all",
+    "would",
+    "there",
+    "their",
+    "The",
+    "Be",
+    "To",
+    "Of",
+    "And",
+    "A",
+    "In",
+    "That",
+    "Have",
+    "I",
+    "It",
+    "For",
+    "Not",
+    "On",
+    "With",
+    "He",
+    "As",
+    "You",
+    "Do",
+    "At",
+    "This",
+    "But",
+    "His",
+    "By",
+    "From",
+    "They",
+    "We",
+    "Say",
+    "Her",
+    "She",
+    "Or",
+    "An",
+    "Will",
+    "My",
+    "One",
+    "All",
+    "Would",
+    "There",
+    "Their", 
+    "THE",
+    "BE",
+    "TO",
+    "OF",
+    "AND",
+    "A",
+    "IN",
+    "THAT",
+    "HAVE",
+    "I",
+    "IT",
+    "FOR",
+    "NOT",
+    "ON",
+    "WITH",
+    "HE",
+    "AS",
+    "YOU",
+    "DO",
+    "AT",
+    "THIS",
+    "BUT",
+    "HIS",
+    "BY",
+    "FROM",
+    "THEY",
+    "WE",
+    "SAY",
+    "HER",
+    "SHE",
+    "OR",
+    "AN",
+    "WILL",
+    "MY",
+    "ONE",
+    "ALL",
+    "WOULD",
+    "THERE",
+    "THEIR"
+}
+local f = function(s)
+	for k,v in pairs(blockenglish) do
+		if s:find(v) then
+			return true
+		end
+	end
+	return false
+end
+menu.add_feature("Block English In Chat", "toggle", modopt.id, function(func)
+    if func.on then
+        english = event.add_event_listener("chat", function(e)
+	        if f(e.body) then
+		        menu.notify(player.get_player_name(e.sender) .. " was removed for speaking English", "Femboy Menu")
+		        network.force_remove_player(e.sender)
+	        end
+        end)
+    else 
+        event.remove_event_listener("chat", english)
+    end
+end)
+
+local botspam = {
+	"gtagta.cc",
+    "discord.gg/"
+}
+local f = function(s)
+	for k,v in pairs(botspam) do
+		if s:find(v) then
+			return true
+		end
+	end
+	return false
+end
+menu.add_feature("Block Bot Spam In Chat", "toggle", modopt.id, function(func)
+    if func.on then
+        menu.notify("Ping me in the LUA share channel with bot phrases you want adding", "Femboy Menu")
+        spam = event.add_event_listener("chat", function(e)
+	        if f(e.body) then
+		        menu.notify(player.get_player_name(e.sender) .. " was removed for Bot Spam", "Femboy Menu")
+		        network.force_remove_player(e.sender)
+	        end
+        end)
+    else 
+        event.remove_event_listener("chat", spam)
     end
 end)
 
