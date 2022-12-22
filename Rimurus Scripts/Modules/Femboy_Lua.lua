@@ -50,6 +50,7 @@ local function LoadSettings()
                 v.value = val
             end
         end
+
     end
 end
 
@@ -60,7 +61,7 @@ local function NotifyMap(title, subtitle, msg, iconname, intcolor)
     native.call(0x1CCD9A37359072CF, iconname, iconname, false, 0, title, subtitle) --END_TEXT_COMMAND_THEFEED_POST_MESSAGETEXT
     native.call(0x2ED7843F8F801023, true, true) --END_TEXT_COMMAND_THEFEED_POST_TICKER
 end
-NotifyMap("Femboy Lua", "~h~~r~Femboy Lua Script", "~b~Script Loaded, head to Script Features", "CHAR_MP_STRIPCLUB_PR", 140) --no_u = invalid image / does not exist
+NotifyMap("Femboy Lua", version .. " ~h~~r~Femboy Lua Script", "~b~Script Loaded, head to Script Features", "CHAR_MP_STRIPCLUB_PR", 140) --no_u = invalid image / does not exist
 
 menu.notify("Saved Settings, Loaded", "Femboy Menu")
 -- parents
@@ -107,8 +108,30 @@ feat_tv.RGBHair.min = 0
 feat_tv.RGBHair.max = 10000
 feat_tv.RGBHair.mod = 50 
 
-menu.add_feature("Mobile Radio", "toggle", popt.id, function(f)
+feats.mobileradio = menu.add_feature("Mobile Radio", "toggle", popt.id, function(f)
     gameplay.set_mobile_radio(f.on)
+end)
+
+menu.add_feature("Ragdoll On Q", "value_str", popt.id, function(f)
+    menu.notify("Normal Ragdoll is recommended. Press Q to enable ragdoll, Press Q again to stand back up", "Femboy Menu")
+    while f.on do
+        if (controls.is_control_just_pressed(0, 44) or controls.is_control_just_pressed(2, 44)) then
+            local pid = player.player_ped()
+            if ped.is_ped_ragdoll(pid) then
+                ped.clear_ped_tasks_immediately(player.player_ped())
+            else
+                ped.set_ped_to_ragdoll(pid, 10000, 20000, f.value + 2)
+            end
+        end
+        system.wait()
+    end
+end):set_str_data({"Narrow Leg Stumble", "Wide Leg Stumble", "Normal Ragdoll"})
+
+feats.clumsy = menu.add_feature("Clumsy Player", "toggle", popt.id, function(f)
+    while f.on do
+        native.call(0xF0A4F1BBF4FA7497, player.player_ped(), true)
+        system.wait()
+    end
 end)
 
 -- vehicle options
@@ -304,12 +327,12 @@ veh_max_speed.mod = 5.0
 veh_max_speed.value = 155.0
 
 local fwdlaunch = menu.add_feature("Launch Forward", "action_slider", vehopt.id, function(f)
-	local veh = player.get_player_vehicle(player.player_id())
+    local veh = player.get_player_vehicle(player.player_id())
 	native.call(0xAB54A438726D25D5, veh, f.value)
 end)
 fwdlaunch.min = 0.0
-fwdlaunch.max = 2000.0
-fwdlaunch.mod = 10.0
+fwdlaunch.max = 10000.0
+fwdlaunch.mod = 50.0
 
 local rgbX = menu.add_feature("RGB Xenon", "value_i", lightctrl.id, function(f)
     menu.notify("Xenon Lights Added, BEGIN THE RAVE")
@@ -418,7 +441,7 @@ end)
 
 -- online options
 
-menu.add_feature("Kick Low Priority Players", "action", onlopt.id, function(f)
+menu.add_feature("Force Host", "action", onlopt.id, function(f)
     local ped = player.player_id() -- get the player's ID
     local host = player.get_player_host_priority(player.player_id()) -- get the player's host priority
     for pid = 0, 31 do
