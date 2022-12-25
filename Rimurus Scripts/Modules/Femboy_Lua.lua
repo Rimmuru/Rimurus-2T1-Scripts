@@ -7,7 +7,7 @@ end
 local feats, feat_vals, feat_tv = {}, {}, {}
 local appdata = utils.get_appdata_path("PopstarDevs", "2Take1Menu")
 local INI = IniParser(appdata .. "\\scripts\\FemboyMenu.ini")
-local version = "v1.0.4"
+local version = "v1.0.6"
 
 local function SaveSettings()
     for k, v in pairs(feats) do
@@ -684,7 +684,6 @@ local blockfrench= {
     "du",
     "en",
     "à",
-    "ne",
     "se",
     "pas",
     "ce",
@@ -717,7 +716,6 @@ local blockfrench= {
     "Du",
     "En",
     "à",
-    "Ne",
     "Se",
     "Pas",
     "Ce",
@@ -750,7 +748,6 @@ local blockfrench= {
     "DU",
     "EN",
     "À",
-    "NE",
     "SE",
     "PAS",
     "CE",
@@ -1341,7 +1338,7 @@ menu.add_feature("RulyPancake", "action", cred.id, function()
         native.call(0x1CCD9A37359072CF, iconname, iconname, false, 0, title, subtitle) --END_TEXT_COMMAND_THEFEED_POST_MESSAGETEXT
         native.call(0x2ED7843F8F801023, true, true) --END_TEXT_COMMAND_THEFEED_POST_TICKER
 end
-NotifyMap("Aren", "~h~~r~4th, 5th, 6th, idk anymore", "~b~Made the 'Show Player Talking' feature", "CHAR_JOE", 140) --no_u = invalid image / does not exist
+NotifyMap("RulyPancake", "~h~~r~4th, 5th, 6th, idk anymore", "~b~Made the 'Show Player Talking' feature", "CHAR_JOE", 140) --no_u = invalid image / does not exist
 end)
 
 -- settings 
