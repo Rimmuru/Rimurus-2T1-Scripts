@@ -1,13 +1,7 @@
-if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then 
-    menu.notify("Natives are required to be enabled to use this script", "Femboy Menu")
-    menu.exit()
-    return
-end
-
 local feats, feat_vals, feat_tv = {}, {}, {}
 local appdata = utils.get_appdata_path("PopstarDevs", "2Take1Menu")
 local INI = IniParser(appdata .. "\\scripts\\FemboyMenu.ini")
-local version = "v1.0.6"
+local version = "v1.3.0"
 
 local function SaveSettings()
     for k, v in pairs(feats) do
@@ -55,13 +49,17 @@ local function LoadSettings()
 end
 
 local function NotifyMap(title, subtitle, msg, iconname, intcolor)
-    native.call(0x92F0DA1E27DB96DC, intcolor) --_THEFEED_SET_NEXT_POST_BACKGROUND_COLOR
-    native.call(0x202709F4C58A0424, "STRING") --BEGIN_TEXT_COMMAND_THEFEED_POST
-    native.call(0x6C188BE134E074AA, msg) --ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME
-    native.call(0x1CCD9A37359072CF, iconname, iconname, false, 0, title, subtitle) --END_TEXT_COMMAND_THEFEED_POST_MESSAGETEXT
-    native.call(0x2ED7843F8F801023, true, true) --END_TEXT_COMMAND_THEFEED_POST_TICKER
+    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then 
+        menu.notify("Script loaded, head to Script Features", "Femboy Lua" .. version)
+    else
+        native.call(0x92F0DA1E27DB96DC, intcolor) --_THEFEED_SET_NEXT_POST_BACKGROUND_COLOR
+        native.call(0x202709F4C58A0424, "STRING") --BEGIN_TEXT_COMMAND_THEFEED_POST
+        native.call(0x6C188BE134E074AA, msg) --ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME
+        native.call(0x1CCD9A37359072CF, iconname, iconname, false, 0, title, subtitle) --END_TEXT_COMMAND_THEFEED_POST_MESSAGETEXT
+        native.call(0x2ED7843F8F801023, true, true) --END_TEXT_COMMAND_THEFEED_POST_TICKER
+    end
 end
-NotifyMap("Femboy Lua", version .. " ~h~~r~Femboy Lua Script", "~b~Script Loaded, head to Script Features", "CHAR_MP_STRIPCLUB_PR", 140) --no_u = invalid image / does not exist
+NotifyMap("Femboy Lua ", version .. " ~h~~r~Femboy Lua Script", "~b~Script Loaded, head to Script Features", "CHAR_MP_STRIPCLUB_PR", 140) --no_u = invalid image / does not exist
 
 menu.notify("Saved Settings, Loaded", "Femboy Menu")
 -- parents
@@ -112,8 +110,12 @@ feats.mobileradio = menu.add_feature("Mobile Radio", "toggle", popt.id, function
     gameplay.set_mobile_radio(f.on)
 end)
 
+local notified = false
 menu.add_feature("Ragdoll On Q", "value_str", popt.id, function(f)
-    menu.notify("Normal Ragdoll is recommended. Press Q to enable ragdoll, Press Q again to stand back up", "Femboy Menu")
+    if not notified then
+        menu.notify("Normal Ragdoll is recommended. Press Q to enable ragdoll, Press Q again to stand back up", "Femboy Menu")
+        notified = true
+    end
     while f.on do
         if (controls.is_control_just_pressed(0, 44) or controls.is_control_just_pressed(2, 44)) then
             local pid = player.player_ped()
@@ -128,20 +130,88 @@ menu.add_feature("Ragdoll On Q", "value_str", popt.id, function(f)
 end):set_str_data({"Narrow Leg Stumble", "Wide Leg Stumble", "Normal Ragdoll"})
 
 feats.clumsy = menu.add_feature("Clumsy Player", "toggle", popt.id, function(f)
-    while f.on do
-        native.call(0xF0A4F1BBF4FA7497, player.player_ped(), true)
-        system.wait()
+    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then 
+        menu.notify("Natives are required to be enabled to use this feature", "Femboy Lua")
+        f.on=false
+    else
+        while f.on do
+            native.call(0xF0A4F1BBF4FA7497, player.player_ped(), true)
+            system.wait()
+        end
     end
 end)
 
 -- vehicle options
 local dorctrl = menu.add_feature("Door Control", "parent", vehopt.id)
+local vcol = menu.add_feature("Vehicle Hex Colours", "parent", vehopt.id)
 local lightctrl = menu.add_feature("Light Control", "parent", vehopt.id)
 local vehaudio = menu.add_feature("Vehicle Audio", "parent", vehopt.id)
 
+menu.add_feature("Set Primary Hex Colour", "action", vcol.id, function(f)
+    local veh = player.get_player_vehicle(player.player_id())
+
+    if player.is_player_in_any_vehicle(player.player_id()) then
+
+        repeat
+            rtn, colour = input.get("Enter custom colour hex value", "", 6, eInputType.IT_ASCII)
+            if rtn == 2 then return end
+            system.wait(0)
+        until rtn == 0
+
+        local hex_colour = tonumber(colour, 16)
+        vehicle.set_vehicle_custom_primary_colour(veh, hex_colour)
+        menu.notify("Custom primary colour set to " .. colour, "Custom Colour")
+    else
+        menu.notify("You are not in a vehicle!", "Femboy Menu")
+    end
+end)
+
+menu.add_feature("Set Secondary Hex Colour", "action", vcol.id, function(f)
+    local veh = player.get_player_vehicle(player.player_id())
+
+    if player.is_player_in_any_vehicle(player.player_id()) then
+
+        repeat
+            rtn, colour = input.get("Enter custom colour hex value", "", 6, eInputType.IT_ASCII)
+            if rtn == 2 then return end
+            system.wait(0)
+        until rtn == 0
+
+        local hex_colour = tonumber(colour, 16)
+        vehicle.set_vehicle_custom_secondary_colour(veh, hex_colour)
+        menu.notify("Custom secondary colour set to " .. colour, "Custom Colour")
+    else
+        menu.notify("You are not in a vehicle!", "Femboy Menu")
+    end
+end)
+
+menu.add_feature("Set Pearlescent Hex Colour", "action", vcol.id, function(f)
+    local veh = player.get_player_vehicle(player.player_id())
+
+    if player.is_player_in_any_vehicle(player.player_id()) then
+
+        repeat
+            rtn, colour = input.get("Enter custom colour hex value", "", 6, eInputType.IT_ASCII)
+            if rtn == 2 then return end
+            system.wait(0)
+        until rtn == 0
+
+        local hex_colour = tonumber(colour, 16)
+        vehicle.set_vehicle_custom_pearlescent_colour(veh, hex_colour)
+        menu.notify("Custom pearlescent colour set to " .. colour, "Custom Colour")
+    else
+        menu.notify("You are not in a vehicle!", "Femboy Menu")
+    end
+end)
+
 local rattle = menu.add_feature("engine rattle", "value_f", vehaudio.id, function(f)
-    local veh = player.player_vehicle()
-    native.call(0x01BB4D577D38BD9E, veh, f.value, f.on)
+    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then 
+        menu.notify("Natives are required to be enabled to use this feature", "Femboy Lua")
+        f.on=false
+    else
+        local veh = player.player_vehicle()
+        native.call(0x01BB4D577D38BD9E, veh, f.value, f.on)
+    end
 end)
 rattle.min = 0.0
 rattle.max = 1.0
@@ -155,18 +225,25 @@ end)
 feats.autorepair = menu.add_feature("Auto Repair", "toggle", vehopt.id, function(f)
     while f.on do
         local veh = player.player_vehicle()
-        if vehicle.is_vehicle_damaged(player.player_vehicle()) then
-            vehicle.set_vehicle_fixed(player.get_player_vehicle(player.player_id()), true)
+        if veh then 
+            if vehicle.is_vehicle_damaged(veh) then
+                vehicle.set_vehicle_fixed(player.get_player_vehicle(player.player_id()), true)
+            end
         end
         system.wait(0.5)
     end
 end)
 
 local dirtLevel = menu.add_feature("Dirt Level", "autoaction_value_f", vehopt.id, function(feat)
-    local veh = player.get_player_vehicle(player.player_id())
-    while feat.value do
-        native.call(0x79D3B596FE44EE8B, veh, feat.value)
-        system.wait(0)
+    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then 
+        menu.notify("Natives are required to be enabled to use this feature", "Femboy Lua")
+        feat.on=false
+    else
+        local veh = player.get_player_vehicle(player.player_id())
+        while feat.value do
+            native.call(0x79D3B596FE44EE8B, veh, feat.value)
+            system.wait(0)
+        end
     end
 end)
 dirtLevel.min = 0.0
@@ -174,9 +251,14 @@ dirtLevel.max = 15.0
 dirtLevel.mod = 1.0
 
 feats.stayclean = menu.add_feature("Stay clean", "toggle", vehopt.id, function(feat)
-    while feat.on do
-        native.call(0x79D3B596FE44EE8B, player.get_player_vehicle(player.player_id()), 0)
-        system.wait(0)
+    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then 
+        menu.notify("Natives are required to be enabled to use this feature", "Femboy Lua")
+        feat.on=false
+    else
+        while feat.on do
+            native.call(0x79D3B596FE44EE8B, player.get_player_vehicle(player.player_id()), 0)
+            system.wait(0)
+        end
     end
 end)
 
@@ -241,58 +323,83 @@ grvty.max = 20.0
 grvty.mod = 1.0
 
 feats.airsuspension = menu.add_feature("Air Suspension", "toggle", vehopt.id, function(f)
-local veh = player.get_player_vehicle(player.player_id())
-    while f.on do
-        system.wait()
-        local speed = entity.get_entity_speed(player.get_player_vehicle(player.player_id()))
-        if speed > 0.5 then
-            native.call(0x3A375167F5782A65, veh, false)
-        else
-            native.call(0x3A375167F5782A65, veh, true)
+    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then 
+        menu.notify("Natives are required to be enabled to use this feature", "Femboy Lua")
+        f.on=false
+    else
+        local veh = player.get_player_vehicle(player.player_id())
+        while f.on do
+            system.wait()
+            local speed = entity.get_entity_speed(player.get_player_vehicle(player.player_id()))
+            if speed > 0.5 then
+                native.call(0x3A375167F5782A65, veh, false)
+            else
+                native.call(0x3A375167F5782A65, veh, true)
+            end
+            system.wait()
         end
-        system.wait()
     end
     local speed = entity.get_entity_speed(player.get_player_vehicle(player.player_id()))
     native.call(0x3A375167F5782A65, veh, false)
 end)
 		
 feats.driftsuspension = menu.add_feature("Drift Suspension", "toggle", vehopt.id, function(f)
-	menu.notify("only works on vehicles released in the Tuners Update", "Femboy Menu")
-    while f.on do 
-	    local veh = player.get_player_vehicle(player.player_id())
-	    native.call(0x3A375167F5782A65, veh, f.on) -- SET_REDUCE_DRIFT_VEHICLE_SUSPENSION(veh, bool) 
-        system.wait()
+    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then 
+        menu.notify("Natives are required to be enabled to use this feature", "Femboy Lua")
+        f.on=false
+    else
+        menu.notify("only works on vehicles released in the Tuners Update", "Femboy Menu")
+        while f.on do 
+            local veh = player.get_player_vehicle(player.player_id())
+            native.call(0x3A375167F5782A65, veh, f.on) -- SET_REDUCE_DRIFT_VEHICLE_SUSPENSION(veh, bool) 
+            system.wait()
+        end
+        local veh = player.get_player_vehicle(player.player_id())
+        native.call(0x3A375167F5782A65, veh, f.off)
     end
-    local veh = player.get_player_vehicle(player.player_id())
-    native.call(0x3A375167F5782A65, veh, f.off)
 end) 
 
 feats.drifttyres = menu.add_feature("Drift Tyres", "toggle", vehopt.id, function(f)
-    while f.on do
-	    local veh = player.get_player_vehicle(player.player_id())
-	    native.call(0x5AC79C98C5C17F05, veh, f.on) -- SET_DRIFT_TYRES_ENABLED(veh, bool)
-        system.wait()
+    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then 
+        menu.notify("Natives are required to be enabled to use this feature", "Femboy Lua")
+        f.on=false
+    else
+        while f.on do
+            local veh = player.get_player_vehicle(player.player_id())
+            native.call(0x5AC79C98C5C17F05, veh, f.on) -- SET_DRIFT_TYRES_ENABLED(veh, bool)
+            system.wait()
+        end
+        local veh = player.get_player_vehicle(player.player_id())
+        native.call(0x5AC79C98C5C17F05, veh, f.off)
     end
-    local veh = player.get_player_vehicle(player.player_id())
-    native.call(0x5AC79C98C5C17F05, veh, f.off)
 end)
 
 feats.launchcontrol = menu.add_feature("Launch Control", "toggle", vehopt.id, function(f)
-    while f.on do 
+    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then 
+        menu.notify("Natives are required to be enabled to use this feature", "Femboy Lua")
+        f.on=false
+    else
+        while f.on do 
+            local veh = player.get_player_vehicle(player.player_id())
+            native.call(0xAA6A6098851C396F,veh, f.on)
+            system.wait()
+        end
         local veh = player.get_player_vehicle(player.player_id())
-	    native.call(0xAA6A6098851C396F,veh, f.on)
-        system.wait()
+        native.call(0xAA6A6098851C396F,veh, f.off)
     end
-    local veh = player.get_player_vehicle(player.player_id())
-    native.call(0xAA6A6098851C396F,veh, f.off)
 end)
 
 menu.add_feature("Exhaust backfire", "value_str", vehopt.id, function(f)
-    if player.is_player_in_any_vehicle(player.player_id()) then 
-        while f.on do 
-            local veh = player.player_vehicle()
-            native.call(0x2BE4BC731D039D5A, veh, f.value)
-            system.wait()
+    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then 
+        menu.notify("Natives are required to be enabled to use this feature", "Femboy Lua")
+        f.on=false
+    else
+        if player.is_player_in_any_vehicle(player.player_id()) then 
+            while f.on do 
+                local veh = player.player_vehicle()
+                native.call(0x2BE4BC731D039D5A, veh, f.value)
+                system.wait()
+            end
         end
     end
 end):set_str_data({"Disable", "Enable"})
@@ -310,50 +417,87 @@ feat_tv.pwr.min = 0
 feat_tv.pwr.max = 10000
 feat_tv.pwr.mod = 10
 
-local veh_max_speed = menu.add_feature("Speed Limiter", "value_f", vehopt.id, function(f)
+local veh_max_speed = menu.add_feature("Speed Limiter (Mph)", "value_f", vehopt.id, function(f)
     while f.on do
     local veh = player.get_player_vehicle(player.player_id())
         if veh then
-        entity.set_entity_max_speed(veh, f.value)
+            entity.set_entity_max_speed(veh, (f.value / 2.236936))
         end
         system.wait(0)
     end
     local veh = player.get_player_vehicle(player.player_id())
-entity.set_entity_max_speed(veh, 155)
+    entity.set_entity_max_speed(veh, 155)
 end)
 veh_max_speed.min = 1.0
 veh_max_speed.max = 10000.0
 veh_max_speed.mod = 5.0
 veh_max_speed.value = 155.0
 
+menu.add_feature("Speedometer", "value_str", vehopt.id, function(f)
+    while f.on do
+    local speed = entity.get_entity_speed(player.get_player_vehicle(player.player_id()))
+    
+        ui.set_text_scale(0.35)
+        ui.set_text_font(0)
+        ui.set_text_centre(0)
+        ui.set_text_color(255, 255, 255, 255)
+        ui.set_text_outline(true)
+    
+            if f.value == 0 then
+                ui.draw_text(math.floor(speed * 2.236936).." Mph", v2(0.5, 0.95))
+            end
+            if f.value == 1 then
+                ui.draw_text(math.floor(speed * 3.6).." Kph", v2(0.5, 0.95))
+            end
+    
+        system.wait(0)
+    end
+    
+end):set_str_data({"Mph", "Kph"})
+
 local fwdlaunch = menu.add_feature("Launch Forward", "action_slider", vehopt.id, function(f)
-    local veh = player.get_player_vehicle(player.player_id())
-	native.call(0xAB54A438726D25D5, veh, f.value)
+    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then 
+        menu.notify("Natives are required to be enabled to use this feature", "Femboy Lua")
+        f.on=false
+    else
+        local veh = player.get_player_vehicle(player.player_id())
+        native.call(0xAB54A438726D25D5, veh, f.value)
+    end
 end)
 fwdlaunch.min = 0.0
 fwdlaunch.max = 10000.0
 fwdlaunch.mod = 50.0
 
 local rgbX = menu.add_feature("RGB Xenon", "value_i", lightctrl.id, function(f)
-    menu.notify("Xenon Lights Added, BEGIN THE RAVE")
-    native.call(0x2A1F4F37F95BAD08, veh, 22, f.on) -- TOGGLE_VEHICLE_MOD
-    while f.on do
-        local veh = player.get_player_vehicle(player.player_id())
-            for i=1,12 do
-                native.call(0xE41033B25D003A07, veh, i) -- SET_VEHICLE_XENON_LIGHTS_COLOR
-                system.wait(f.value)
-            end
-        system.wait(0)
+    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then 
+        menu.notify("Natives are required to be enabled to use this feature", "Femboy Lua")
+        f.on=false
+    else
+        menu.notify("Xenon Lights Added, BEGIN THE RAVE")
+        native.call(0x2A1F4F37F95BAD08, veh, 22, f.on) -- TOGGLE_VEHICLE_MOD
+        while f.on do
+            local veh = player.get_player_vehicle(player.player_id())
+                for i=1,12 do
+                    native.call(0xE41033B25D003A07, veh, i) -- SET_VEHICLE_XENON_LIGHTS_COLOR
+                    system.wait(f.value)
+                end
+            system.wait(0)
+        end
     end
 end)
 rgbX.min = 0
 rgbX.max = 2500
 rgbX.mod = 100
 
-local Hedlit = menu.add_feature("Headlight Brightness", "autoaction_value_f", lightctrl.id, function(f)
-	while f.on do
-        local veh = player.get_player_vehicle(player.player_id())
-	    native.call(0xB385454F8791F57C, veh, f.value)
+local Hedlit = menu.add_feature("Headlight Brightness", "autoaction_value_f", lightctrl.id, function(f) 
+    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then 
+        menu.notify("Natives are required to be enabled to use this feature", "Femboy Lua")
+        f.on=false
+    else
+        while f.on do
+            local veh = player.get_player_vehicle(player.player_id())
+            native.call(0xB385454F8791F57C, veh, f.value)
+        end
     end
 end)
 Hedlit.min = 0.0
@@ -361,20 +505,35 @@ Hedlit.max = 100.0
 Hedlit.mod = 1.0
 
 menu.add_feature("Turn engine off", "action", vehopt.id, function()
-	local veh = player.get_player_vehicle(player.player_id())
-	native.call(0x2497C4717C8B881E, veh, 0, 0, true)
+    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then 
+        menu.notify("Natives are required to be enabled to use this feature", "Femboy Lua")
+        f.on=false
+    else
+        local veh = player.get_player_vehicle(player.player_id())
+        native.call(0x2497C4717C8B881E, veh, 0, 0, true)
+    end
 end)
 	
 menu.add_feature("Kill engine", "action", vehopt.id, function()
-	menu.notify("next bit of damage will kill the car, gl", "Femboy Menu")
-	local veh = player.get_player_vehicle(player.player_id())
-	native.call(0x45F6D8EEF34ABEF1, veh, 0)
+    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then 
+        menu.notify("Natives are required to be enabled to use this feature", "Femboy Lua")
+        f.on=false
+    else
+        menu.notify("next bit of damage will kill the car, gl", "Femboy Menu")
+        local veh = player.get_player_vehicle(player.player_id())
+        native.call(0x45F6D8EEF34ABEF1, veh, 0)
+    end
 end)
 
 menu.add_feature("Notify Engine Health" , "action" , vehopt.id, function(feat)
-    local veh = player.get_player_vehicle(player.player_id())
-    local enginehealth = native.call(0xC45D23BAF168AAB8 , veh):__tonumber() --GET_VEHICLE_ENGINE_HEALTH
-    menu.notify("Engine health is " .. enginehealth .. ".", "Femboy Menu")
+    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then 
+        menu.notify("Natives are required to be enabled to use this feature", "Femboy Lua")
+        f.on=false
+    else
+        local veh = player.get_player_vehicle(player.player_id())
+        local enginehealth = native.call(0xC45D23BAF168AAB8 , veh):__tonumber() --GET_VEHICLE_ENGINE_HEALTH
+        menu.notify("Engine health is " .. enginehealth .. ".", "Femboy Menu")
+    end
 end) 
 
 menu.add_feature("Set Patriot Tyre Smoke", "action" , vehopt.id, function()
@@ -397,15 +556,25 @@ menu.add_feature("Close All Doors", "action" , dorctrl.id, function(feat)
 end) 
 
 menu.add_feature("Remove All Doors", "action" , dorctrl.id, function(feat)
-    local veh = player.get_player_vehicle(player.player_id())
-    for i = 0, 5 do
-        native.call(0xD4D4F6A4AB575A33 , veh , i , true) -- SET_VEHICLE_DOOR_BROKEN
+    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then 
+        menu.notify("Natives are required to be enabled to use this feature", "Femboy Lua")
+        f.on=false
+    else
+        local veh = player.get_player_vehicle(player.player_id())
+        for i = 0, 5 do
+            native.call(0xD4D4F6A4AB575A33 , veh , i , true) -- SET_VEHICLE_DOOR_BROKEN
+        end
     end
 end)
 
 local brkdor = menu.add_feature("Remove Specific Door", "action_value_i", dorctrl.id, function(feat)
-    local veh = player.get_player_vehicle(player.player_id())
-	native.call(0xD4D4F6A4AB575A33 , veh , feat.value, true) -- SET_VEHICLE_DOOR_BROKEN, true = delete, false = break
+    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then 
+        menu.notify("Natives are required to be enabled to use this feature", "Femboy Lua")
+        f.on=false
+    else
+        local veh = player.get_player_vehicle(player.player_id())
+        native.call(0xD4D4F6A4AB575A33 , veh , feat.value, true) -- SET_VEHICLE_DOOR_BROKEN, true = delete, false = break
+    end
 end)
 brkdor.min = 0
 brkdor.max = 5
@@ -418,10 +587,15 @@ brkdor.mod = 1
 --VEH_EXT_BOOT = 5,
 
 local wndwcol = menu.add_feature("Window Colour", "action_value_i", dorctrl.id, function(feat)
-    local veh = player.get_player_vehicle(player.player_id())
-    while feat.on do
-        native.call(0x57C51E6BAD752696, veh, feat.value)
-        system.wait(0)
+    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then 
+        menu.notify("Natives are required to be enabled to use this feature", "Femboy Lua")
+        f.on=false
+    else
+        local veh = player.get_player_vehicle(player.player_id())
+        while feat.on do
+            native.call(0x57C51E6BAD752696, veh, feat.value)
+            system.wait(0)
+        end
     end
 end)
 wndwcol.min = 0
@@ -429,14 +603,19 @@ wndwcol.max = 5
 wndwcol.mod = 1
 
 menu.add_feature("Windows open/close", "toggle", dorctrl.id, function(feat)
-	local veh = player.get_player_vehicle(player.player_id())
-	if feat.on then
-		native.call(0x85796B0549DDE156, veh) -- ROLL_DOWN_WINDOWS
-	else 
-		for i = 0, 3 do
-			native.call(0x602E548F46E24D59, veh, i) -- ROLL_UP_WINDOW
-		end
-	end
+    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then 
+        menu.notify("Natives are required to be enabled to use this feature", "Femboy Lua")
+        f.on=false
+    else
+        local veh = player.get_player_vehicle(player.player_id())
+        if feat.on then
+            native.call(0x85796B0549DDE156, veh) -- ROLL_DOWN_WINDOWS
+        else 
+            for i = 0, 3 do
+                native.call(0x602E548F46E24D59, veh, i) -- ROLL_UP_WINDOW
+            end
+        end
+    end
 end)
 
 -- online options
@@ -502,6 +681,17 @@ end)
 
 -- Moderation options
 local modopt = menu.add_feature("Moderation Options", "parent", onlopt.id)
+local autokickopt = menu.add_feature("Auto Kicker Options", "parent", modopt.id, function()
+    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_HTTP) then 
+        menu.notify("HTTP trusted mode must be enabled to use these.", "Femboy Menu")
+    end
+end)
+
+local function dec_to_ipv4(ip)
+    if ip then
+        return string.format("%i.%i.%i.%i", ip >> 24 & 255, ip >> 16 & 255, ip >> 8 & 255, ip & 255)
+    end
+end
 
 local racismfilter = {
 	"assnigger",
@@ -790,6 +980,26 @@ feats.blockfrench = menu.add_feature("Block French In Chat", "toggle", modopt.id
         event.remove_event_listener("chat", french)
     end
 end)
+feats.blockfrenchip = menu.add_feature("Auto Kick The French by IP", "toggle", autokickopt.id, function(f)
+    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_HTTP) then 
+        menu.notify("HTTP trusted mode must be enabled to use this.", "Femboy Menu")
+        f.on=false
+    else
+        while f.on do
+            for pid = 0,31 do
+                local player_ip = player.get_player_ip(pid)
+                local response, info = web.get("http://ip-api.com/json/" .. dec_to_ipv4(player_ip) .."?fields=2")
+                if response == 200 then
+                    if string.find(info, "FR") and pid ~= ped then
+                        menu.notify(string.format("Player %s (IP: %s) is from France! Removing them now for you! :D", player.get_player_name(pid), dec_to_ipv4(player_ip)), "Location Detection")
+                        network.force_remove_player(pid)
+                    end
+                end
+            end
+            system.wait(3000)
+        end
+    end
+end)
 
 local blockdutch= {
     "de",
@@ -895,6 +1105,26 @@ feats.blockdutch = menu.add_feature("Block Dutch In Chat", "toggle", modopt.id, 
         event.remove_event_listener("chat", dutch)
     end
 end)
+feats.blockdutchip = menu.add_feature("Auto Kick The Dutch by IP", "toggle", autokickopt.id, function(f)
+    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_HTTP) then 
+        menu.notify("HTTP trusted mode must be enabled to use this.", "Femboy Menu")
+        f.on=false
+    else
+        while f.on do
+            for pid = 0,31 do
+                local player_ip = player.get_player_ip(pid)
+                local response, info = web.get("http://ip-api.com/json/" .. dec_to_ipv4(player_ip) .."?fields=2")
+                if response == 200 then
+                    if string.find(info, "NL") and pid ~= ped then
+                        menu.notify(string.format("Player %s (IP: %s) is from the Netherlands! Removing them now for you! :D", player.get_player_name(pid), dec_to_ipv4(player_ip)), "Location Detection")
+                        network.force_remove_player(pid)
+                    end
+                end
+            end
+            system.wait(3000)
+        end
+    end
+end)
 
 local blockrussian= {
     "б",
@@ -948,6 +1178,26 @@ feats.blockrussian = menu.add_feature("Block Russian In Chat", "toggle", modopt.
         end)
     else 
         event.remove_event_listener("chat", russian)
+    end
+end)
+feats.blockrussianip = menu.add_feature("Auto Kick Russians by IP", "toggle", autokickopt.id, function(f)
+    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_HTTP) then 
+        menu.notify("HTTP trusted mode must be enabled to use this.", "Femboy Menu")
+        f.on=false
+    else
+        while f.on do
+            for pid = 0,31 do
+                local player_ip = player.get_player_ip(pid)
+                local response, info = web.get("http://ip-api.com/json/" .. dec_to_ipv4(player_ip) .."?fields=2")
+                if response == 200 then
+                    if string.find(info, "RU") and pid ~= ped then
+                        menu.notify(string.format("Player %s (IP: %s) is from Russia! Removing them now for you! :D", player.get_player_name(pid), dec_to_ipv4(player_ip)), "Location Detection")
+                        network.force_remove_player(pid)
+                    end
+                end
+            end
+            system.wait(3000)
+        end
     end
 end)
 
@@ -1040,6 +1290,26 @@ feats.blockchinese = menu.add_feature("Block Chinese In Chat", "toggle", modopt.
         end)
     else 
         event.remove_event_listener("chat", china)
+    end
+end)
+feats.blockchineseip = menu.add_feature("Auto Kick The Chinese by IP", "toggle", autokickopt.id, function(f)
+    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_HTTP) then 
+        menu.notify("HTTP trusted mode must be enabled to use this.", "Femboy Menu")
+        f.on=false
+    else
+        while f.on do
+            for pid = 0,31 do
+                local player_ip = player.get_player_ip(pid)
+                local response, info = web.get("http://ip-api.com/json/" .. dec_to_ipv4(player_ip) .."?fields=2")
+                if response == 200 then
+                    if string.find(info, "CN") and pid ~= ped then
+                        menu.notify(string.format("Player %s (IP: %s) is from China! Removing them now for you! :D", player.get_player_name(pid), dec_to_ipv4(player_ip)), "Location Detection")
+                        network.force_remove_player(pid)
+                    end
+                end
+            end
+            system.wait(3000)
+        end
     end
 end)
 
@@ -1182,6 +1452,26 @@ menu.add_feature("Block English In Chat", "toggle", modopt.id, function(func)
         event.remove_event_listener("chat", english)
     end
 end)
+menu.add_feature("Auto Kick The English by IP", "toggle", autokickopt.id, function(f)
+    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_HTTP) then 
+        menu.notify("HTTP trusted mode must be enabled to use this.", "Femboy Menu")
+        f.on=false
+    else
+        while f.on do
+            for pid = 0,31 do
+                local player_ip = player.get_player_ip(pid)
+                local response, info = web.get("http://ip-api.com/json/" .. dec_to_ipv4(player_ip) .."?fields=2")
+                if response == 200 then
+                    if string.find(info, "GB") and pid ~= ped then
+                        menu.notify(string.format("Player %s (IP: %s) is from England! Removing them now for you! :D", player.get_player_name(pid), dec_to_ipv4(player_ip)), "Location Detection")
+                        network.force_remove_player(pid)
+                    end
+                end
+            end
+            system.wait(3000)
+        end
+    end
+end)
 
 local botspam = {
 	"gtagta.cc",
@@ -1211,14 +1501,29 @@ end)
 
 --weather options
 local rainlvl = menu.add_feature("Magic puddles", "autoaction_value_f", wthopt.id, function(feat)
-    native.call(0x643E26EA6E024D92, feat.value)
+    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then 
+        menu.notify("Natives are required to be enabled to use this feature", "Femboy Lua")
+        f.on=false
+    else
+        if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then 
+            menu.notify("Natives are required to be enabled to use this feature", "Femboy Menu")
+            f.on=false
+        else
+            native.call(0x643E26EA6E024D92, feat.value)
+        end
+    end
 end)
 rainlvl.min = 0.0
 rainlvl.max = 10.0
 rainlvl.mod = 0.5
 
 local windspd = menu.add_feature("Wind speed", "autoaction_value_f", wthopt.id, function(feat)
-    native.call(0xEE09ECEDBABE47FC, feat.value)
+    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then 
+        menu.notify("Natives are required to be enabled to use this feature", "Femboy Lua")
+        f.on=false
+    else
+        native.call(0xEE09ECEDBABE47FC, feat.value)
+    end
 end)
 windspd.min = 0.0
 windspd.max = 12.0
@@ -1226,21 +1531,26 @@ windspd.mod = 0.5
 
 --misc options
 feats.playerstalking = menu.add_feature("Show Player Talking", "toggle", miscopt.id, function(feat)
-    if feat.on then
-        local IsTalking = {}
-        while true do
-            system.yield(100)
-            for pid = 0, 31 do
-                if player.is_player_valid(pid) then
-                    if native.call(0x031E11F3D447647E, pid):__tointeger() == 1 then
-                        if not IsTalking[pid] then
-                            menu.notify(player.get_player_name(pid) .. " started talking", "Femboy Script")
-                            IsTalking[pid] = true
-                        end
-                    else
-                        if IsTalking[pid] then
-                            menu.notify(player.get_player_name(pid) .. " stopped talking", "Femboy Script")
-                            IsTalking[pid] = false
+    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then 
+        menu.notify("Natives are required to be enabled to use this feature", "Femboy Lua")
+        f.on=false
+    else
+        if feat.on then
+            local IsTalking = {}
+            while true do
+                system.yield(100)
+                for pid = 0, 31 do
+                    if player.is_player_valid(pid) then
+                        if native.call(0x031E11F3D447647E, pid):__tointeger() == 1 then
+                            if not IsTalking[pid] then
+                                menu.notify(player.get_player_name(pid) .. " started talking", "Femboy Script")
+                                IsTalking[pid] = true
+                            end
+                        else
+                            if IsTalking[pid] then
+                                menu.notify(player.get_player_name(pid) .. " stopped talking", "Femboy Script")
+                                IsTalking[pid] = false
+                            end
                         end
                     end
                 end
@@ -1250,7 +1560,12 @@ feats.playerstalking = menu.add_feature("Show Player Talking", "toggle", miscopt
 end, nil) -- thank you Ruly Pancake the whatever(th)
 
 menu.add_feature("Make Nearby NPCs Riot", "toggle", miscopt.id, function(feat)
-    native.call(0x2587A48BC88DFADF, feat.on)
+    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then 
+        menu.notify("Natives are required to be enabled to use this feature", "Femboy Lua")
+        f.on=false
+    else
+        native.call(0x2587A48BC88DFADF, feat.on)
+    end
 end)
 
 feats.skipcutscene = menu.add_feature("Auto Skip Cutscene", "toggle", miscopt.id, function(f)
@@ -1263,12 +1578,17 @@ feats.skipcutscene = menu.add_feature("Auto Skip Cutscene", "toggle", miscopt.id
 end)
 
 local mmdisco = menu.add_feature("Minimap Disco" , "value_i" , miscopt.id, function(feat)
-    while feat.on do
-        for i = 208, 213 do
-            native.call(0x6B1DE27EE78E6A19 , i)
-            system.wait(feat.value)
+    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then 
+        menu.notify("Natives are required to be enabled to use this feature", "Femboy Lua")
+        f.on=false
+    else
+        while feat.on do
+            for i = 208, 213 do
+                native.call(0x6B1DE27EE78E6A19 , i)
+                system.wait(feat.value)
+            end
+            system.wait(0)
         end
-        system.wait(0)
     end
 end)
 mmdisco.min = 0
@@ -1277,18 +1597,28 @@ mmdisco.mod = 100
 mmdisco.value = 100 
 
 menu.add_feature("Get All Achievements", "action", miscopt.id, function()
-    for i=1,77 do
-        native.call(0xBEC7076D64130195, i)
+    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then 
+        menu.notify("Natives are required to be enabled to use this feature", "Femboy Lua")
+        f.on=false
+    else
+        for i=1,77 do
+            native.call(0xBEC7076D64130195, i)
+        end
     end
 end)
 
 menu.add_feature("Hide HUD", "toggle", miscopt.id, function(feat)
-    if feat.on then
-        native.call(0xA6294919E56FF02A, false)
-        native.call(0xA0EBB943C300E693, false)
-    else 
-        native.call(0xA6294919E56FF02A, true)
-        native.call(0xA0EBB943C300E693, true)
+    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then 
+        menu.notify("Natives are required to be enabled to use this feature", "Femboy Lua")
+        f.on=false
+    else
+        if feat.on then
+            native.call(0xA6294919E56FF02A, false)
+            native.call(0xA0EBB943C300E693, false)
+        else 
+            native.call(0xA6294919E56FF02A, true)
+            native.call(0xA0EBB943C300E693, true)
+        end
     end
 end)
 
@@ -1301,57 +1631,72 @@ end)
 -- credits
 
 menu.add_feature("Toph", "action", cred.id, function()
-    local function NotifyMap(title, subtitle, msg, iconname, intcolor)
-        native.call(0x92F0DA1E27DB96DC, intcolor) --_THEFEED_SET_NEXT_POST_BACKGROUND_COLOR
-        native.call(0x202709F4C58A0424, "STRING") --BEGIN_TEXT_COMMAND_THEFEED_POST
-        native.call(0x6C188BE134E074AA, msg) --ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME
-        native.call(0x1CCD9A37359072CF, iconname, iconname, false, 0, title, subtitle) --END_TEXT_COMMAND_THEFEED_POST_MESSAGETEXT
-        native.call(0x2ED7843F8F801023, true, true) --END_TEXT_COMMAND_THEFEED_POST_TICKER
+    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then 
+        menu.notify("Helped an absolute BUNCH with understanding the API and helped with a lot of features!", "Toph")
+    else
+        local function NotifyMap(title, subtitle, msg, iconname, intcolor)
+            native.call(0x92F0DA1E27DB96DC, intcolor) --_THEFEED_SET_NEXT_POST_BACKGROUND_COLOR
+            native.call(0x202709F4C58A0424, "STRING") --BEGIN_TEXT_COMMAND_THEFEED_POST
+            native.call(0x6C188BE134E074AA, msg) --ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME
+            native.call(0x1CCD9A37359072CF, iconname, iconname, false, 0, title, subtitle) --END_TEXT_COMMAND_THEFEED_POST_MESSAGETEXT
+            native.call(0x2ED7843F8F801023, true, true) --END_TEXT_COMMAND_THEFEED_POST_TICKER
+    end
 end
 NotifyMap("Topher", "~h~~r~The Gopher", "~b~Helped an absolute BUNCH with understanding the API and helped with a lot of features!", "CHAR_HAO", 140) --no_u = invalid image / does not exist
 end)
 menu.add_feature("Rimuru", "action", cred.id, function()
-    local function NotifyMap(title, subtitle, msg, iconname, intcolor)
-        native.call(0x92F0DA1E27DB96DC, intcolor) --_THEFEED_SET_NEXT_POST_BACKGROUND_COLOR
-        native.call(0x202709F4C58A0424, "STRING") --BEGIN_TEXT_COMMAND_THEFEED_POST
-        native.call(0x6C188BE134E074AA, msg) --ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME
-        native.call(0x1CCD9A37359072CF, iconname, iconname, false, 0, title, subtitle) --END_TEXT_COMMAND_THEFEED_POST_MESSAGETEXT
-        native.call(0x2ED7843F8F801023, true, true) --END_TEXT_COMMAND_THEFEED_POST_TICKER
+    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then 
+        menu.notify("'let' me learn LUA using her script and gave me many helpful tips", "Rimuru")
+    else
+        local function NotifyMap(title, subtitle, msg, iconname, intcolor)
+            native.call(0x92F0DA1E27DB96DC, intcolor) --_THEFEED_SET_NEXT_POST_BACKGROUND_COLOR
+            native.call(0x202709F4C58A0424, "STRING") --BEGIN_TEXT_COMMAND_THEFEED_POST
+            native.call(0x6C188BE134E074AA, msg) --ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME
+            native.call(0x1CCD9A37359072CF, iconname, iconname, false, 0, title, subtitle) --END_TEXT_COMMAND_THEFEED_POST_MESSAGETEXT
+            native.call(0x2ED7843F8F801023, true, true) --END_TEXT_COMMAND_THEFEED_POST_TICKER
+    end
 end
 NotifyMap("Rimuru", "~h~~r~Wannabe Welsh", "~b~'let' me learn LUA using her script and gave me many helpful tips", "CHAR_WENDY", 140) --no_u = invalid image / does not exist
 end)
 menu.add_feature("Aren", "action", cred.id, function()
-    local function NotifyMap(title, subtitle, msg, iconname, intcolor)
-        native.call(0x92F0DA1E27DB96DC, intcolor) --_THEFEED_SET_NEXT_POST_BACKGROUND_COLOR
-        native.call(0x202709F4C58A0424, "STRING") --BEGIN_TEXT_COMMAND_THEFEED_POST
-        native.call(0x6C188BE134E074AA, msg) --ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME
-        native.call(0x1CCD9A37359072CF, iconname, iconname, false, 0, title, subtitle) --END_TEXT_COMMAND_THEFEED_POST_MESSAGETEXT
-        native.call(0x2ED7843F8F801023, true, true) --END_TEXT_COMMAND_THEFEED_POST_TICKER
+    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then 
+        menu.notify("Helped me a lot with LUA at the beginning, taught me how to use natives", "Aren")
+    else
+        local function NotifyMap(title, subtitle, msg, iconname, intcolor)
+            native.call(0x92F0DA1E27DB96DC, intcolor) --_THEFEED_SET_NEXT_POST_BACKGROUND_COLOR
+            native.call(0x202709F4C58A0424, "STRING") --BEGIN_TEXT_COMMAND_THEFEED_POST
+            native.call(0x6C188BE134E074AA, msg) --ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME
+            native.call(0x1CCD9A37359072CF, iconname, iconname, false, 0, title, subtitle) --END_TEXT_COMMAND_THEFEED_POST_MESSAGETEXT
+            native.call(0x2ED7843F8F801023, true, true) --END_TEXT_COMMAND_THEFEED_POST_TICKER
+    end
 end
 NotifyMap("Aren", "~h~~r~Mostly Cringe", "~b~Helped me a lot with LUA at the beginning, taught me how to use natives", "CHAR_JIMMY", 140) --no_u = invalid image / does not exist
 end)
 menu.add_feature("RulyPancake", "action", cred.id, function()
-    local function NotifyMap(title, subtitle, msg, iconname, intcolor)
-        native.call(0x92F0DA1E27DB96DC, intcolor) --_THEFEED_SET_NEXT_POST_BACKGROUND_COLOR
-        native.call(0x202709F4C58A0424, "STRING") --BEGIN_TEXT_COMMAND_THEFEED_POST
-        native.call(0x6C188BE134E074AA, msg) --ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME
-        native.call(0x1CCD9A37359072CF, iconname, iconname, false, 0, title, subtitle) --END_TEXT_COMMAND_THEFEED_POST_MESSAGETEXT
-        native.call(0x2ED7843F8F801023, true, true) --END_TEXT_COMMAND_THEFEED_POST_TICKER
+    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then 
+        menu.notify("Made the 'Show Player Talking' feature", "RulyPancake")
+    else
+        local function NotifyMap(title, subtitle, msg, iconname, intcolor)
+            native.call(0x92F0DA1E27DB96DC, intcolor) --_THEFEED_SET_NEXT_POST_BACKGROUND_COLOR
+            native.call(0x202709F4C58A0424, "STRING") --BEGIN_TEXT_COMMAND_THEFEED_POST
+            native.call(0x6C188BE134E074AA, msg) --ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME
+            native.call(0x1CCD9A37359072CF, iconname, iconname, false, 0, title, subtitle) --END_TEXT_COMMAND_THEFEED_POST_MESSAGETEXT
+            native.call(0x2ED7843F8F801023, true, true) --END_TEXT_COMMAND_THEFEED_POST_TICKER
+    end
 end
 NotifyMap("RulyPancake", "~h~~r~4th, 5th, 6th, idk anymore", "~b~Made the 'Show Player Talking' feature", "CHAR_JOE", 140) --no_u = invalid image / does not exist
 end)
 
 -- settings 
-
+LoadSettings()
 menu.add_feature("Save Settings", "action", set.id, function(f)
     SaveSettings()
 end)
-menu.create_thread(function()
-    while true do
-        if controls.is_control_just_pressed(0, 169) or controls.is_control_just_pressed(2, 169) then
+menu.add_feature("F8 to save settings", "toggle", set.id, function(f)
+    while f.on do
+        if controls.is_control_just_pressed(0, 169) or controls.is_control_just_pressed(2, 169) and f.on then
             SaveSettings()
         end
     system.wait()
     end
-end)
-LoadSettings()
+end).on=true
