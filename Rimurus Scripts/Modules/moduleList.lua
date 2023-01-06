@@ -8,7 +8,8 @@ local moduleList = {
     {name = "Rain Spawner", link = "https://raw.githubusercontent.com/Rimmuru/Rimurus-2T1-Scripts/main/Rimurus%20Scripts/Modules/Rain%20Spawner.lua", author = "GhostOne#0991"},
     {name = "Escort", link = "https://raw.githubusercontent.com/Rimmuru/Rimurus-2T1-Scripts/main/Rimurus%20Scripts/Modules/Escort.lua", author = "INI2Moist"},
     {name = "RC Troll", link = "https://raw.githubusercontent.com/Rimmuru/Rimurus-2T1-Scripts/main/Rimurus%20Scripts/Modules/RC%20Troll.lua", author = "unknown"},
-    {name = "ScriptHostFuckery", link = "https://raw.githubusercontent.com/Rimmuru/Rimurus-2T1-Scripts/main/Rimurus%20Scripts/Modules/ScriptHostFuckery.lua", author = "DemonKiya(updated by Rimuru)"}
+    {name = "ScriptHostFuckery", link = "https://raw.githubusercontent.com/Rimmuru/Rimurus-2T1-Scripts/main/Rimurus%20Scripts/Modules/ScriptHostFuckery.lua", author = "DemonKiya(updated by Rimuru)"},
+    {name = "ScriptHostFuckery", link = "https://github.com/Rimmuru/Rimurus-2T1-Scripts/blob/main/Rimurus%20Scripts/Modules/TophsOverlay.lua", author = "Toph"}
 
 }
 return moduleList
