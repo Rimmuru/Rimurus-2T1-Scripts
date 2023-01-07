@@ -1,7 +1,7 @@
 local feats, feat_vals, feat_tv = {}, {}, {}
 local appdata = utils.get_appdata_path("PopstarDevs", "2Take1Menu")
 local INI = IniParser(appdata .. "\\scripts\\FemboyMenu.ini")
-local version = "v1.3.0"
+local version = "v1.4.0"
 
 local function SaveSettings()
     for k, v in pairs(feats) do
@@ -85,6 +85,9 @@ feat_tv.AllRGBHair = menu.add_feature("Loop All Hair Colors", "value_i", rgb.id,
         local playerped = player.get_player_ped(player.player_id())
         for i = 0, 63 do
             ped.set_ped_hair_colors(playerped, i, i)
+            if not f.on then
+                break
+            end
             system.wait(f.value)
         end
     end
@@ -98,6 +101,9 @@ feat_tv.RGBHair = menu.add_feature("Rainbow Hair (better)", "value_i", rgb.id, f
         local playerped = player.get_player_ped(player.player_id())
         for i = 33, 53 do
             ped.set_ped_hair_colors(playerped, i, i)
+            if not f.on then
+                break
+            end
             system.wait(f.value)
         end
     end
@@ -142,6 +148,8 @@ feats.clumsy = menu.add_feature("Clumsy Player", "toggle", popt.id, function(f)
 end)
 
 -- vehicle options
+menu.add_feature("--    Sub Menus    --", "action", vehopt.id)
+
 local dorctrl = menu.add_feature("Door Control", "parent", vehopt.id)
 local vcol = menu.add_feature("Vehicle Hex Colours", "parent", vehopt.id)
 local lightctrl = menu.add_feature("Light Control", "parent", vehopt.id)
@@ -221,6 +229,8 @@ rattle.value = 0.0
 menu.add_feature("Fix Vehicle", "action", vehopt.id, function()
 	vehicle.set_vehicle_fixed(player.get_player_vehicle(player.player_id()), true)
 end)
+
+menu.add_feature("--------------------", "action", vehopt.id)
 
 feats.autorepair = menu.add_feature("Auto Repair", "toggle", vehopt.id, function(f)
     while f.on do
@@ -672,20 +682,23 @@ feats.enableaimkarma = menu.add_feature("Enable Aim Karma", "toggle", autoaim.id
         APv2(f)
     end
 end)
+menu.add_feature("--------------------", "action", autoaim.id)
 feats.notifykarma = menu.add_feature("Notify If Aimed At", "toggle", autoaim.id, function(f)
-    notify = f.on
+    notifykarma = f.on
 end)
 feats.kickkarma = menu.add_feature("Kick Player", "toggle", autoaim.id, function(f)
-    kick = f.on 
+    kickkarma = f.ona 
 end)
 
 -- Moderation options
 local modopt = menu.add_feature("Moderation Options", "parent", onlopt.id)
-local autokickopt = menu.add_feature("Auto Kicker Options", "parent", modopt.id, function()
+local automod = menu.add_feature("Auto Kicker By Modder Flags Options", "parent", modopt.id)
+local autokickopt = menu.add_feature("Auto Kicker By IP Options", "parent", modopt.id, function()
     if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_HTTP) then 
         menu.notify("HTTP trusted mode must be enabled to use these.", "Femboy Menu")
     end
 end)
+local chatmodopt = menu.add_feature("Chat Moderation Options", "parent", modopt.id)
 
 local function dec_to_ipv4(ip)
     if ip then
@@ -786,7 +799,7 @@ local f = function(s)
 	end
 	return false
 end
-feats.blockracism = menu.add_feature("Block Racism In Chat", "toggle", modopt.id, function(func)
+feats.blockracism = menu.add_feature("Block Racism In Chat", "toggle", chatmodopt.id, function(func)
     if func.on then
         racism = event.add_event_listener("chat", function(e)
 	        if f(e.body) then
@@ -849,7 +862,7 @@ local f = function(s)
 	end
 	return false
 end
-feats.blockhomophobia = menu.add_feature("Block Homophobia In Chat", "toggle", modopt.id, function(func)
+feats.blockhomophobia = menu.add_feature("Block Homophobia In Chat", "toggle", chatmodopt.id, function(func)
     if func.on then
         homophobic = event.add_event_listener("chat", function(e)
 	        if f(e.body) then
@@ -968,7 +981,7 @@ local f = function(s)
 	end
 	return false
 end
-feats.blockfrench = menu.add_feature("Block French In Chat", "toggle", modopt.id, function(func)
+feats.blockfrench = menu.add_feature("Block French In Chat", "toggle", chatmodopt.id, function(func)
     if func.on then
         french = event.add_event_listener("chat", function(e)
 	        if f(e.body) then
@@ -980,7 +993,7 @@ feats.blockfrench = menu.add_feature("Block French In Chat", "toggle", modopt.id
         event.remove_event_listener("chat", french)
     end
 end)
-feats.blockfrenchip = menu.add_feature("Auto Kick The French by IP", "toggle", autokickopt.id, function(f)
+feats.blockfrenchip = menu.add_feature("Auto Kick The French", "toggle", autokickopt.id, function(f)
     if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_HTTP) then 
         menu.notify("HTTP trusted mode must be enabled to use this.", "Femboy Menu")
         f.on=false
@@ -1093,7 +1106,7 @@ local f = function(s)
 	end
 	return false
 end
-feats.blockdutch = menu.add_feature("Block Dutch In Chat", "toggle", modopt.id, function(func)
+feats.blockdutch = menu.add_feature("Block Dutch In Chat", "toggle", chatmodopt.id, function(func)
     if func.on then
         dutch = event.add_event_listener("chat", function(e)
 	        if f(e.body) then
@@ -1105,7 +1118,7 @@ feats.blockdutch = menu.add_feature("Block Dutch In Chat", "toggle", modopt.id, 
         event.remove_event_listener("chat", dutch)
     end
 end)
-feats.blockdutchip = menu.add_feature("Auto Kick The Dutch by IP", "toggle", autokickopt.id, function(f)
+feats.blockdutchip = menu.add_feature("Auto Kick The Dutch", "toggle", autokickopt.id, function(f)
     if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_HTTP) then 
         menu.notify("HTTP trusted mode must be enabled to use this.", "Femboy Menu")
         f.on=false
@@ -1168,7 +1181,7 @@ local f = function(s)
 	end
 	return false
 end
-feats.blockrussian = menu.add_feature("Block Russian In Chat", "toggle", modopt.id, function(func)
+feats.blockrussian = menu.add_feature("Block Russian In Chat", "toggle", chatmodopt.id, function(func)
     if func.on then
         russian = event.add_event_listener("chat", function(e)
 	        if f(e.body) then
@@ -1180,7 +1193,7 @@ feats.blockrussian = menu.add_feature("Block Russian In Chat", "toggle", modopt.
         event.remove_event_listener("chat", russian)
     end
 end)
-feats.blockrussianip = menu.add_feature("Auto Kick Russians by IP", "toggle", autokickopt.id, function(f)
+feats.blockrussianip = menu.add_feature("Auto Kick The Russians", "toggle", autokickopt.id, function(f)
     if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_HTTP) then 
         menu.notify("HTTP trusted mode must be enabled to use this.", "Femboy Menu")
         f.on=false
@@ -1280,7 +1293,7 @@ local f = function(s)
 	end
 	return false
 end
-feats.blockchinese = menu.add_feature("Block Chinese In Chat", "toggle", modopt.id, function(func)
+feats.blockchinese = menu.add_feature("Block Chinese In Chat", "toggle", chatmodopt.id, function(func)
     if func.on then
         china = event.add_event_listener("chat", function(e)
 	        if f(e.body) then
@@ -1292,7 +1305,7 @@ feats.blockchinese = menu.add_feature("Block Chinese In Chat", "toggle", modopt.
         event.remove_event_listener("chat", china)
     end
 end)
-feats.blockchineseip = menu.add_feature("Auto Kick The Chinese by IP", "toggle", autokickopt.id, function(f)
+feats.blockchineseip = menu.add_feature("Auto Kick The Chinese", "toggle", autokickopt.id, function(f)
     if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_HTTP) then 
         menu.notify("HTTP trusted mode must be enabled to use this.", "Femboy Menu")
         f.on=false
@@ -1440,7 +1453,7 @@ local f = function(s)
 	end
 	return false
 end
-menu.add_feature("Block English In Chat", "toggle", modopt.id, function(func)
+menu.add_feature("Block English In Chat", "toggle", chatmodopt.id, function(func)
     if func.on then
         english = event.add_event_listener("chat", function(e)
 	        if f(e.body) then
@@ -1452,7 +1465,7 @@ menu.add_feature("Block English In Chat", "toggle", modopt.id, function(func)
         event.remove_event_listener("chat", english)
     end
 end)
-menu.add_feature("Auto Kick The English by IP", "toggle", autokickopt.id, function(f)
+menu.add_feature("Auto Kick The English", "toggle", autokickopt.id, function(f)
     if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_HTTP) then 
         menu.notify("HTTP trusted mode must be enabled to use this.", "Femboy Menu")
         f.on=false
@@ -1485,7 +1498,7 @@ local f = function(s)
 	end
 	return false
 end
-menu.add_feature("Block Bot Spam In Chat", "toggle", modopt.id, function(func)
+menu.add_feature("Block Bot Spam In Chat", "toggle", chatmodopt.id, function(func)
     if func.on then
         menu.notify("Ping me in the LUA share channel with bot phrases you want adding", "Femboy Menu")
         spam = event.add_event_listener("chat", function(e)
@@ -1496,6 +1509,167 @@ menu.add_feature("Block Bot Spam In Chat", "toggle", modopt.id, function(func)
         end)
     else 
         event.remove_event_listener("chat", spam)
+    end
+end)
+
+local automoder = menu.add_feature("Enable Auto Moderation", "toggle", automod.id)
+local function kickPlayersForFlag(flag)
+    if not automoder.on then return end
+        for pid = 0, 31 do
+            if player.is_player_modder(pid, flag) then
+                menu.notify(string.format("Player %s (ID: %d) has been kicked for having the %s modder flag", player.get_player_name(pid), pid, player.get_modder_flag_text(flag)), "Kick Player")
+            end
+        end
+end
+menu.add_feature("--------------------", "action", automod.id)
+feats.manual = menu.add_feature("Manual flag", "toggle", automod.id, function(f)
+    while f.on do
+        kickPlayersForFlag(eModderDetectionFlags.MDF_MANUAL)
+        system.wait()
+    end
+end)
+feats.model = menu.add_feature("Player Model flag", "toggle", automod.id, function(f)
+    while f.on do
+        kickPlayersForFlag(eModderDetectionFlags.MDF_PLAYER_MODEL)
+        system.wait()
+    end
+end)
+feats.scidspoof = menu.add_feature("SCID Spoof flag", "toggle", automod.id, function(f)
+    while f.on do
+        kickPlayersForFlag(eModderDetectionFlags.MDF_SCID_SPOOF)
+        system.wait()
+    end
+end)
+feats.invobject = menu.add_feature("Invalid Object flag", "toggle", automod.id, function(f)
+    while f.on do
+        kickPlayersForFlag(eModderDetectionFlags.MDF_INVALID_OBJECT)
+        system.wait()
+    end
+end)
+feats.pedcrash = menu.add_feature("Invalid Ped Crash flag", "toggle", automod.id, function(f)
+    while f.on do
+        kickPlayersForFlag(eModderDetectionFlags.MDF_INVALID_PED_CRASH)
+        system.wait()
+    end
+end)  
+feats.modelcrash = menu.add_feature("Model Change Crash flag", "toggle", automod.id, function(f)
+    while f.on do
+        kickPlayersForFlag(eModderDetectionFlags.MDF_MODEL_CHANGE_CRASH)
+        system.wait()
+    end
+end)   
+feats.modelchange = menu.add_feature("Player Model Change flag", "toggle", automod.id, function(f)
+    while f.on do
+        kickPlayersForFlag(eModderDetectionFlags.MDF_PLAYER_MODEL_CHANGE)
+        system.wait()
+    end
+end)    
+feats.racflag = menu.add_feature("RAC flag", "toggle", automod.id, function(f)
+    while f.on do
+        kickPlayersForFlag(eModderDetectionFlags.MDF_RAC)
+        system.wait()
+    end
+end)
+feats.moneydrop = menu.add_feature("Money Drop flag", "toggle", automod.id, function(f)
+    while f.on do
+        kickPlayersForFlag(eModderDetectionFlags.MDF_MONEY_DROP)
+        system.wait()
+    end
+end)    
+feats.sep = menu.add_feature("SEP flag", "toggle", automod.id, function(f)
+    while f.on do
+        kickPlayersForFlag(eModderDetectionFlags.MDF_SEP)
+        system.wait()
+    end
+end)  
+feats.attachobject = menu.add_feature("Attach Object flag", "toggle", automod.id, function(f)
+    while f.on do
+        kickPlayersForFlag(eModderDetectionFlags.MDF_ATTACH_OBJECT)
+        system.wait()
+    end
+end)  
+feats.attachped = menu.add_feature("Attach Ped flag", "toggle", automod.id, function(f)
+    while f.on do
+        kickPlayersForFlag(eModderDetectionFlags.MDF_ATTACH_PED)
+        system.wait()
+    end
+end) 
+feats.netarraycrash = menu.add_feature("Net Array Crash flag", "toggle", automod.id, function(f)
+    while f.on do
+        kickPlayersForFlag(eModderDetectionFlags.MDF_NET_ARRAY_CRASH)
+        system.wait()
+    end
+end)
+feats.netsynccrash = menu.add_feature("Net Sync Crash flag", "toggle", automod.id, function(f)
+    while f.on do
+        kickPlayersForFlag(eModderDetectionFlags.MDF_SYNC_CRASH)
+        system.wait()
+    end
+end)
+feats.neteventcrash = menu.add_feature("Net Event Crash flag", "toggle", automod.id, function(f)
+    while f.on do
+        kickPlayersForFlag(eModderDetectionFlags.MDF_NET_EVENT_CRASH)
+        system.wait()
+    end
+end)
+feats.hosttoken = menu.add_feature("Host Token flag", "toggle", automod.id, function(f)
+    while f.on do
+        kickPlayersForFlag(eModderDetectionFlags.MDF_HOST_TOKEN)
+        system.wait()
+    end
+end)
+feats.sespam = menu.add_feature("SE Spam flag", "toggle", automod.id, function(f)
+    while f.on do
+        kickPlayersForFlag(eModderDetectionFlags.MDF_SE_SPAM)
+        system.wait()
+    end
+end)
+feats.frameflags = menu.add_feature("Frame Flags flag", "toggle", automod.id, function(f)
+    while f.on do
+        kickPlayersForFlag(eModderDetectionFlags.MDF_FRAME_FLAGS)
+        system.wait()
+    end
+end)
+feats.ipspoof = menu.add_feature("IP Spoof flag", "toggle", automod.id, function(f)
+    while f.on do
+        kickPlayersForFlag(eModderDetectionFlags.MDF_IP_SPOOF)
+        system.wait()
+    end
+end)
+feats.karenflag = menu.add_feature("Karen flag", "toggle", automod.id, function(f)
+    while f.on do
+        kickPlayersForFlag(eModderDetectionFlags.MDF_KAREN)
+        system.wait()
+    end
+end)
+feats.sessionmismatch = menu.add_feature("Session Mismatch flag", "toggle", automod.id, function(f)
+    while f.on do
+        kickPlayersForFlag(eModderDetectionFlags.MDF_SESSION_MISMATCH)
+        system.wait()
+    end
+end)
+feats.soundspam = menu.add_feature("Sound Spam flag", "toggle", automod.id, function(f)
+    while f.on do
+        kickPlayersForFlag(eModderDetectionFlags.MDF_SOUND_SPAM)
+        system.wait()
+    end
+end)
+feats.sepint = menu.add_feature("SEP INT flag", "toggle", automod.id, function(f)
+    while f.on do
+        kickPlayersForFlag(eModderDetectionFlags.MDF_SEP_INT)
+        system.wait()
+    end
+end)
+feats.suspiciousactivity = menu.add_feature("Suspicious Activity flag", "toggle", automod.id, function(f)
+    while f.on do
+        kickPlayersForFlag(eModderDetectionFlags.MDF_SUSPICIOUS_ACTIVITY)
+        system.wait()
+    end
+end)
+feats.chatspoof = menu.add_feature("Chat Spoof flag", "toggle", automod.id, function(f)
+    while f.on do
+        kickPlayersForFlag(eModderDetectionFlags.MDF_CHAT_SPOOF)
+        system.wait()
     end
 end)
 
@@ -1529,7 +1703,29 @@ windspd.min = 0.0
 windspd.max = 12.0
 windspd.mod = 0.5
 
+local waveint = menu.add_feature("Wave Intensity", "value_f", wthopt.id, function(f)
+    if f.on then 
+        water.set_waves_intensity(f.value)
+    else  
+        water.reset_waves_intensity()
+    end
+end)
+waveint.min = 0.0
+waveint.max = 1000.0
+waveint.value = 1
+waveint.mod = 10.0
+
 --misc options
+local phone = menu.add_feature("Change Phone Model", "value_i", miscopt.id, function(f)
+    while f.on do 
+        native.call(0xA4E8E696C532FBC7, f.value)
+        system.wait()
+    end
+end)
+phone.min = 0
+phone.max = 4
+phone.mod = 1
+
 feats.playerstalking = menu.add_feature("Show Player Talking", "toggle", miscopt.id, function(feat)
     if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then 
         menu.notify("Natives are required to be enabled to use this feature", "Femboy Lua")
