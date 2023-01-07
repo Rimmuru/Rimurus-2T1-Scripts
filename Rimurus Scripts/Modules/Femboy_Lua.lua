@@ -1,7 +1,7 @@
 local feats, feat_vals, feat_tv = {}, {}, {}
 local appdata = utils.get_appdata_path("PopstarDevs", "2Take1Menu")
 local INI = IniParser(appdata .. "\\scripts\\FemboyMenu.ini")
-local version = "v1.4.0"
+local version = "v1.4.3"
 
 local function SaveSettings()
     for k, v in pairs(feats) do
@@ -226,11 +226,11 @@ rattle.max = 1.0
 rattle.mod = 0.1
 rattle.value = 0.0
 
+menu.add_feature("--------------------", "action", vehopt.id)
+
 menu.add_feature("Fix Vehicle", "action", vehopt.id, function()
 	vehicle.set_vehicle_fixed(player.get_player_vehicle(player.player_id()), true)
 end)
-
-menu.add_feature("--------------------", "action", vehopt.id)
 
 feats.autorepair = menu.add_feature("Auto Repair", "toggle", vehopt.id, function(f)
     while f.on do
@@ -693,18 +693,311 @@ end)
 -- Moderation options
 local modopt = menu.add_feature("Moderation Options", "parent", onlopt.id)
 local automod = menu.add_feature("Auto Kicker By Modder Flags Options", "parent", modopt.id)
-local autokickopt = menu.add_feature("Auto Kicker By IP Options", "parent", modopt.id, function()
+local countrykick = menu.add_feature("Auto Kicker By IP Options", "parent", modopt.id, function()
     if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_HTTP) then 
         menu.notify("HTTP trusted mode must be enabled to use these.", "Femboy Menu")
     end
 end)
-local chatmodopt = menu.add_feature("Chat Moderation Options", "parent", modopt.id)
 
 local function dec_to_ipv4(ip)
     if ip then
         return string.format("%i.%i.%i.%i", ip >> 24 & 255, ip >> 16 & 255, ip >> 8 & 255, ip & 255)
     end
 end
+
+local cheese = {
+	{name = "Afghanistan", code = "AF"},
+	{name = "Albania", code = "AL"},
+	{name = "Algeria", code = "DZ"},
+	{name = "American Samoa", code = "AS"},
+	{name = "Andorra", code = "AD"},
+	{name = "Angola", code = "AO"},
+	{name = "Anguilla", code = "AI"},
+	{name = "Antarctica", code = "AQ"},
+	{name = "Antigua and Barbuda", code = "AG"},
+	{name = "Argentina", code = "AR"},
+	{name = "Armenia", code = "AM"},
+	{name = "Aruba", code = "AW"},
+	{name = "Australia", code = "AU"},
+	{name = "Austria", code = "AT"},
+	{name = "Azerbaijan", code = "AZ"},
+	{name = "Bahamas", code = "BS"},
+	{name = "Bahrain", code = "BH"},
+	{name = "Bangladesh", code = "BD"},
+	{name = "Barbados", code = "BB"},
+	{name = "Belarus", code = "BY"},
+	{name = "Belgium", code = "BE"},
+	{name = "Belize", code = "BZ"},
+	{name = "Benin", code = "BJ"},
+	{name = "Bermuda", code = "BM"},
+	{name = "Bhutan", code = "BT"},
+	{name = "Bolivia", code = "BO"},
+	{name = "Bonaire, Sint Eustatius and Saba", code = "BQ"},
+	{name = "Bosnia and Herzegovina", code = "BA"},
+	{name = "Botswana", code = "BW"},
+	{name = "Bouvet Island", code = "BV"},
+	{name = "Brazil", code = "BR"},
+	{name = "British Indian Ocean Territory", code = "IO"},
+	{name = "Brunei Darussalam", code = "BN"},
+	{name = "Bulgaria", code = "BG"},
+	{name = "Burkina Faso", code = "BF"},
+	{name = "Burundi", code = "BI"},
+	{name = "Cabo Verde", code = "CV"},
+	{name = "Cambodia", code = "KH"},
+	{name = "Cameroon", code = "CM"},
+	{name = "Canada", code = "CA"},
+	{name = "Cayman Islands", code = "KY"},
+	{name = "Central African Republic", code = "CF"},
+	{name = "Chad", code = "TD"},
+	{name = "Chile", code = "CL"},
+	{name = "China", code = "CN"},
+	{name = "Christmas Island", code = "CX"},
+	{name = "Cocos (Keeling) Islands", code = "CC"},
+	{name = "Colombia", code = "CO"},
+	{name = "Comoros", code = "KM"},
+	{name = "Congo CD", code = "CD"},
+	{name = "Congo CG", code = "CG"},
+	{name = "Cook Islands", code = "CK"},
+	{name = "Costa Rica", code = "CR"},
+	{name = "Croatia", code = "HR"},
+	{name = "Cuba", code = "CU"},
+	{name = "Curaçao", code = "CW"},
+	{name = "Cyprus", code = "CY"},
+	{name = "Czechia", code = "CZ"},
+	{name = "Côte d'Ivoire", code = "CI"},
+	{name = "Denmark", code = "DK"},
+	{name = "Djibouti", code = "DJ"},
+	{name = "Dominica", code = "DM"},
+	{name = "Dominican Republic", code = "DO"},
+	{name = "Ecuador", code = "EC"},
+	{name = "Egypt", code = "EG"},
+	{name = "El Salvador", code = "SV"},
+	{name = "Equatorial Guinea", code = "GQ"},
+	{name = "Eritrea", code = "ER"},
+	{name = "Estonia", code = "EE"},
+	{name = "Eswatini", code = "SZ"},
+	{name = "Ethiopia", code = "ET"},
+	{name = "Falkland Islands [Malvinas]", code = "FK"},
+	{name = "Faroe Islands", code = "FO"},
+	{name = "Fiji", code = "FJ"},
+	{name = "Finland", code = "FI"},
+	{name = "France", code = "FR"},
+	{name = "French Guiana", code = "GF"},
+	{name = "French Polynesia", code = "PF"},
+	{name = "French Southern Territories", code = "TF"},
+	{name = "Gabon", code = "GA"},
+	{name = "Gambia", code = "GM"},
+	{name = "Georgia", code = "GE"},
+	{name = "Germany", code = "DE"},
+	{name = "Ghana", code = "GH"},
+	{name = "Gibraltar", code = "GI"},
+	{name = "Greece", code = "GR"},
+	{name = "Greenland", code = "GL"},
+	{name = "Grenada", code = "GD"},
+	{name = "Guadeloupe", code = "GP"},
+	{name = "Guam", code = "GU"},
+	{name = "Guatemala", code = "GT"},
+	{name = "Guernsey", code = "GG"},
+	{name = "Guinea", code = "GN"},
+	{name = "Guinea-Bissau", code = "GW"},
+	{name = "Guyana", code = "GY"},
+	{name = "Haiti", code = "HT"},
+	{name = "Heard Island and McDonald Islands", code = "HM"},
+	{name = "Holy See", code = "VA"},
+	{name = "Honduras", code = "HN"},
+	{name = "Hong Kong", code = "HK"},
+	{name = "Hungary", code = "HU"},
+	{name = "Iceland", code = "IS"},
+	{name = "India", code = "IN"},
+	{name = "Indonesia", code = "ID"},
+	{name = "Iran", code = "IR"},
+	{name = "Iraq", code = "IQ"},
+	{name = "Ireland", code = "IE"},
+	{name = "Isle of Man", code = "IM"},
+	{name = "Israel", code = "IL"},
+	{name = "Italy", code = "IT"},
+	{name = "Jamaica", code = "JM"},
+	{name = "Japan", code = "JP"},
+	{name = "Jersey", code = "JE"},
+	{name = "Jordan", code = "JO"},
+	{name = "Kazakhstan", code = "KZ"},
+	{name = "Kenya", code = "KE"},
+	{name = "Kiribati", code = "KI"},
+	{name = "Korea KP", code = "KP"},
+	{name = "Korea KR", code = "KR"},
+	{name = "Kuwait", code = "KW"},
+	{name = "Kyrgyzstan", code = "KG"},
+	{name = "Lao People's Democratic Republic", code = "LA"},
+	{name = "Latvia", code = "LV"},
+	{name = "Lebanon", code = "LB"},
+	{name = "Lesotho", code = "LS"},
+	{name = "Liberia", code = "LR"},
+	{name = "Libya", code = "LY"},
+	{name = "Liechtenstein", code = "LI"},
+	{name = "Lithuania", code = "LT"},
+	{name = "Luxembourg", code = "LU"},
+	{name = "Macao", code = "MO"},
+	{name = "Madagascar", code = "MG"},
+	{name = "Malawi", code = "MW"},
+	{name = "Malaysia", code = "MY"},
+	{name = "Maldives", code = "MV"},
+	{name = "Mali", code = "ML"},
+	{name = "Malta", code = "MT"},
+	{name = "Marshall Islands", code = "MH"},
+	{name = "Martinique", code = "MQ"},
+	{name = "Mauritania", code = "MR"},
+	{name = "Mauritius", code = "MU"},
+	{name = "Mayotte", code = "YT"},
+	{name = "Mexico", code = "MX"},
+	{name = "Micronesia", code = "FM"},
+	{name = "Moldova", code = "MD"},
+	{name = "Monaco", code = "MC"},
+	{name = "Mongolia", code = "MN"},
+	{name = "Montenegro", code = "ME"},
+	{name = "Montserrat", code = "MS"},
+	{name = "Morocco", code = "MA"},
+	{name = "Mozambique", code = "MZ"},
+	{name = "Myanmar", code = "MM"},
+	{name = "Namibia", code = "NA"},
+	{name = "Nauru", code = "NR"},
+	{name = "Nepal", code = "NP"},
+	{name = "Netherlands", code = "NL"},
+	{name = "New Caledonia", code = "NC"},
+	{name = "New Zealand", code = "NZ"},
+	{name = "Nicaragua", code = "NI"},
+	{name = "Niger", code = "NE"},
+	{name = "Nigeria", code = "NG"},
+	{name = "Niue", code = "NU"},
+	{name = "Norfolk Island", code = "NF"},
+	{name = "Northern Mariana Islands", code = "MP"},
+	{name = "Norway", code = "NO"},
+	{name = "Oman", code = "OM"},
+	{name = "Pakistan", code = "PK"},
+	{name = "Palau", code = "PW"},
+	{name = "Palestine, State of", code = "PS"},
+	{name = "Panama", code = "PA"},
+	{name = "Papua New Guinea", code = "PG"},
+	{name = "Paraguay", code = "PY"},
+	{name = "Peru", code = "PE"},
+	{name = "Philippines", code = "PH"},
+	{name = "Pitcairn", code = "PN"},
+	{name = "Poland", code = "PL"},
+	{name = "Portugal", code = "PT"},
+	{name = "Puerto Rico", code = "PR"},
+	{name = "Qatar", code = "QA"},
+	{name = "Republic of North Macedonia", code = "MK"},
+	{name = "Romania", code = "RO"},
+	{name = "Russian Federation", code = "RU"},
+	{name = "Rwanda", code = "RW"},
+	{name = "Réunion", code = "RE"},
+	{name = "Saint Barthélemy", code = "BL"},
+	{name = "Saint Helena", code = "SH"},
+	{name = "Saint Kitts and Nevis", code = "KN"},
+	{name = "Saint Lucia", code = "LC"},
+	{name = "Saint Martin (French part)", code = "MF"},
+	{name = "Saint Pierre and Miquelon", code = "PM"},
+	{name = "Saint Vincent and the Grenadines", code = "VC"},
+	{name = "Samoa", code = "WS"},
+	{name = "San Marino", code = "SM"},
+	{name = "Sao Tome and Principe", code = "ST"},
+	{name = "Saudi Arabia", code = "SA"},
+	{name = "Senegal", code = "SN"},
+	{name = "Serbia", code = "RS"},
+	{name = "Seychelles", code = "SC"},
+	{name = "Sierra Leone", code = "SL"},
+	{name = "Singapore", code = "SG"},
+	{name = "Sint Maarten (Dutch part)", code = "SX"},
+	{name = "Slovakia", code = "SK"},
+	{name = "Slovenia", code = "SI"},
+	{name = "Solomon Islands", code = "SB"},
+	{name = "Somalia", code = "SO"},
+	{name = "South Africa", code = "ZA"},
+	{name = "South Georgia and the South Sandwich Islands", code = "GS"},
+	{name = "South Sudan", code = "SS"},
+	{name = "Spain", code = "ES"},
+	{name = "Sri Lanka", code = "LK"},
+	{name = "Sudan", code = "SD"},
+	{name = "Suriname", code = "SR"},
+	{name = "Svalbard and Jan Mayen", code = "SJ"},
+	{name = "Sweden", code = "SE"},
+	{name = "Switzerland", code = "CH"},
+	{name = "Syrian Arab Republic", code = "SY"},
+	{name = "Taiwan", code = "TW"},
+	{name = "Tajikistan", code = "TJ"},
+	{name = "Tanzania", code = "TZ"},
+	{name = "Thailand", code = "TH"},
+	{name = "Timor-Leste", code = "TL"},
+	{name = "Togo", code = "TG"},
+	{name = "Tokelau", code = "TK"},
+	{name = "Tonga", code = "TO"},
+	{name = "Trinidad and Tobago", code = "TT"},
+	{name = "Tunisia", code = "TN"},
+	{name = "Turkey", code = "TR"},
+	{name = "Turkmenistan", code = "TM"},
+	{name = "Turks and Caicos Islands", code = "TC"},
+	{name = "Tuvalu", code = "TV"},
+	{name = "Uganda", code = "UG"},
+	{name = "Ukraine", code = "UA"},
+	{name = "United Arab Emirates", code = "AE"},
+	{name = "United Kingdom of Great Britain and Northern Ireland", code = "GB"},
+	{name = "United States Minor Outlying Islands", code = "UM"},
+	{name = "United States of America", code = "US"},
+	{name = "Uruguay", code = "UY"},
+	{name = "Uzbekistan", code = "UZ"},
+	{name = "Vanuatu", code = "VU"},
+	{name = "Venezuela", code = "VE"},
+	{name = "Viet Nam", code = "VN"},
+	{name = "Virgin Islands (British)", code = "VG"},
+	{name = "Virgin Islands (U.S.)", code = "VI"},
+	{name = "Wallis and Futuna", code = "WF"},
+	{name = "Western Sahara", code = "EH"},
+	{name = "Yemen", code = "YE"},
+	{name = "Zambia", code = "ZM"},
+	{name = "Zimbabwe", code = "ZW"},
+	{name = "Aland Islands", code = "AX"}
+}
+
+menu.add_feature("Enable", "toggle", countrykick.id, function(f)
+	if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_HTTP) then 
+		menu.notify("HTTP trusted mode must be enabled to use this.", "Femboy Menu")
+		f.on=false
+	else
+		while f.on do
+			for pid = 0,31 do
+				local player_ip = player.get_player_ip(pid)
+				local response, info = web.get("http://ip-api.com/json/" .. dec_to_ipv4(player_ip) .."?fields=2")
+				if response == 200 then
+					for _, v in pairs(cheese) do
+						if v.on and pid ~= player.player_id() then
+							if string.find(info, v.code) then
+								menu.notify(string.format("Player %s (IP: %s) is from " .. v.name .. "! Removing them now for you! :D", player.get_player_name(pid), dec_to_ipv4(player_ip)), "Location Detection")
+								network.force_remove_player(pid)
+							end
+						end
+					end
+				end
+			end
+			system.wait(3000)
+		end
+	end
+end)
+
+menu.add_feature("Enable All", "toggle", countrykick.id, function(f)    
+    menu.notify("if you enable this and then ask why you keep getting kicked from lobbies, im going to treat you like a retard, so make sure to check twice.", "Femboy Lua")
+    for _, feat in pairs(countrykick.children) do
+        if feat ~= f and feat.name ~= "Enable" then
+          feat.on = f.on
+        end
+    end
+end)
+
+for _, v in pairs(cheese) do
+    menu.add_feature("Auto Kick " .. v.name, "toggle", countrykick.id, function(f)
+        v.on = f.on
+    end)
+end
+
+local chatmodopt = menu.add_feature("Chat Moderation Options", "parent", modopt.id)
 
 local racismfilter = {
 	"assnigger",
@@ -993,26 +1286,6 @@ feats.blockfrench = menu.add_feature("Block French In Chat", "toggle", chatmodop
         event.remove_event_listener("chat", french)
     end
 end)
-feats.blockfrenchip = menu.add_feature("Auto Kick The French", "toggle", autokickopt.id, function(f)
-    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_HTTP) then 
-        menu.notify("HTTP trusted mode must be enabled to use this.", "Femboy Menu")
-        f.on=false
-    else
-        while f.on do
-            for pid = 0,31 do
-                local player_ip = player.get_player_ip(pid)
-                local response, info = web.get("http://ip-api.com/json/" .. dec_to_ipv4(player_ip) .."?fields=2")
-                if response == 200 then
-                    if string.find(info, "FR") and pid ~= ped then
-                        menu.notify(string.format("Player %s (IP: %s) is from France! Removing them now for you! :D", player.get_player_name(pid), dec_to_ipv4(player_ip)), "Location Detection")
-                        network.force_remove_player(pid)
-                    end
-                end
-            end
-            system.wait(3000)
-        end
-    end
-end)
 
 local blockdutch= {
     "de",
@@ -1118,26 +1391,6 @@ feats.blockdutch = menu.add_feature("Block Dutch In Chat", "toggle", chatmodopt.
         event.remove_event_listener("chat", dutch)
     end
 end)
-feats.blockdutchip = menu.add_feature("Auto Kick The Dutch", "toggle", autokickopt.id, function(f)
-    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_HTTP) then 
-        menu.notify("HTTP trusted mode must be enabled to use this.", "Femboy Menu")
-        f.on=false
-    else
-        while f.on do
-            for pid = 0,31 do
-                local player_ip = player.get_player_ip(pid)
-                local response, info = web.get("http://ip-api.com/json/" .. dec_to_ipv4(player_ip) .."?fields=2")
-                if response == 200 then
-                    if string.find(info, "NL") and pid ~= ped then
-                        menu.notify(string.format("Player %s (IP: %s) is from the Netherlands! Removing them now for you! :D", player.get_player_name(pid), dec_to_ipv4(player_ip)), "Location Detection")
-                        network.force_remove_player(pid)
-                    end
-                end
-            end
-            system.wait(3000)
-        end
-    end
-end)
 
 local blockrussian= {
     "б",
@@ -1191,26 +1444,6 @@ feats.blockrussian = menu.add_feature("Block Russian In Chat", "toggle", chatmod
         end)
     else 
         event.remove_event_listener("chat", russian)
-    end
-end)
-feats.blockrussianip = menu.add_feature("Auto Kick The Russians", "toggle", autokickopt.id, function(f)
-    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_HTTP) then 
-        menu.notify("HTTP trusted mode must be enabled to use this.", "Femboy Menu")
-        f.on=false
-    else
-        while f.on do
-            for pid = 0,31 do
-                local player_ip = player.get_player_ip(pid)
-                local response, info = web.get("http://ip-api.com/json/" .. dec_to_ipv4(player_ip) .."?fields=2")
-                if response == 200 then
-                    if string.find(info, "RU") and pid ~= ped then
-                        menu.notify(string.format("Player %s (IP: %s) is from Russia! Removing them now for you! :D", player.get_player_name(pid), dec_to_ipv4(player_ip)), "Location Detection")
-                        network.force_remove_player(pid)
-                    end
-                end
-            end
-            system.wait(3000)
-        end
     end
 end)
 
@@ -1303,26 +1536,6 @@ feats.blockchinese = menu.add_feature("Block Chinese In Chat", "toggle", chatmod
         end)
     else 
         event.remove_event_listener("chat", china)
-    end
-end)
-feats.blockchineseip = menu.add_feature("Auto Kick The Chinese", "toggle", autokickopt.id, function(f)
-    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_HTTP) then 
-        menu.notify("HTTP trusted mode must be enabled to use this.", "Femboy Menu")
-        f.on=false
-    else
-        while f.on do
-            for pid = 0,31 do
-                local player_ip = player.get_player_ip(pid)
-                local response, info = web.get("http://ip-api.com/json/" .. dec_to_ipv4(player_ip) .."?fields=2")
-                if response == 200 then
-                    if string.find(info, "CN") and pid ~= ped then
-                        menu.notify(string.format("Player %s (IP: %s) is from China! Removing them now for you! :D", player.get_player_name(pid), dec_to_ipv4(player_ip)), "Location Detection")
-                        network.force_remove_player(pid)
-                    end
-                end
-            end
-            system.wait(3000)
-        end
     end
 end)
 
@@ -1465,26 +1678,6 @@ menu.add_feature("Block English In Chat", "toggle", chatmodopt.id, function(func
         event.remove_event_listener("chat", english)
     end
 end)
-menu.add_feature("Auto Kick The English", "toggle", autokickopt.id, function(f)
-    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_HTTP) then 
-        menu.notify("HTTP trusted mode must be enabled to use this.", "Femboy Menu")
-        f.on=false
-    else
-        while f.on do
-            for pid = 0,31 do
-                local player_ip = player.get_player_ip(pid)
-                local response, info = web.get("http://ip-api.com/json/" .. dec_to_ipv4(player_ip) .."?fields=2")
-                if response == 200 then
-                    if string.find(info, "GB") and pid ~= ped then
-                        menu.notify(string.format("Player %s (IP: %s) is from England! Removing them now for you! :D", player.get_player_name(pid), dec_to_ipv4(player_ip)), "Location Detection")
-                        network.force_remove_player(pid)
-                    end
-                end
-            end
-            system.wait(3000)
-        end
-    end
-end)
 
 local botspam = {
 	"gtagta.cc",
@@ -1517,6 +1710,7 @@ local function kickPlayersForFlag(flag)
     if not automoder.on then return end
         for pid = 0, 31 do
             if player.is_player_modder(pid, flag) then
+                network.force_remove_player(pid)
                 menu.notify(string.format("Player %s (ID: %d) has been kicked for having the %s modder flag", player.get_player_name(pid), pid, player.get_modder_flag_text(flag)), "Kick Player")
             end
         end
@@ -1716,16 +1910,6 @@ waveint.value = 1
 waveint.mod = 10.0
 
 --misc options
-local phone = menu.add_feature("Change Phone Model", "value_i", miscopt.id, function(f)
-    while f.on do 
-        native.call(0xA4E8E696C532FBC7, f.value)
-        system.wait()
-    end
-end)
-phone.min = 0
-phone.max = 4
-phone.mod = 1
-
 feats.playerstalking = menu.add_feature("Show Player Talking", "toggle", miscopt.id, function(feat)
     if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then 
         menu.notify("Natives are required to be enabled to use this feature", "Femboy Lua")
@@ -1853,6 +2037,20 @@ menu.add_feature("Rimuru", "action", cred.id, function()
     end
 end
 NotifyMap("Rimuru", "~h~~r~Wannabe Welsh", "~b~'let' me learn LUA using her script and gave me many helpful tips", "CHAR_WENDY", 140) --no_u = invalid image / does not exist
+end)
+menu.add_feature("GhostOne", "action", cred.id, function()
+    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then 
+        menu.notify("I ask him for help, he give help ez pz. Also, he make code, i steal", "GhostOne")
+    else
+        local function NotifyMap(title, subtitle, msg, iconname, intcolor)
+            native.call(0x92F0DA1E27DB96DC, intcolor) --_THEFEED_SET_NEXT_POST_BACKGROUND_COLOR
+            native.call(0x202709F4C58A0424, "STRING") --BEGIN_TEXT_COMMAND_THEFEED_POST
+            native.call(0x6C188BE134E074AA, msg) --ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME
+            native.call(0x1CCD9A37359072CF, iconname, iconname, false, 0, title, subtitle) --END_TEXT_COMMAND_THEFEED_POST_MESSAGETEXT
+            native.call(0x2ED7843F8F801023, true, true) --END_TEXT_COMMAND_THEFEED_POST_TICKER
+    end
+end
+NotifyMap("GhostOne", "~h~~r~Has Cheese", "~b~I ask him for help, he give help ez pz. Also, he make code, i steal", "CHAR_TAXI", 140) --no_u = invalid image / does not exist
 end)
 menu.add_feature("Aren", "action", cred.id, function()
     if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then 
