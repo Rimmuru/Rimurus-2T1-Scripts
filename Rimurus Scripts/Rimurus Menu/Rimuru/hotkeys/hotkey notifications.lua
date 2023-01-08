@@ -1,4 +1,4 @@
 return {
-	["toggle"] = true,
 	["action"] = false,
+	["toggle"] = true,
 }
