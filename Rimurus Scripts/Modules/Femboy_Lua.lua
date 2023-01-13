@@ -1,4 +1,4 @@
-local version = "1.7.4"
+local version = "1.8.0"
 local feats, feat_vals, feat_tv = {}, {}, {}
 local appdata = utils.get_appdata_path("PopstarDevs", "2Take1Menu")
 local INI = IniParser(appdata .. "\\scripts\\FemboyMenu.ini")
@@ -824,6 +824,7 @@ menu.add_feature("Force Host", "toggle", onlopt.id, function(f)
     end
 end)
 
+-- aim karma
 local autoaim = menu.add_feature("Aim Karma", "parent", onlopt.id)
 local function APv2(f)
     local PlayerPed = player.get_player_ped(player.player_id())
@@ -845,6 +846,42 @@ local function APv2(f)
                             menu.notify(player.get_player_name(pid) .. " was kicked for aiming at you", "Femboy Menu")
                         end
 
+                        if tazekarma then
+                            local playerstart = player.get_player_coords(pid) + 1
+                            local playerloc = player.get_player_coords(pid)
+                            gameplay.shoot_single_bullet_between_coords(playerstart, playerloc, 1000, 911657153, player.player_ped(), true, false, 100)
+                        end
+
+                        if killkarma then
+                            local playerstart = player.get_player_coords(pid) + 1
+                            local playerloc = player.get_player_coords(pid)
+                            gameplay.shoot_single_bullet_between_coords(playerstart, playerloc, 10000, 3219281620, player.player_ped(), true, false, 100)
+                        end
+
+                        if explokarma then
+                            local playerstart = player.get_player_coords(pid) + 1
+                            local playerloc = player.get_player_coords(pid)
+                            gameplay.shoot_single_bullet_between_coords(playerstart, playerloc, 1000, 1672152130, player.player_ped(), true, false, 100)
+                        end
+
+                        if firewrkkarma then
+                            local playerstart = player.get_player_coords(pid) + 1
+                            local playerloc = player.get_player_coords(pid)
+                            gameplay.shoot_single_bullet_between_coords(playerstart, playerloc, 1000, 2138347493, player.player_ped(), true, false, 100)
+                        end
+
+                        if atomkarma then
+                            local playerstart = player.get_player_coords(pid) + 1
+                            local playerloc = player.get_player_coords(pid)
+                            gameplay.shoot_single_bullet_between_coords(playerstart, playerloc, 1000, 2939590305, player.player_ped(), true, false, 100)
+                        end
+
+                        if tankkarma then
+                            local playerloc = player.get_player_coords(pid) 
+                            playerloc.z = playerloc.z + 2.7
+                            vehicle.create_vehicle(2859440138, playerloc, 0, true, false)
+                        end
+
                     end
                 end    
             end
@@ -862,7 +899,25 @@ feats.notifykarma = menu.add_feature("Notify If Aimed At", "toggle", autoaim.id,
     notifykarma = f.on
 end)
 feats.kickkarma = menu.add_feature("Kick Player", "toggle", autoaim.id, function(f)
-    kickkarma = f.ona 
+    kickkarma = f.on
+end)
+feats.tazekarma = menu.add_feature("Taze Player", "toggle", autoaim.id, function(f)
+    tazekarma = f.on
+end)
+feats.killkarma = menu.add_feature("Kill Player", "toggle", autoaim.id, function(f)
+    killkarma = f.on
+end)
+feats.explokarma = menu.add_feature("Explode Player", "toggle", autoaim.id, function(f)
+    explokarma = f.on 
+end)
+feats.firewrkkarma = menu.add_feature("Firework Player", "toggle", autoaim.id, function(f)
+    firewrkkarma = f.on 
+end)
+feats.atomkarma = menu.add_feature("Atomize Player (with damage)", "toggle", autoaim.id, function(f)
+    atomkarma = f.on 
+end)
+feats.tankkarma = menu.add_feature("Crush Player", "toggle", autoaim.id, function(f)
+    tankkarma = f.on 
 end)
 
 -- IP Lookup
@@ -1904,7 +1959,7 @@ local messages = {}
 
 local max_repeats = 3
 
-menu.add_feature("Block Bot/Chat Spam In Chat", "toggle", chatmodopt.id, function(func)
+feats.chatspam = menu.add_feature("Block Bot/Chat Spam In Chat", "toggle", chatmodopt.id, function(func)
     if func.on then
         menu.notify("Ping me in the LUA share channel with bot phrases you want adding", "Femboy Menu")
         spam = event.add_event_listener("chat", function(e)
@@ -1938,9 +1993,9 @@ menu.add_feature("Block Bot/Chat Spam In Chat", "toggle", chatmodopt.id, functio
     end
 end)  
 
-local automoder = menu.add_feature("Enable Auto Moderation", "toggle", automod.id)
+feats.automoder = menu.add_feature("Enable Auto Moderation", "toggle", automod.id)
 local function kickPlayersForFlag(flag)
-    if not automoder.on then return end
+    if not feats.automoder.on then return end
         for pid = 0, 31 do
             if player.is_player_modder(pid, flag) then
                 network.force_remove_player(pid)
@@ -2100,7 +2155,7 @@ feats.chatspoof = menu.add_feature("Chat Spoof flag", "toggle", automod.id, func
     end
 end)
 
---weather options
+--world options
 local distancescale = menu.add_feature("Distance Scale", "value_f", worldopt.id, function(f)
     menu.notify("This will effect your FPS massively", "Femboy Menu")
     while f.on do
@@ -2112,6 +2167,10 @@ end)
 distancescale.min=0.0
 distancescale.max=200.0
 distancescale.mod=0.5
+
+menu.add_feature("Blackout", "toggle", worldopt.id, function(f)
+    gameplay.set_blackout(f.on)
+end)
 
 local rainlvl = menu.add_feature("Magic puddles", "autoaction_value_f", worldopt.id, function(feat)
     if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then 
@@ -2323,6 +2382,41 @@ end)
 -- online player options
 local mainpid = menu.add_player_feature("Femboy Script", "parent", 0)
 
+-- Griefing options
+local grifopt = menu.add_player_feature("Griefing Options", "parent", mainpid.id)
+
+menu.add_player_feature("Crush Player", "action", grifopt.id, function(f, pid)
+    local playerloc = player.get_player_coords(pid) 
+    playerloc.z = playerloc.z + 2.7
+    vehicle.create_vehicle(2859440138, playerloc, 0, true, false)
+end)
+
+menu.add_player_feature("Taze Player", "toggle", grifopt.id, function(f, pid)
+    while f.on do
+        local playerstart = player.get_player_coords(pid) + 1
+        local playerloc = player.get_player_coords(pid)
+        gameplay.shoot_single_bullet_between_coords(playerstart, playerloc, 1000, 911657153, player.player_ped(), true, false, 100)
+        system.wait()
+    end
+end)
+
+menu.add_player_feature("Firework Player", "toggle", grifopt.id, function(f, pid)
+    while f.on do
+        local playerstart = player.get_player_coords(pid) + 1
+        local playerloc = player.get_player_coords(pid)
+        gameplay.shoot_single_bullet_between_coords(playerstart, playerloc, 1000, 2138347493, player.player_ped(), true, false, 100)
+        system.wait()
+    end
+end)
+
+menu.add_player_feature("Atomize Player", "toggle", grifopt.id, function(f, pid)
+    while f.on do
+        local playerstart = player.get_player_coords(pid) + 1
+        local playerloc = player.get_player_coords(pid)
+        gameplay.shoot_single_bullet_between_coords(playerstart, playerloc, 1000, 2939590305, player.player_ped(), true, false, 100)
+        system.wait()
+    end
+end)
 -- IP info
 local ip_feats = {}
 local iplookuppid = menu.add_player_feature("IP Shits", "parent", mainpid.id, function(f, pid)
