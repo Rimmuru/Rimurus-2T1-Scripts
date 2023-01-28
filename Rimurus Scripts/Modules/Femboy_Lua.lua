@@ -1,4 +1,4 @@
-local version = "1.9.1"
+local version = "1.10.0"
 local feats, feat_vals, feat_tv = {}, {}, {}
 local appdata = utils.get_appdata_path("PopstarDevs", "2Take1Menu")
 local INI = IniParser(appdata .. "\\scripts\\FemboyMenu.ini")
@@ -67,22 +67,23 @@ menu.notify("Saved Settings, Loaded", "Femboy Menu")
 local main = menu.add_feature("Femboy Script", "parent", 0)
 -- player options
     local popt = menu.add_feature("Player Options", "parent", main.id)
-        local mone = menu.add_feature("Money Features", "parent", popt.id)
         local rgb = menu.add_feature("RGB Player Features", "parent", popt.id)
 -- vehicle options
     local vehopt = menu.add_feature("Vehicle Options", "parent", main.id)
-        menu.add_feature("--    Sub Menus    --", "action", vehopt.id) -- separator 
         local dorctrl = menu.add_feature("Door Control", "parent", vehopt.id)
         local vcol = menu.add_feature("Vehicle Customisation", "parent", vehopt.id)
             local col = menu.add_feature("Colour Customisation", "parent", vcol.id)
         local lightctrl = menu.add_feature("Light Control", "parent", vehopt.id)
-        menu.add_feature("--------------------", "action", vehopt.id) -- separator  
 -- online options
     local onlopt = menu.add_feature("Online Options", "parent", main.id)
         local modopt = menu.add_feature("Moderation Options", "parent", onlopt.id)
             local automod = menu.add_feature("Auto Kicker By Modder Flags Options", "parent", modopt.id)
             local countrykick = menu.add_feature("Auto Kicker By IP Options", "parent", modopt.id)
             local chatmodopt = menu.add_feature("Chat Moderation Options", "parent", modopt.id)
+-- money stuffs
+    local mone = menu.add_feature("Money Stuffs", "parent", main.id)
+        local air = menu.add_feature("Air Cargo Stuffs", "parent", mone.id)
+        local special = menu.add_feature("Special Cargo", "parent", mone.id)
 -- weather options
     local worldopt = menu.add_feature("World Options", "parent", main.id)
 -- misc options
@@ -97,78 +98,6 @@ local main = menu.add_feature("Femboy Script", "parent", 0)
         -- local iplookuppid = menu.add_player_feature("IP Shits", "parent", mainpid.id, function(f, pid) line 2571
 -- end of parents
 -- player option functions
--- Money Options
-local monloop = menu.add_feature("NightClub Safe Loop", "value_i", mone.id, function(f)
-    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_STATS) and not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_SCRIPT_VARS) then
-        menu.notify("Globals and Stats are required to be enabled in trusted mode to use this", "Femboy Menu")
-        f.on=false
-    elseif f.on then 
-        while f.on do
-            script.set_global_i(262145 + 24045, 300000)
-            script.set_global_i(262145 + 24041, 300000) 
-            stats.stat_set_int(gameplay.get_hash_key("MP0_CLUB_POPULARITY"), 10000, true)
-            stats.stat_set_int(gameplay.get_hash_key("MP0_CLUB_PAY_TIME_LEFT"), -1, true)
-            stats.stat_set_int(gameplay.get_hash_key("MP0_CLUB_POPULARITY"), 100000, true)
-            stats.stat_set_int(gameplay.get_hash_key("MP1_CLUB_POPULARITY"), 10000, true)
-            stats.stat_set_int(gameplay.get_hash_key("MP1_CLUB_PAY_TIME_LEFT"), -1, true)
-            stats.stat_set_int(gameplay.get_hash_key("MP1_CLUB_POPULARITY"), 100000, true)
-        system.wait(f.value)
-        end
-    end
-end)
-monloop.min = 0
-monloop.max = 2500
-monloop.mod = 100
-monloop.value = 500
-
-local muneloop = menu.add_feature("300k loop", "value_i", mone.id, function(f)
-    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_STATS) and not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_SCRIPT_VARS) then
-        menu.notify("Globals and Stats are required to be enabled in trusted mode to use this", "Femboy Menu")
-        f.on=false
-    elseif f.on then 
-        menu.notify("This feature is very temperamental", "Femboy Menu")
-        while f.on do
-            script.set_global_i(262145 + 24045, 300000)
-            script.set_global_i(262145 + 24041, 300000) 
-            stats.stat_set_int(gameplay.get_hash_key("MP0_CLUB_POPULARITY"), 10000, true)
-            stats.stat_set_int(gameplay.get_hash_key("MP0_CLUB_PAY_TIME_LEFT"), -1, true)
-            stats.stat_set_int(gameplay.get_hash_key("MP0_CLUB_POPULARITY"), 100000, true)
-            stats.stat_set_int(gameplay.get_hash_key("MP1_CLUB_POPULARITY"), 10000, true)
-            stats.stat_set_int(gameplay.get_hash_key("MP1_CLUB_PAY_TIME_LEFT"), -1, true)
-            stats.stat_set_int(gameplay.get_hash_key("MP1_CLUB_POPULARITY"), 100000, true)
-            system.wait(f.value)
-            menu.get_feature_by_hierarchy_key("online.business.safes.cash_out_nightclub_safe"):toggle()
-        system.wait()
-        end
-        script.set_global_i(262145 + 24045, 300000)
-        script.set_global_i(262145 + 24041, 300000) 
-        stats.stat_set_int(gameplay.get_hash_key("MP0_CLUB_POPULARITY"), 10000, true)
-        stats.stat_set_int(gameplay.get_hash_key("MP0_CLUB_PAY_TIME_LEFT"), -1, true)
-        stats.stat_set_int(gameplay.get_hash_key("MP0_CLUB_POPULARITY"), 100000, true)
-        stats.stat_set_int(gameplay.get_hash_key("MP1_CLUB_POPULARITY"), 10000, true)
-        stats.stat_set_int(gameplay.get_hash_key("MP1_CLUB_PAY_TIME_LEFT"), -1, true)
-        stats.stat_set_int(gameplay.get_hash_key("MP1_CLUB_POPULARITY"), 100000, true)
-    end
-end)
-muneloop.min = 0
-muneloop.max = 5000
-muneloop.mod = 100
-muneloop.value = 500
-
-menu.add_feature("Auto Special Cargo Supplier", "toggle", mone.id, function(f)
-    if f.on then
-        menu.notify("Notifications above map disabled to prevent spam, Make sure to disable this feature before unloading script", "Femboy Menu") 
-    end
-    while f.on do
-        menu.get_feature_by_hierarchy_key("online.business.special_cargo.supply_cargo"):toggle()
-        system.wait()
-        native.call(0x32888337579A5970, f.on) -- hide feed
-        system.wait()
-    end
-    native.call(0x15CFA549788D35EF) -- THEFEED_SHOW
-    native.call(0xA8FDB297A8D25FBA) -- THEFEED_FLUSH_QUEUE
-    menu.notify("Notifications above map enabled", "Femboy Menu")
-end)
 -- RGB Player Options
 feat_tv.AllRGBHair = menu.add_feature("Loop All Hair Colours", "value_i", rgb.id, function(f)
     while f.on do
@@ -2215,6 +2144,159 @@ menu.add_feature("Block English", "toggle", chatmodopt.id, function(func)
         event.remove_event_listener("chat", english)
     end
 end)
+-- Money stuffs
+menu.add_feature("Sell Aircargo For 2.1B", "toggle", air.id, function(f)
+    while f.on do
+        script.set_global_i(284955,2147483647)
+        script.set_global_i(284956,2147483647)
+        script.set_global_i(284957,2147483647)
+        script.set_global_i(284958,2147483647)
+        script.set_global_i(284959,2147483647)
+        script.set_global_i(284960,2147483647)
+        script.set_global_i(284961,2147483647)
+        script.set_global_i(284962,2147483647)
+        script.set_global_i(284963,2147483647)
+        system.wait()
+    end
+end)
+
+menu.add_feature("Disable Airfreight Cooldown", "toggle" , air.id, function(f)
+    while f.on do 
+        script.set_global_i(2766148,0)
+        script.set_global_i(284896,0)
+        script.set_global_i(284897,0)
+        script.set_global_i(284898,0)
+        script.set_global_i(284899,0)
+        script.set_global_i(284900,0)
+        system.wait()
+    end
+end)
+
+menu.add_feature("Instant Finish Sell", "toggle", air.id, function(f)
+    while f.on do
+        script.set_local_i(2882788887,2963,0)
+        system.wait()
+    end
+end)
+
+menu.add_feature("Instant Source","action",air.id,function(f)
+    script.set_local_i(2882788887,1999,-1)
+end)
+-- 
+local monloop = menu.add_feature("NightClub Safe Loop", "value_i", mone.id, function(f)
+    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_STATS) and not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_SCRIPT_VARS) then
+        menu.notify("Globals and Stats are required to be enabled in trusted mode to use this", "Femboy Menu")
+        f.on=false
+    elseif f.on then 
+        while f.on do
+            script.set_global_i(262145 + 24045, 300000)
+            script.set_global_i(262145 + 24041, 300000) 
+            stats.stat_set_int(gameplay.get_hash_key("MP0_CLUB_POPULARITY"), 10000, true)
+            stats.stat_set_int(gameplay.get_hash_key("MP0_CLUB_PAY_TIME_LEFT"), -1, true)
+            stats.stat_set_int(gameplay.get_hash_key("MP0_CLUB_POPULARITY"), 100000, true)
+            stats.stat_set_int(gameplay.get_hash_key("MP1_CLUB_POPULARITY"), 10000, true)
+            stats.stat_set_int(gameplay.get_hash_key("MP1_CLUB_PAY_TIME_LEFT"), -1, true)
+            stats.stat_set_int(gameplay.get_hash_key("MP1_CLUB_POPULARITY"), 100000, true)
+        system.wait(f.value)
+        end
+    end
+end)
+monloop.min = 0
+monloop.max = 2500
+monloop.mod = 100
+monloop.value = 500
+
+local muneloop = menu.add_feature("300k loop", "value_i", mone.id, function(f)
+    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_STATS) and not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_SCRIPT_VARS) then
+        menu.notify("Globals and Stats are required to be enabled in trusted mode to use this", "Femboy Menu")
+        f.on=false
+    elseif f.on then 
+        menu.notify("This feature is very temperamental", "Femboy Menu")
+        while f.on do
+            script.set_global_i(262145 + 24045, 300000)
+            script.set_global_i(262145 + 24041, 300000) 
+            stats.stat_set_int(gameplay.get_hash_key("MP0_CLUB_POPULARITY"), 10000, true)
+            stats.stat_set_int(gameplay.get_hash_key("MP0_CLUB_PAY_TIME_LEFT"), -1, true)
+            stats.stat_set_int(gameplay.get_hash_key("MP0_CLUB_POPULARITY"), 100000, true)
+            stats.stat_set_int(gameplay.get_hash_key("MP1_CLUB_POPULARITY"), 10000, true)
+            stats.stat_set_int(gameplay.get_hash_key("MP1_CLUB_PAY_TIME_LEFT"), -1, true)
+            stats.stat_set_int(gameplay.get_hash_key("MP1_CLUB_POPULARITY"), 100000, true)
+            system.wait(f.value)
+            menu.get_feature_by_hierarchy_key("online.business.manual_actions.supply_special_cargo"):toggle()
+        system.wait()
+        end
+        script.set_global_i(262145 + 24045, 300000)
+        script.set_global_i(262145 + 24041, 300000) 
+        stats.stat_set_int(gameplay.get_hash_key("MP0_CLUB_POPULARITY"), 10000, true)
+        stats.stat_set_int(gameplay.get_hash_key("MP0_CLUB_PAY_TIME_LEFT"), -1, true)
+        stats.stat_set_int(gameplay.get_hash_key("MP0_CLUB_POPULARITY"), 100000, true)
+        stats.stat_set_int(gameplay.get_hash_key("MP1_CLUB_POPULARITY"), 10000, true)
+        stats.stat_set_int(gameplay.get_hash_key("MP1_CLUB_PAY_TIME_LEFT"), -1, true)
+        stats.stat_set_int(gameplay.get_hash_key("MP1_CLUB_POPULARITY"), 100000, true)
+    end
+end)
+muneloop.min = 0
+muneloop.max = 5000
+muneloop.mod = 100
+muneloop.value = 500
+
+menu.add_feature("Remove Transaction Error", "toggle", mone.id,function(f)
+    while f.on do
+        script.set_global_i(4536673,0)
+        script.set_global_i(4536674,0)
+        script.set_global_i(4536675,0)
+        system.wait()
+    end
+end)
+
+-- Special cargo
+menu.add_feature("Sell Special Cargo For 5m", "toggle", special.id, function(f)
+    while f.on do
+        script.set_global_i(278133,5780000)
+        script.set_global_i(278131,5780000)
+        script.set_global_i(278135,5780000)
+        script.set_global_i(278129,5780000)
+        script.set_global_i(278127,5780000)
+        script.set_global_i(278137,5780000)
+        script.set_global_i(277933,5791000)
+        script.set_global_i(277934,2895500)
+        script.set_global_i(277935,1930333)
+        script.set_global_i(277936,1158200)
+        script.set_global_i(277937,827285)
+        script.set_global_i(277938,643444)
+        script.set_global_i(277939,413642)
+        script.set_global_i(277940,304789)
+        script.set_global_i(277941,241291)
+        script.set_global_i(277942,199689)
+        script.set_global_i(277943,170323)
+        script.set_global_i(277944,148487)
+        script.set_global_i(277945,131613)
+        script.set_global_i(277946,118183)
+        script.set_global_i(277947,98152)
+        script.set_global_i(277948,83927)
+        script.set_global_i(277949,73303)
+        script.set_global_i(277950,65067)
+        script.set_global_i(277951,58494)
+        script.set_global_i(277952,52645)
+        script.set_global_i(277953,52171)
+        system.wait()
+    end
+end)
+
+menu.add_feature("Auto Special Cargo Supplier", "toggle", special.id, function(f)
+    if f.on then
+        menu.notify("Notifications above map disabled to prevent spam, Make sure to disable this feature before unloading script", "Femboy Menu") 
+    end
+    while f.on do
+        menu.get_feature_by_hierarchy_key("online.business.manual_actions.supply_special_cargo"):toggle()
+        system.wait()
+        native.call(0x32888337579A5970, f.on) -- hide feed
+        system.wait()
+    end
+    native.call(0x15CFA549788D35EF) -- THEFEED_SHOW
+    native.call(0xA8FDB297A8D25FBA) -- THEFEED_FLUSH_QUEUE
+    menu.notify("Notifications above map enabled", "Femboy Menu")
+end)
 -- World Options
 local distancescale = menu.add_feature("Distance Scale", "value_f", worldopt.id, function(f)
     menu.notify("This will effect your FPS massively", "Femboy Menu")
@@ -2385,12 +2467,12 @@ menu.add_feature("F8 To Save Settings", "toggle", set.id, function(f)
 end).on=true
 
 menu.add_feature("Femboy Lua Changelog", "action", set.id, function(f)
-    menu.notify("#FFC0CBFF#https://github.com/Decuwu/femboylua/blob/main/Changelog.md #FFFFFFFF#copied to clipboard, paste it in your browser url to see the scripts changelog", "Femboy Menu")
+    menu.notify("#FFC0CBFF#https://github.com/Decuwu/femboylua/blob/main/Changelog.md\n\n#DEFAULT#copied to clipboard, paste it in your browser url to see the scripts changelog", "Femboy Menu")
     utils.to_clipboard("https://github.com/Decuwu/femboylua/blob/main/Changelog.md")
 end)
 
 menu.add_feature("Femboy Lua Feature List", "action", set.id, function(f)
-    menu.notify("#FFC0CBFF#https://github.com/Decuwu/femboylua/blob/main/Femboy.md #FFFFFFFF#copied to clipboard, paste it in your browser url to see the scripts feature list", "Femboy Menu")
+    menu.notify("#FFC0CBFF#https://github.com/Decuwu/femboylua/blob/main/Femboy.md\n\n#DEFAULT#copied to clipboard, paste it in your browser url to see the scripts feature list", "Femboy Menu")
     utils.to_clipboard("https://github.com/Decuwu/femboylua/blob/main/Femboy.md")
 end)
 
@@ -2402,13 +2484,6 @@ local function dec_to_ipv4(ip)
 end
 local flagged_players = {} 
 local enable_vpn_check = true
-menu.add_feature("Disable VPN Check", "toggle", set.id, function(f)
-    if f.on then
-        enable_vpn_check = not enable_vpn_check
-    else 
-        check_vpn(pid)
-    end
-end)
 local function check_vpn(pid)
     if not enable_vpn_check then return end
     system.wait(1000)
@@ -2423,7 +2498,7 @@ local function check_vpn(pid)
         if string.find(my_info, "true") then
             menu.notify(player.get_player_name(pid) .. " was flagged for using a VPN", "Femboy Lua VPN Checker")
             if not player_parent.name:find("VPN") then
-                player_parent.name = player_parent.name .. " #FFC0CBFF#[VPN]"
+                player_parent.name = player_parent.name .. " #DEFAULT#[#FFC0CBFF#VPN#DEFAULT#]"
                 flagged_players[pid] = true 
             end
         end     
@@ -2451,7 +2526,7 @@ menu.create_thread(function() -- check if the player has been flagged before, if
             local player_parent = menu.get_feature_by_hierarchy_key("online.online_players.player_"..pid)
             if not player_parent.name:find("VPN") then
                 local name = ""
-                player_parent.name = player_parent.name .. " #FFC0CBFF#[VPN]"
+                player_parent.name = player_parent.name .. " #DEFAULT#[#FFC0CBFF#VPN#DEFAULT#]"
             end
         end
         system.wait(3000)
@@ -2532,18 +2607,21 @@ end)
 -- Online Script Features Options
 -- Griefing Options
 local function request_model(hash, timeout)
-	streaming.request_model(2859440138)
-	local timer = utils.time_ms() + (timeout or 1000)
-	while timer > utils.time_ms() and not streaming.has_model_loaded(2859440138) do
-	  	system.wait(0)
-	end
-	return streaming.has_model_loaded(2859440138)
+    streaming.request_model(hash)
+    local timer = utils.time_ms() + (timeout or 1000)
+    while timer > utils.time_ms() and not streaming.has_model_loaded(hash) do
+          system.wait(0)
+    end
+    return streaming.has_model_loaded(hash)
 end
 menu.add_player_feature("Crush Player", "action", grifopt.id, function(f, pid)
     local playerloc = player.get_player_coords(pid) 
     playerloc.z = playerloc.z + 2.7
-	request_model(2859440138)
-	vehicle.create_vehicle(2859440138, playerloc, 0, true, false)
+    request_model(2859440138)
+    local veh = vehicle.create_vehicle(2859440138, playerloc, 0, true, false)
+    entity.set_entity_visible(veh, false)
+    system.wait(10000)
+    entity.delete_entity(veh)
 end)
 
 menu.add_player_feature("Taze Player", "toggle", grifopt.id, function(f, pid)
@@ -2572,6 +2650,19 @@ menu.add_player_feature("Atomize Player", "toggle", grifopt.id, function(f, pid)
         system.wait()
     end
 end)
+
+menu.add_player_feature("Kill Player", "toggle", grifopt.id,function(f, pid)
+    while f.on do
+        local playerstart = player.get_player_coords(pid) + 1
+        local playerloc = player.get_player_coords(pid)
+        gameplay.shoot_single_bullet_between_coords(playerstart, playerloc, 10000, 3219281620, player.player_ped(), true, false, 100)
+        system.wait()     
+    end
+end)
+
+menu.add_player_feature("Clone Player", "action", grifopt.id, function(f, pid)
+    ped.clone_ped(player.get_player_ped(pid))
+end)
 -- IP Shits
 local ip_feats = {}
 local iplookuppid = menu.add_player_feature("IP Shits", "parent", mainpid.id, function(f, pid)
@@ -2596,13 +2687,16 @@ end)
 
 menu.add_player_feature("Post IP Info In Chat", "action_value_str", iplookuppid.id, function(f, pid)
     local ip = player.get_player_ip(pid)
-    local response, my_info = web.get("http://ip-api.com/json/" .. dec_to_ipv4(ip) .."?fields=1191481")
+    local response, my_info = web.get("http://ip-api.com/json/" .. dec_to_ipv4(ip) .."?fields=1189433")
+    local message = my_info:gsub(",", "\n"):gsub('[{}"]', ""):gsub(":", " - "):gsub("proxy", "VPN"):gsub("regionName", "Region"):gsub("query", "IP")
     if response == 200 then
         if f.value == 0 then
-            network.send_chat_message(my_info:gsub( ",", "\n"), true)
+            local name = player.get_player_name(pid)
+            network.send_chat_message(name .. "'s IP info:\n" .. message, true)
         end
         if f.value == 1 then
-            network.send_chat_message(my_info:gsub( ",", "\n"), false)
+            local name = player.get_player_name(pid)
+            network.send_chat_message(name .. "'s IP info:\n" .. message, false)
         end
     else
         print("Error.")
