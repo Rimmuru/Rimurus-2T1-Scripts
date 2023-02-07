@@ -1,5 +1,6 @@
 local moduleList = {
     {name = "Femboy Lua", link = "https://raw.githubusercontent.com/Rimmuru/Rimurus-2T1-Scripts/main/Rimurus%20Scripts/Modules/Femboy_Lua.lua", author = "Decuwu"},
+    {name = "Femboy Unlocker", link = "https://raw.githubusercontent.com/Rimmuru/Rimurus-2T1-Scripts/main/Rimurus%20Scripts/Modules/femboyunlocker.e.lua", author = "Decuwu"},
     {name = "Tophs Overlay", link = "https://raw.githubusercontent.com/Rimmuru/Rimurus-2T1-Scripts/main/Rimurus%20Scripts/Modules/TophsOverlay.lua", author = "Toph"},
     {name = "Copy IP", link = "https://raw.githubusercontent.com/Rimmuru/Rimurus-2T1-Scripts/main/Rimurus%20Scripts/Modules/Copy%20IP.lua", author = "unknown"},
     {name = "example", link = "https://raw.githubusercontent.com/Rimmuru/Rimurus-2T1-Scripts/main/Rimurus%20Scripts/Modules/example.lua", author = "Caru#1766"},
