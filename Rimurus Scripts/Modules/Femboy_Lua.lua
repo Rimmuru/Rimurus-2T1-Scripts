@@ -1,4 +1,4 @@
-local version = "2.0.1" 
+local version = "2.1.1.2" 
 local feats, feat_vals, feat_tv = {}, {}, {}
 local appdata = utils.get_appdata_path("PopstarDevs", "2Take1Menu")
 local INI = IniParser(appdata .. "\\scripts\\Femboy.ini")
@@ -49,6 +49,7 @@ end
 
 local main = menu.add_feature("Femboy Lua", "parent", 0).id 
 local player_feature = menu.add_feature("Player Features", "parent", main).id 
+local player_proof = menu.add_feature("Player Proofs", "parent", player_feature).id 
 local rgb_player_feature = menu.add_feature("RGB Player Features", "parent", player_feature).id 
 local vehicle_feature = menu.add_feature("Vehicle Feature", "parent", main).id
 local door_control = menu.add_feature("Door Controls", "parent", vehicle_feature).id 
@@ -56,10 +57,10 @@ local vehicle_customisation = menu.add_feature("Vehicle Customisation", "parent"
 local light_control = menu.add_feature("Light Controls", "parent", vehicle_feature).id
 
 local online_feature = menu.add_feature("Online Features", "parent", main).id 
+local friendly_feature = menu.add_feature("Friendly Options", "parent", online_feature).id 
 local moderation_options = menu.add_feature("Moderation Options", "parent", online_feature).id 
 local auto_moderation = menu.add_feature("Auto Moderation", "parent", moderation_options).id 
 local country_kick = menu.add_feature("Country Kick", "parent", moderation_options).id 
-local chat_moderation_options = menu.add_feature("Chat Moderation Options", "parent", moderation_options).id 
 local ip_lookup = menu.add_feature("IP Lookup", "parent", online_feature).id
 
 local recovery_feature = menu.add_feature("Recovery Features", "parent", main).id
@@ -72,8 +73,6 @@ local special_crate = menu.add_feature("Choose Special Crate To Buy", "parent", 
 local air_cargo = menu.add_feature("Air Freight Cargo Options", "parent", recovery_feature).id
 local steal_missions_air = menu.add_feature("Steal Missions", "parent", air_cargo).id 
 local sell_missions_air = menu.add_feature("Sell Missions", "parent", air_cargo).id 
-
-local bunker_features = menu.add_feature("Bunker Options", "parent", recovery_feature).id 
 
 local night_club = menu.add_feature("Nightclub Options", "parent", recovery_feature).id
 local vehicle_cargo = menu.add_feature("Vehicle Cargo Options", "parent", recovery_feature).id 
@@ -93,6 +92,10 @@ local misc_feature = menu.add_feature("Misc Features", "parent", main).id
 local logging_feature = menu.add_feature("Logging Features", "parent", main).id 
 local settings = menu.add_feature("Settings", "parent", main).id 
 local credits = menu.add_feature("Credits", "parent", main).id
+
+--local dev_build_stuff = menu.add_feature("Dev Build Shit", "parent", main).id
+--local webhook = menu.add_feature("Discord Webhook", "parent", dev_build_stuff).id 
+--local colour_list = menu.add_feature("Colour List", "parent", dev_build_stuff).id
 
 local main_online = menu.add_player_feature("Femboy Lua", "parent", 0).id
 --local ip_online_lookup = menu.add_player_feature("IP Lookup", "parent", main_online).id
@@ -142,6 +145,29 @@ local function kickPlayersForFlag(flag)
     end
 end
 
+local function check_vpn(pid)
+    if not enable_vpn_check then return end
+    system.wait(1000)
+    local paramType = type(pid)
+    if paramType == "table" or paramType == "userdata" then
+        pid = pid.player
+    end
+    local player_parent = menu.get_feature_by_hierarchy_key("online.online_players.player_" .. pid)
+    local ip = player.get_player_ip(pid)
+    local response, my_info = web.get("http://ip-api.com/json/" .. dec_to_ipv4(ip) .. "?fields=131072")
+    if response == 200 then
+        if string.find(my_info, "true") then
+            menu.notify(player.get_player_name(pid) .. " was flagged for using a VPN", "Femboy Lua VPN Checker")
+            if not player_parent.name:find("VPN") then
+                player_parent.name = player_parent.name .. " #DEFAULT#[#FFC0CBFF#VPN#DEFAULT#]"
+                flagged_players[pid] = true
+            end
+        end
+    else
+        print("Error.")
+    end
+end
+
 local function NotifyMap(title, subtitle, msg, iconname, intcolor)
     native.call(0x92F0DA1E27DB96DC, intcolor) --_THEFEED_SET_NEXT_POST_BACKGROUND_COLOR
     native.call(0x202709F4C58A0424, "STRING") --BEGIN_TEXT_COMMAND_THEFEED_POST
@@ -150,10 +176,89 @@ local function NotifyMap(title, subtitle, msg, iconname, intcolor)
     native.call(0x2ED7843F8F801023, true, true) --END_TEXT_COMMAND_THEFEED_POST_TICKER
 end
 
+local function AlertMessage(body)
+    local scaleForm = graphics.request_scaleform_movie("POPUP_WARNING")
+    if(graphics.has_scaleform_movie_loaded(scaleForm)) then
+        ui.draw_rect(.5, .5, 1, 1, 0, 0, 0, 255)
+        graphics.begin_scaleform_movie_method(scaleForm, "SHOW_POPUP_WARNING")
+        graphics.draw_scaleform_movie_fullscreen(scaleForm, 255, 255, 255, 255, 0)
+        graphics.scaleform_movie_method_add_param_float(500.0)
+        graphics.scaleform_movie_method_add_param_texture_name_string("Alert")
+        graphics.scaleform_movie_method_add_param_texture_name_string(body)
+        graphics.end_scaleform_movie_method(scaleForm)
+    end
+end
+
 -- 
-NotifyMap("Femboy Lua ", version .. " ~h~~r~Femboy Lua Script", "~b~Script Loaded, head to Script Features", "CHAR_MP_STRIPCLUB_PR", 140)
+local name = player.get_player_name(player.player_id())
+NotifyMap("Femboy Lua ", version .. " ~h~~r~Femboy Lua Script", "~b~Script Loaded, head to Script Features\n\nCongratulations ~r~"..name.."~b~ you are now a femboy.", "CHAR_MP_STRIPCLUB_PR", 140)
 
 -- player_feature 
+local bullet_proof, fire_proof, explosion_proof, collision_proof, melee_proof, steam_proof, water_proof
+local native_call = native.call
+
+menu.add_feature("Set All Entity Proofs", "toggle", player_proof, function(f)
+	while f.on do
+		system.wait()
+		bullet_proof.on=f.on
+		fire_proof.on=f.on
+		explosion_proof.on=f.on
+		collision_proof.on=f.on
+		melee_proof.on=f.on 
+		steam_proof.on=f.on 
+		water_proof.on=f.on
+	end
+end)
+
+bullet_proof = menu.add_feature("Set Bulletproof", "toggle", player_proof, function(f)
+	while f.on do
+		native_call(0xFAEE099C6F890BB8, player.get_player_ped(player.player_id()), true, 0, 0, 0, 0, 0, 1, 0)
+		system.wait()
+	end
+end) 
+
+fire_proof = menu.add_feature("Set Fireproof", "toggle", player_proof, function(f)
+	while f.on do
+		native_call(0xFAEE099C6F890BB8, player.get_player_ped(player.player_id()), 0, true, 0, 0, 0, 0, 1, 0)
+		system.wait()
+	end
+end) 
+
+explosion_proof = menu.add_feature("Set Explosion Proof", "toggle", player_proof, function(f)
+	while f.on do
+		native_call(0xFAEE099C6F890BB8, player.get_player_ped(player.player_id()), 0, 0, true, 0, 0, 0, 1, 0)
+		system.wait()
+	end
+end) 
+
+collision_proof = menu.add_feature("Set Collision Proof", "toggle", player_proof, function(f)
+	while f.on do
+		native_call(0xFAEE099C6F890BB8, player.get_player_ped(player.player_id()), 0, 0, 0, true, 0, 0, 1, 0)
+		system.wait()
+	end
+end) 
+
+melee_proof = menu.add_feature("Set Melee Proof", "toggle", player_proof, function(f)
+	while f.on do
+		native_call(0xFAEE099C6F890BB8, player.get_player_ped(player.player_id()), 0, 0, 0, 0, true, 0, 1, 0)
+		system.wait()
+	end
+end) 
+
+steam_proof = menu.add_feature("Set Steam Proof", "toggle", player_proof, function(f)
+	while f.on do
+		native_call(0xFAEE099C6F890BB8, player.get_player_ped(player.player_id()), 0, 0, 0, 0, 0, true, 1, 0)
+		system.wait()
+	end
+end) 
+
+water_proof = menu.add_feature("Set Water Proof", "toggle", player_proof, function(f)
+	while f.on do
+		native_call(0xFAEE099C6F890BB8, player.get_player_ped(player.player_id()), 0, 0, 0, 0, 0, 0, 1, true)
+		system.wait()
+	end
+end) 
+
 feat_tv.AllRGBHair = menu.add_feature("Loop All Hair Colours", "value_i", rgb_player_feature, function(f)
     while f.on do
         local playerped = player.get_player_ped(player.player_id())
@@ -622,18 +727,30 @@ menu.add_feature("Fix Vehicle", "action", vehicle_feature, function()
 end)
 
 feats.autorepair = menu.add_feature("Auto Repair", "toggle", vehicle_feature, function(f)
-    while f.on do
-        local veh = player.player_vehicle()
-        if veh then
-            local speed = entity.get_entity_speed(veh)
-            if speed < 80 then
-                if vehicle.is_vehicle_damaged(veh) then
-                    vehicle.set_vehicle_fixed(player.get_player_vehicle(player.player_id()), true)
+    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then
+        menu.notify("Natives are required to be enabled to use this feature", "Femboy Lua")
+        f.on = false
+    else
+        while f.on do
+            local veh = player.player_vehicle()
+            if veh then
+                local speed = entity.get_entity_speed(veh)
+
+                if speed < 80 then
+                    if vehicle.is_vehicle_damaged(veh) then
+                        vehicle.set_vehicle_fixed(player.get_player_vehicle(player.player_id()), true)
+                    end
+                elseif veh and speed > 81 then return end
+
+                if native.call(0x11D862A3E977A9EF, veh):__tointeger() then -- ARE_ALL_VEHICLE_WINDOWS_INTACT
+                    for i = 0, 7 do 
+                        native.call(0x772282EBEB95E682, veh, i) -- FIX_VEHICLE_WINDOW
+                    end 
                 end
-            elseif veh and speed > 81 then
+                
             end
+            system.wait(5)
         end
-        system.wait(0.5)
     end
 end)
 if feats.autorepair.on then
@@ -892,6 +1009,17 @@ menu.add_feature("Force Host", "toggle", online_feature, function(f)
     end
 end)
 
+menu.add_feature("Bail To SP", "action", online_feature, function(f)
+    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then
+        menu.notify("Natives are required to be enabled to use this feature", "Femboy Lua")
+        f.on=false
+    else
+        if native.call(0x580CE4438479CC61) then
+            native.call(0x95914459A87EBA28, 0, 0, 0)
+        end
+    end
+end)
+
 local aim_karma = menu.add_feature("Aim Karma", "parent", online_feature).id
 local function APv2(f)
     while f.on do
@@ -963,36 +1091,30 @@ local function APv2(f)
         system.wait()
     end
 end
+
 feats.enableaimkarma = menu.add_feature("Enable Aim Karma", "toggle", aim_karma, function(f)
     if f.on then
         APv2(f)
     end
 end)
+
 menu.add_feature("--------------------", "action", aim_karma)
-feats.notifykarma = menu.add_feature("Notify If Aimed At", "toggle", aim_karma, function(f)
-    notifykarma = f.on
-end)
-feats.kickkarma = menu.add_feature("Kick Player", "toggle", aim_karma, function(f)
-    kickkarma = f.on
-end)
-feats.tazekarma = menu.add_feature("Taze Player", "toggle", aim_karma, function(f)
-    tazekarma = f.on
-end)
-feats.killkarma = menu.add_feature("Kill Player", "toggle", aim_karma, function(f)
-    killkarma = f.on
-end)
-feats.explokarma = menu.add_feature("Explode Player", "toggle", aim_karma, function(f)
-    explokarma = f.on
-end)
-feats.firewrkkarma = menu.add_feature("Firework Player", "toggle", aim_karma, function(f)
-    firewrkkarma = f.on
-end)
-feats.atomkarma = menu.add_feature("Atomize Player (with damage)", "toggle", aim_karma, function(f)
-    atomkarma = f.on
-end)
-feats.tankkarma = menu.add_feature("Crush Player", "toggle", aim_karma, function(f)
-    tankkarma = f.on
-end)
+
+local aim_karma_table = {
+    {name = "Notify If Aimed At", feat = "notifykarma"},
+    {name = "Kick Player", feat = "kickkarma"},
+    {name = "Taze Player", feat = "tazekarma"},
+    {name = "Kill Player", feat = "killkarma"},
+    {name = "Explode Player", feat = "explokarma"},
+    {name = "Firework Player", feat = "firewrkkarma"},
+    {name = "Atomize Player (with damage)", feat = "atomkarma"},
+    {name = "Crush Player", feat = "tankkarma"}
+}
+for _,v in ipairs(aim_karma_table) do
+    feats[v.feat] = menu.add_feature(v.name, "toggle", aim_karma,function(f)
+        v.feat = f.on    
+    end)
+end
 
 local ip_feats = {}
 menu.add_feature("Press here to enter IP", "action", ip_lookup, function(f)
@@ -1018,158 +1140,44 @@ menu.add_feature("                                    -- IP Info --             
 ip_feats["query"] = menu.add_feature("Query", "action_value_str", ip_lookup)
 ip_feats["query"].hidden = true
 
-feats.automoder = menu.add_feature("Enable Auto Moderation", "toggle", auto_moderation)
+feats.auto_moderation = menu.add_feature("Enable Auto Moderation", "toggle", auto_moderation)
 menu.add_feature("--------------------", "action", auto_moderation)
-feats.manual = menu.add_feature("Manual flag", "toggle", auto_moderation, function(f)
-    while f.on do
-        kickPlayersForFlag(eModderDetectionFlags.MDF_MANUAL)
-        system.wait()
-    end
-end)
-feats.model = menu.add_feature("Player Model flag", "toggle", auto_moderation, function(f)
-    while f.on do
-        kickPlayersForFlag(eModderDetectionFlags.MDF_PLAYER_MODEL)
-        system.wait()
-    end
-end)
-feats.scidspoof = menu.add_feature("SCID Spoof flag", "toggle", auto_moderation, function(f)
-    while f.on do
-        kickPlayersForFlag(eModderDetectionFlags.MDF_SCID_SPOOF)
-        system.wait()
-    end
-end)
-feats.invobject = menu.add_feature("Invalid Object flag", "toggle", auto_moderation, function(f)
-    while f.on do
-        kickPlayersForFlag(eModderDetectionFlags.MDF_INVALID_OBJECT)
-        system.wait()
-    end
-end)
-feats.pedcrash = menu.add_feature("Invalid Ped Crash flag", "toggle", auto_moderation, function(f)
-    while f.on do
-        kickPlayersForFlag(eModderDetectionFlags.MDF_INVALID_PED_CRASH)
-        system.wait()
-    end
-end)
-feats.modelcrash = menu.add_feature("Model Change Crash flag", "toggle", auto_moderation, function(f)
-    while f.on do
-        kickPlayersForFlag(eModderDetectionFlags.MDF_MODEL_CHANGE_CRASH)
-        system.wait()
-    end
-end)
-feats.modelchange = menu.add_feature("Player Model Change flag", "toggle", auto_moderation, function(f)
-    while f.on do
-        kickPlayersForFlag(eModderDetectionFlags.MDF_PLAYER_MODEL_CHANGE)
-        system.wait()
-    end
-end)
-feats.racflag = menu.add_feature("RAC flag", "toggle", auto_moderation, function(f)
-    while f.on do
-        kickPlayersForFlag(eModderDetectionFlags.MDF_RAC)
-        system.wait()
-    end
-end)
-feats.moneydrop = menu.add_feature("Money Drop flag", "toggle", auto_moderation, function(f)
-    while f.on do
-        kickPlayersForFlag(eModderDetectionFlags.MDF_MONEY_DROP)
-        system.wait()
-    end
-end)
-feats.sep = menu.add_feature("SEP flag", "toggle", auto_moderation, function(f)
-    while f.on do
-        kickPlayersForFlag(eModderDetectionFlags.MDF_SEP)
-        system.wait()
-    end
-end)
-feats.attachobject = menu.add_feature("Attach Object flag", "toggle", auto_moderation, function(f)
-    while f.on do
-        kickPlayersForFlag(eModderDetectionFlags.MDF_ATTACH_OBJECT)
-        system.wait()
-    end
-end)
-feats.attachped = menu.add_feature("Attach Ped flag", "toggle", auto_moderation, function(f)
-    while f.on do
-        kickPlayersForFlag(eModderDetectionFlags.MDF_ATTACH_PED)
-        system.wait()
-    end
-end)
-feats.netarraycrash = menu.add_feature("Net Array Crash flag", "toggle", auto_moderation, function(f)
-    while f.on do
-        kickPlayersForFlag(eModderDetectionFlags.MDF_NET_ARRAY_CRASH)
-        system.wait()
-    end
-end)
-feats.netsynccrash = menu.add_feature("Net Sync Crash flag", "toggle", auto_moderation, function(f)
-    while f.on do
-        kickPlayersForFlag(eModderDetectionFlags.MDF_SYNC_CRASH)
-        system.wait()
-    end
-end)
-feats.neteventcrash = menu.add_feature("Net Event Crash flag", "toggle", auto_moderation, function(f)
-    while f.on do
-        kickPlayersForFlag(eModderDetectionFlags.MDF_NET_EVENT_CRASH)
-        system.wait()
-    end
-end)
-feats.hosttoken = menu.add_feature("Host Token flag", "toggle", auto_moderation, function(f)
-    while f.on do
-        kickPlayersForFlag(eModderDetectionFlags.MDF_HOST_TOKEN)
-        system.wait()
-    end
-end)
-feats.sespam = menu.add_feature("SE Spam flag", "toggle", auto_moderation, function(f)
-    while f.on do
-        kickPlayersForFlag(eModderDetectionFlags.MDF_SE_SPAM)
-        system.wait()
-    end
-end)
-feats.frameflags = menu.add_feature("Frame Flags flag", "toggle", auto_moderation, function(f)
-    while f.on do
-        kickPlayersForFlag(eModderDetectionFlags.MDF_FRAME_FLAGS)
-        system.wait()
-    end
-end)
-feats.ipspoof = menu.add_feature("IP Spoof flag", "toggle", auto_moderation, function(f)
-    while f.on do
-        kickPlayersForFlag(eModderDetectionFlags.MDF_IP_SPOOF)
-        system.wait()
-    end
-end)
-feats.karenflag = menu.add_feature("Karen flag", "toggle", auto_moderation, function(f)
-    while f.on do
-        kickPlayersForFlag(eModderDetectionFlags.MDF_KAREN)
-        system.wait()
-    end
-end)
-feats.sessionmismatch = menu.add_feature("Session Mismatch flag", "toggle", auto_moderation, function(f)
-    while f.on do
-        kickPlayersForFlag(eModderDetectionFlags.MDF_SESSION_MISMATCH)
-        system.wait()
-    end
-end)
-feats.soundspam = menu.add_feature("Sound Spam flag", "toggle", auto_moderation, function(f)
-    while f.on do
-        kickPlayersForFlag(eModderDetectionFlags.MDF_SOUND_SPAM)
-        system.wait()
-    end
-end)
-feats.sepint = menu.add_feature("SEP INT flag", "toggle", auto_moderation, function(f)
-    while f.on do
-        kickPlayersForFlag(eModderDetectionFlags.MDF_SEP_INT)
-        system.wait()
-    end
-end)
-feats.suspiciousactivity = menu.add_feature("Suspicious Activity flag", "toggle", auto_moderation, function(f)
-    while f.on do
-        kickPlayersForFlag(eModderDetectionFlags.MDF_SUSPICIOUS_ACTIVITY)
-        system.wait()
-    end
-end)
-feats.chatspoof = menu.add_feature("Chat Spoof flag", "toggle", auto_moderation, function(f)
-    while f.on do
-        kickPlayersForFlag(eModderDetectionFlags.MDF_CHAT_SPOOF)
-        system.wait()
-    end
-end)
+local modder_flags = {
+    {name = "Manual", detection = "MDF_MANUAL"},
+    {name = "Player Model", detection = "MDF_PLAYER_MODEL"},
+    {name = "SCID Spoof", detection = "MDF_SCID_SPOOF"},
+    {name = "Invalid Object", detection = "MDF_INVALID_OBJECT"},
+    {name = "Invalid Ped Crash", detection = "MDF_INVALID_PED_CRASH"},
+    {name = "Model Change Crash", detection = "MDF_MODEL_CHANGE_CRASH"},
+    {name = "Player Model Change", detection = "MDF_PLAYER_MODEL_CHANGE"},
+    {name = "RAC", detection = "MDF_RAC"},
+    {name = "Money Drop", detection = "MDF_MONEY_DROP"},
+    {name = "SEP", detection = "MDF_SEP"},
+    {name = "Attach Object", detection = "MDF_ATTACH_OBJECT"},
+    {name = "Attach Ped", detection = "MDF_ATTACH_PED"},
+    {name = "Array Crash", detection = "MDF_ARRAY_CRASH"},
+    {name = "Sync Crash", detection = "MDF_SYNC_CRASH"},
+    {name = "Net Event Crash", detection = "MDF_NET_EVENT_CRASH"},
+    {name = "Host Token", detection = "MDF_HOST_TOKEN"},
+    {name = "SE Spam", detection = "MDF_SE_SPAM"},
+    {name = "Frame Flags", detection = "MDF_FRAME_FLAGS"},
+    {name = "IP Spoof", detection = "MDF_IP_SPOOF"},
+    {name = "Karen", detection = "MDF_KAREN"},
+    {name = "Session Mismatch", detection = "MDF_SESSION_MISMATCH"},
+    {name = "Sound Spam", detection = "MDF_SOUND_SPAM"},
+    {name = "Sep Int", detection = "MDF_SEP_INT"},
+    {name = "Suspsicious Activity", detection = "MDF_SUSPICIOUS_ACTIVITY"},
+    {name = "Chat Spoof", detection = "MDF_CHAT_SPOOF"}
+}
+for _,v in ipairs(modder_flags) do 
+    feats[v.detection] = menu.add_feature(v.name .. " flag", "toggle", auto_moderation, function(f)
+        while f.on do
+            kickPlayersForFlag(eModderDetectionFlags[v.detection])
+            system.wait()
+        end
+    end)
+    feats[v.detection] = modder_flags[#modder_flags]
+end
 
 local cheese = {
     { name = "Afghanistan",                                          code = "AF" },
@@ -1423,7 +1431,7 @@ local cheese = {
     { name = "Aland Islands",                                        code = "AX" }
 }
 local country_features = {}
-menu.add_feature("Enable", "toggle", country_kick, function(f)
+feats.enable_auto_kick = menu.add_feature("Enable", "toggle", country_kick, function(f)
     if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_HTTP) then
         menu.notify("HTTP trusted mode must be enabled to use this.", "Femboy Menu")
         f.on = false
@@ -1489,228 +1497,8 @@ for _, v in pairs(cheese) do
         v.on = f.on
     end)
     country_features[#country_features].data = v
+    feats[v.code] = country_features[#country_features]
 end
-
-local racismfilter = {
-    "assnigger",
-    "assnigga",
-    "Assnigger",
-    "Assnigga",
-    "beaner",
-    "Beaner",
-    "coon",
-    "Coon",
-    "chink",
-    "Chink",
-    "chinc",
-    "Chink",
-    "gook",
-    "Gook",
-    "guido",
-    "Guido",
-    "jap",
-    "Jap",
-    "jigaboo",
-    "Jigaboo",
-    "negro",
-    "Negro",
-    "nigaboo",
-    "Nigaboo",
-    "niggaboo",
-    "Niggaboo",
-    "nigga",
-    "Nigga",
-    "nigger",
-    "Nigger",
-    "niggerish",
-    "Niggerish",
-    "niggers",
-    "Niggers",
-    "niglet",
-    "nigglet",
-    "Niglet",
-    "Nigglet",
-    "nignog",
-    "Nignog",
-    "paki",
-    "Paki",
-    "porch monkey",
-    "Porch Monkey",
-    "porchmonkey",
-    "Porchmonkey",
-    "sand nigger",
-    "sandnigger",
-    "Sand Nigger",
-    "Sandnigger",
-    "spic",
-    "spick",
-    "Spic",
-    "Spick",
-    "wetback",
-    "Wetback",
-    "ASSNIGGER",
-    "ASSNIGGA",
-    "BEANER",
-    "COON",
-    "CHINK",
-    "CHINC",
-    "GOOK",
-    "JAP",
-    "JIGABOO",
-    "NEGRO",
-    "NIGABOO",
-    "NIGGABOO",
-    "NIGGA",
-    "NIGGER",
-    "NIGGERISH",
-    "NIGGERS",
-    "NIGLET",
-    "NIGGLET",
-    "NIGNOG",
-    "PAKI",
-    "PORCH MONKEY",
-    "PORCHMONKEY",
-    "SAND NIGGER",
-    "SANDNIGGER",
-    "SPIC",
-    "SPICK",
-    "WETBACK"
-}
-local f = function(s)
-    for k, v in pairs(racismfilter) do
-        if s:find(v .. " ") or s:find(" " .. v) or s:find("^" .. v .. "$") then
-            return true
-        end
-    end
-    return false
-end
-feats.blockracism = menu.add_feature("Block Racism", "toggle", chat_moderation_options, function(func)
-    if func.on then
-        racism = event.add_event_listener("chat", function(e)
-            if f(e.body) then
-                menu.notify(player.get_player_name(e.sender) .. " was removed for being too much of an edgelord",
-                    "Femboy Menu")
-                network.force_remove_player(e.sender)
-            end
-        end)
-    else
-        event.remove_event_listener("chat", racism)
-    end
-end)
-
-local homophobicfilter = {
-    "dike",
-    "dyke",
-    "fag",
-    "faggit",
-    "faggot",
-    "fagtard",
-    "fag tard",
-    "gay fuck",
-    "homo",
-    "tranny",
-    "DIKE",
-    "DYKE",
-    "FAG",
-    "FAGGIT",
-    "FAGGOT",
-    "FAGTARD",
-    "FAG TARD",
-    "GAY FUCK",
-    "HOMO",
-    "TRANNY",
-    "Dike",
-    "Dyke",
-    "Fag",
-    "Faggit",
-    "Faggot",
-    "Fagtard",
-    "Fag Tard",
-    "Gay Fuck",
-    "Homo",
-    "Tranny",
-    "dIKE",
-    "dYKE",
-    "fAG",
-    "fAGGIT",
-    "fAGGOT",
-    "fAGTARD",
-    "fAG tARD",
-    "gAY fUCK",
-    "hOMO",
-    "tRANNY"
-}
-local f = function(s)
-    for k, v in pairs(homophobicfilter) do
-        if s:find(v .. " ") or s:find(" " .. v) or s:find("^" .. v .. "$") then
-            return true
-        end
-    end
-    return false
-end
-feats.blockhomophobia = menu.add_feature("Block Homophobia", "toggle", chat_moderation_options, function(func)
-    if func.on then
-        homophobic = event.add_event_listener("chat", function(e)
-            if f(e.body) then
-                menu.notify(
-                    player.get_player_name(e.sender) ..
-                    " was removed for being too much of an edgelord, probably gets pegged :shrug:", "Femboy Menu")
-                network.force_remove_player(e.sender)
-            end
-        end)
-    else
-        event.remove_event_listener("chat", homophobic)
-    end
-end)
-
-local botspam = {
-    "gtagta.cc",
-    "discord.gg/"
-}
-local f = function(s)
-    for k, v in pairs(botspam) do
-        if s:find(v) then
-            return true
-        end
-    end
-    return false
-end
-local messages = {}
-local max_repeats = 2
-feats.chatspam = menu.add_feature("Block Bot/Chat Spam", "toggle", chat_moderation_options, function(func)
-    if func.on then
-        spam = event.add_event_listener("chat", function(e)
-            local sender = e.sender
-            local message = e.body
-            if e.sender then
-                if not messages[sender] then
-                    messages[sender] = {
-                        count = 0,
-                        last_message = ""
-                    }
-                end
-                if message == messages[sender].last_message then
-                    messages[sender].count = messages[sender].count + 1
-                else
-                    messages[sender].count = 0
-                    messages[sender].last_message = message
-                end
-                if f(message) or messages[sender].count >= max_repeats then
-                    for pid = 0, 31 do
-                        local name = player.get_player_name(e.sender)
-                        menu.notify(name .. " was removed for Chat Spam, likely an ad bot or just annoying",
-                            "Femboy Menu")
-                        network.force_remove_player(e.sender)
-                    end
-                    messages[sender].count = 0
-                    messages[sender].last_message = message
-                end
-            end
-        end)
-    else
-        event.remove_event_listener("chat", spam)
-    end
-end)
 
 -- recovery_feature
 -- remote_business
@@ -1724,89 +1512,29 @@ menu.add_feature("Start CEO", "action", remote_business, function()
     end
 end)
 
-menu.add_feature("Open Airfreight App","action", remote_business,function()
-    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) and not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_SCRIPT_VARS) then
-        menu.notify("Natives and Globals/Locals are required to be enabled to use this feature", "Femboy Lua")
-    else
-        script.set_global_i(1854376,-1)
-        script.set_global_i(1894584,0)
-        script.set_global_i(274986,32)
-        script.set_global_i(274984,32)
-        native.call(0x6EB5F71AA68F2E8E, "appsmuggler") -- VOID REQUEST_SCRIPT(const char* scriptName)
-        native.call(0xE6CC9F3BA0FB9EF1, "appsmuggler") -- BOOL HAS_SCRIPT_LOADED(const char* scriptName)
-        native.call(0xE81651AD79516E48, "appsmuggler", 54000) -- INT START_NEW_SCRIPT(const char* stackSize)
-    end
-end)
-
-menu.add_feature("Open Bunker App","action", remote_business,function()
-    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) and not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_SCRIPT_VARS) then
-        menu.notify("Natives and Globals/Locals are required to be enabled to use this feature", "Femboy Lua")
-    else
-        script.set_global_i(1854376,-1)
-        script.set_global_i(1894584,0)
-        script.set_global_i(274986,32)
-        script.set_global_i(274984,32)
-        native.call(0x6EB5F71AA68F2E8E, "appbunkerbusiness") -- VOID REQUEST_SCRIPT(const char* scriptName)
-        native.call(0xE6CC9F3BA0FB9EF1, "appbunkerbusiness") -- BOOL HAS_SCRIPT_LOADED(const char* scriptName)
-        native.call(0xE81651AD79516E48, "appbunkerbusiness", 54000) -- INT START_NEW_SCRIPT(const char* stackSize)
-    end
-end)
-
-menu.add_feature("Franklin's Agency","action", remote_business,function()
-    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) and not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_SCRIPT_VARS) then
-        menu.notify("Natives and Globals/Locals are required to be enabled to use this feature", "Femboy Lua")
-    else
-        script.set_global_i(1854376,-1)
-        script.set_global_i(1894584,0)
-        script.set_global_i(274986,32)
-        script.set_global_i(274984,32)
-        native.call(0x6EB5F71AA68F2E8E, "appfixersecurity") -- VOID REQUEST_SCRIPT(const char* scriptName)
-        native.call(0xE6CC9F3BA0FB9EF1, "appfixersecurity") -- BOOL HAS_SCRIPT_LOADED(const char* scriptName)
-        native.call(0xE81651AD79516E48, "appfixersecurity", 54000) -- INT START_NEW_SCRIPT(const char* stackSize)
-    end
-end)
-
-menu.add_feature("Master Control Terminal","action", remote_business,function()
-    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) and not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_SCRIPT_VARS) then
-        menu.notify("Natives and Globals/Locals are required to be enabled to use this feature", "Femboy Lua")
-    else
-        script.set_global_i(1854376,-1)
-        script.set_global_i(1894584,0)
-        script.set_global_i(274986,32)
-        script.set_global_i(274984,32)
-        native.call(0x6EB5F71AA68F2E8E, "apparcadebusinesshub") -- VOID REQUEST_SCRIPT(const char* scriptName)
-        native.call(0xE6CC9F3BA0FB9EF1, "apparcadebusinesshub") -- BOOL HAS_SCRIPT_LOADED(const char* scriptName)
-        native.call(0xE81651AD79516E48, "apparcadebusinesshub", 54000) -- INT START_NEW_SCRIPT(const char* stackSize)
-    end
-end)
-
-menu.add_feature("Nightclub App","action", remote_business,function()
-    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) and not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_SCRIPT_VARS) then
-        menu.notify("Natives and Globals/Locals are required to be enabled to use this feature", "Femboy Lua")
-    else
-        script.set_global_i(1854376,-1)
-        script.set_global_i(1894584,0)
-        script.set_global_i(274986,32)
-        script.set_global_i(274984,32)
-        native.call(0x6EB5F71AA68F2E8E, "appbusinesshub") -- VOID REQUEST_SCRIPT(const char* scriptName)
-        native.call(0xE6CC9F3BA0FB9EF1, "appbusinesshub") -- BOOL HAS_SCRIPT_LOADED(const char* scriptName)
-        native.call(0xE81651AD79516E48, "appbusinesshub", 54000) -- INT START_NEW_SCRIPT(const char* stackSize)
-    end
-end)
-
-menu.add_feature("Terrobyte Touchscreen Terminal","action", remote_business,function()
-    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) and not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_SCRIPT_VARS) then
-        menu.notify("Natives and Globals/Locals are required to be enabled to use this feature", "Femboy Lua")
-    else
-        script.set_global_i(1854376,-1)
-        script.set_global_i(1894584,0)
-        script.set_global_i(274986,32)
-        script.set_global_i(274984,32)
-        native.call(0x6EB5F71AA68F2E8E, "apphackertruck") -- VOID REQUEST_SCRIPT(const char* scriptName)
-        native.call(0xE6CC9F3BA0FB9EF1, "apphackertruck") -- BOOL HAS_SCRIPT_LOADED(const char* scriptName)
-        native.call(0xE81651AD79516E48, "apphackertruck", 54000) -- INT START_NEW_SCRIPT(const char* stackSize)
-    end
-end)
+local remote_business_table = {
+    {name = "Open Airfrieght App", hash = "appsmuggler"},
+    {name = "Open Bunker App", hash = "appbunkerbusiness"},
+    {name = "Franklin's Agency", hash = "appfixersecurity"},
+    {name = "Master Control Terminal", hash = "apparcadebusinesshub"},
+    {name = "Nightclub App App", hash = "appbusinesshub"},
+    {name = "Terrobyte Terminal", hash = "apphackertruck"}
+}
+for _,v in ipairs(remote_business_table) do
+    menu.add_feature(v.name, "action", remote_business, function()
+        if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_SCRIPT_VARS) then
+            menu.notify("Globals/Locals are required to be enabled to use this feature", "Femboy Lua")
+        else
+            script.set_global_i(1854376,-1)
+            script.set_global_i(1894584,0)
+            script.set_global_i(274986,32)
+            script.set_global_i(274984,32)
+            native.call(0x6EB5F71AA68F2E8E, v.hash) -- VOID REQUEST_SCRIPT(const char* scriptName)
+            native.call(0xE6CC9F3BA0FB9EF1, v.hash) -- BOOL HAS_SCRIPT_LOADED(const char* scriptName)
+            native.call(0xE81651AD79516E48, v.hash, 54000) -- INT START_NEW_SCRIPT(const char* stackSize)
+        end
+    end)
+end
 
 -- special_cargo
 menu.add_feature("Sell Cargo For 5 Million", "toggle", special_cargo, function(f)
@@ -1845,6 +1573,17 @@ menu.add_feature("Sell Cargo For 5 Million", "toggle", special_cargo, function(f
             system.wait()
         end
     end
+end)
+
+menu.add_feature("Auto Supplier", "toggle", special_cargo, function(f)
+    while f.on do
+        menu.get_feature_by_hierarchy_key("online.business.manual_actions.supply_special_cargo"):toggle()
+        system.wait()
+        native.call(0x32888337579A5970, f.on) -- hide feed
+        system.wait()
+    end
+    native.call(0x15CFA549788D35EF) -- THEFEED_SHOW
+    native.call(0xA8FDB297A8D25FBA) -- THEFEED_FLUSH_QUEUE
 end)
 
 menu.add_feature("Instant Buy", "toggle", special_cargo, function(f)
@@ -1964,45 +1703,45 @@ end
 
 -- air_cargo 
 
-menu.add_feature("Set Air Cargo Price To 1 Billion", "toggle", air_cargo, function(f)
-    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_SCRIPT_VARS) then
-        menu.notify("Globals/Locals are required to be enabled to use this feature", "Femboy Lua")
-        f.on=false
-    else
-        while f.on do
-            script.set_global_i(284955,1147483647)
-            script.set_global_i(284956,1147483647)
-            script.set_global_i(284957,1147483647)
-            script.set_global_i(284958,1147483647)
-            script.set_global_i(284959,1147483647)
-            script.set_global_i(284960,1147483647)
-            script.set_global_i(284961,1147483647)
-            script.set_global_i(284962,1147483647)
-            script.set_global_i(284963,1147483647)
-            system.wait()
-        end
-    end
-end)
+--menu.add_feature("Set Air Cargo Price To 1 Billion", "toggle", air_cargo, function(f)
+--    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_SCRIPT_VARS) then
+--        menu.notify("Globals/Locals are required to be enabled to use this feature", "Femboy Lua")
+--        f.on=false
+--    else
+--        while f.on do
+--            script.set_global_i(284955,1147483647)
+--            script.set_global_i(284956,1147483647)
+--            script.set_global_i(284957,1147483647)
+--            script.set_global_i(284958,1147483647)
+--            script.set_global_i(284959,1147483647)
+--            script.set_global_i(284960,1147483647)
+--            script.set_global_i(284961,1147483647)
+--            script.set_global_i(284962,1147483647)
+--            script.set_global_i(284963,1147483647)
+--            system.wait()
+--        end
+--    end
+--end)
 
-menu.add_feature("Set Air Cargo Price To 2 Billion", "toggle", air_cargo, function(f)
-    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_SCRIPT_VARS) then
-        menu.notify("Globals/Locals are required to be enabled to use this feature", "Femboy Lua")
-        f.on=false
-    else
-        while f.on do
-            script.set_global_i(284955,2147483647)
-            script.set_global_i(284956,2147483647)
-            script.set_global_i(284957,2147483647)
-            script.set_global_i(284958,2147483647)
-            script.set_global_i(284959,2147483647)
-            script.set_global_i(284960,2147483647)
-            script.set_global_i(284961,2147483647)
-            script.set_global_i(284962,2147483647)
-            script.set_global_i(284963,2147483647)
-            system.wait()
-        end
-    end
-end)
+--menu.add_feature("Set Air Cargo Price To 2 Billion", "toggle", air_cargo, function(f)
+--    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_SCRIPT_VARS) then
+--        menu.notify("Globals/Locals are required to be enabled to use this feature", "Femboy Lua")
+--        f.on=false
+--    else
+--        while f.on do
+--            script.set_global_i(284955,2147483647)
+--            script.set_global_i(284956,2147483647)
+--            script.set_global_i(284957,2147483647)
+--            script.set_global_i(284958,2147483647)
+--            script.set_global_i(284959,2147483647)
+--            script.set_global_i(284960,2147483647)
+--            script.set_global_i(284961,2147483647)
+--            script.set_global_i(284962,2147483647)
+--            script.set_global_i(284963,2147483647)
+--            system.wait()
+--        end
+--    end
+--end)
 
 menu.add_feature("Open AirFrieght App", "action", air_cargo, function()
     if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_SCRIPT_VARS) then
@@ -2130,6 +1869,25 @@ for _, v in ipairs(sell_missions) do
 end
 
 -- night_club
+local nightclub_notif = false
+menu.add_feature("300k Safe Loop", "toggle", night_club, function(f)
+    if nightclub_notif == false then 
+        menu.notify("- Activate Loop\n- Go to nightclub safe, directly ahead of the computer\n- Open the safe and stand right against it", "Femboy Lua", 5, 0xFF00EEEE)
+        nightclub_notif = true
+    end
+    while f.on do
+        script.set_global_i(262145 + 24045, 300000)
+        script.set_global_i(262145 + 24041, 300000) 
+        stats.stat_set_int(gameplay.get_hash_key("MP0_CLUB_POPULARITY"), 10000, true)
+        stats.stat_set_int(gameplay.get_hash_key("MP0_CLUB_PAY_TIME_LEFT"), -1, true)
+        stats.stat_set_int(gameplay.get_hash_key("MP0_CLUB_POPULARITY"), 100000, true)
+        stats.stat_set_int(gameplay.get_hash_key("MP1_CLUB_POPULARITY"), 10000, true)
+        stats.stat_set_int(gameplay.get_hash_key("MP1_CLUB_PAY_TIME_LEFT"), -1, true)
+        stats.stat_set_int(gameplay.get_hash_key("MP1_CLUB_POPULARITY"), 100000, true)
+        system.wait()
+    end
+end)
+
 menu.add_feature("Instant Sell","toggle",night_club,function(f)
     if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_SCRIPT_VARS) then
         menu.notify("Globals/Locals are required to be enabled to use this feature", "Femboy Lua")
@@ -2164,84 +1922,6 @@ menu.add_feature("Remove Nightclub Sell Cooldown","toggle",night_club,function(f
         while f.on do
             script.set_global_i(1962972,-1)
             system.wait()
-        end
-    end
-end)
-
--- nightclub scam (stolen from lol)
-local night_club_scam = menu.add_feature("Nightclub Scam", "parent", night_club, function()
-    menu.notify("Stolen from Loled (lemone method)")
-end).id
-
-local function ezBan()
-    local nlprice = gameplay.get_hash_key("MP0_PROP_NIGHTCLUB_VALUE")
-    local nlprice2 = gameplay.get_hash_key("MP1_PROP_NIGHTCLUB_VALUE")
-
-    local leplayer = script.get_global_i(1574918)
-    if leplayer == 0 then
-        stats.stat_set_int(nlprice, ((1000000000 * 2) + 4500000), true)
-    else
-        stats.stat_set_int(nlprice2, ((1000000000 * 2) + 4500000), true)
-    end
-end
-
-local native_call = native.call
-local function simulate_a_mouse_click()
-    native_call(0x351220255D64C155, 2, 237, true)
-    native_call(0xE8A25867FBA3B05E, 2, 237, 1.0)
-    system.yield(25)
-    native_call(0xE8A25867FBA3B05E, 2, 237, 0.0)
-end
-local function simulate_an_enter_press_1()
-    native_call(0x351220255D64C155, 0, 176, true)
-    native_call(0xE8A25867FBA3B05E, 0, 176, 1.0)
-    system.yield(25)
-    native_call(0xE8A25867FBA3B05E, 0, 176, 0.0)
-end
-local function simulate_an_enter_press_2()
-    native_call(0x351220255D64C155, 2, 176, true)
-    native_call(0xE8A25867FBA3B05E, 2, 176, 1.0)
-    system.yield(25)
-    native_call(0xE8A25867FBA3B05E, 2, 176, 0.0)
-end
-
-local positions = {
-    { x = 0.474922, y = 0.555133 }, --to select first nightclub
-    { x = 0.363114, y = 0.729087 }, --to enter purchase
-    { x = 0.318704, y = 0.918251 }, --to choose to buy
-    { x = 0.782132, y = 0.912548 }, --to buy
-    { x = 0.708464, y = 0.911597 }, --to return to the map
-    { x = 0.465104, y = 0.452778 }, --to select 2nd nightclub
-    { x = 0.356250, y = 0.675000 }, --to enter purchase
-    { x = 0.318704, y = 0.918251 }, --to choose to buy
-    { x = 0.782132, y = 0.912548 }, --to buy
-    { x = 0.708464, y = 0.708464 } --to return
-}
-
-menu.add_feature("Real Estate Scam", "toggle", night_club_scam, function(f)
-    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_STATS) and not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_SCRIPT_VARS) then
-        menu.notify("Stats and Globals/Locals are required to be enabled to use this feature", "Femboy Lua")
-        f.on=false
-    else
-        while f.on do
-            ezBan()
-            system.wait()
-        end
-    end
-end)
-
-menu.add_feature("move mouse", "toggle", night_club_scam, function(f)
-    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then
-        menu.notify("Natives are required to be enabled to use this feature", "Femboy Lua")
-        f.on=false
-    else
-        while f.on do
-            for _, value in ipairs(positions) do
-                native_call(0xFC695459D4D0E219, value.x, value.y)
-                simulate_a_mouse_click()
-                simulate_an_enter_press_1()
-                simulate_an_enter_press_2()
-            end
         end
     end
 end)
@@ -2435,17 +2115,6 @@ menu.add_feature("Remove bad sport", "action", bad_sport_manager, function()
     end
 end)
 
-menu.add_feature("Bail To SP", "action", misc_feature, function(f)
-    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then
-        menu.notify("Natives are required to be enabled to use this feature", "Femboy Lua")
-        f.on=false
-    else
-        if native.call(0x580CE4438479CC61) then
-            native.call(0x95914459A87EBA28, 0, 0, 0)
-        end
-    end
-end)
-
 menu.add_feature("Force Cloud Save", "action", recovery_tool, function(f)
     if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then
         menu.notify("Natives are required to be enabled to use this feature", "Femboy Lua")
@@ -2549,7 +2218,7 @@ feats.disable_transaction_error = menu.add_feature("Remove Transaction Error", "
     end
 end)
 
-feats.disable_kosatka_missiles_cd = menu.add_feature("Disable Kosatka Missiles Cooldown", "toggle", disable_tools, function()
+feats.disable_kosatka_missiles_cd = menu.add_feature("Disable Kosatka Missiles Cooldown", "toggle", disable_tools, function(f)
     if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_SCRIPT_VARS) then
         menu.notify("Globals/Locals are required to be enabled to use this feature", "Femboy Lua")
         f.on=false
@@ -2639,6 +2308,30 @@ distancescale.min = 0.0
 distancescale.max = 200.0
 distancescale.mod = 0.5
 
+local set_time_scale = menu.add_feature("Set Time Scale", "value_f", world_feature, function(f)
+	if f.on then
+		native.call(0x1D408577D440E81E, f.value) -- SET_TIME_SCALE
+	else 
+		native.call(0x1D408577D440E81E, 1.0)
+	end
+end) 
+set_time_scale.min = 0.0
+set_time_scale.max = 1.0
+set_time_scale.mod = 0.1
+
+menu.add_feature("Load Map", "action_value_str", world_feature, function(f)
+    if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then
+        menu.notify("Natives are required to be enabled to use this feature", "Femboy Lua")
+        f.on = false
+    else
+        if f.value == 0 then
+            native.call(0xD7C10C4A637992C9) -- on_enter_sp
+        elseif f.value == 1 then 
+            native.call(0x0888C3502DBBEEF5) -- on_enter_mp
+        end 
+    end 
+end):set_str_data({"SP Map", "MP Map"})
+
 menu.add_feature("Make Nearby NPC's Riot", "toggle", world_feature, function(f)
     if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then
         menu.notify("Natives are required to be enabled to use this feature", "Femboy Lua")
@@ -2714,6 +2407,17 @@ menu.add_feature("Get All Achievements", "action", misc_feature, function(f)
     end
 end)
 
+local set_radar_angle = menu.add_feature("Set Radar Angle", "value_i", misc_feature, function(f)
+	while f.on do 
+		native.call(0x299FAEBB108AE05B, f.value) -- LOCK_MINIMAP_ANGLE
+		system.wait()
+	end
+	native.call(0x8183455E16C42E3A) -- UNLOCK_MINIMAP_ANGLE
+end) 
+set_radar_angle.min = 1
+set_radar_angle.max = 360 
+set_radar_angle.mod = 1
+
 menu.add_feature("Hide HUD", "toggle", misc_feature, function(f)
     if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then
         menu.notify("Natives are required to be enabled to use this feature", "Femboy Lua")
@@ -2727,6 +2431,21 @@ menu.add_feature("Hide HUD", "toggle", misc_feature, function(f)
             native.call(0xA0EBB943C300E693, true)
         end
     end
+end)
+
+menu.add_feature("Custom Error Message", "toggle", misc_feature, function(f)
+
+	local rtn, subtitle
+	repeat
+		rtn, body = input.get("Insert Message", "", 50, eInputType.IT_ASCII)
+		if rtn == 2 then return end
+		system.wait()
+	until rtn == 0 
+
+	while f.on do 
+		AlertMessage(body)
+		system.wait()
+	end
 end)
 
 menu.add_feature("Disable Above Map Notifs", "toggle", misc_feature, function(f)
@@ -2744,21 +2463,11 @@ menu.add_feature("Disable Above Map Notifs", "toggle", misc_feature, function(f)
     end
 end)
 
--- logging_feature
-feats.log_messages_to_console = menu.add_feature("Log Messages To Console", "toggle", logging_feature, function(f)
-    if f.on then
-        messagelog = event.add_event_listener("chat", function(e)
-            local pid = player.get_player_name(e.player)
-            local time = os.time()
-            local badtime = os.time()
-            local goodtime = os.date("%A, %B %d %Y, %X", badtime)
-            print("[" .. goodtime .. "] " .. pid .. " > " .. e.body)
-        end)
-    else
-        event.remove_event_listener("chat", messagelog)
-    end
+menu.add_feature("Fix Weapon Wheel", "action", misc_feature, function(f)
+	native.call(0xEB354E5376BC81A7) -- HUD_FORCE_WEAPON_WHEEL
 end)
 
+-- logging_feature
 feats.log_joins_to_console = menu.add_feature("Log Joins To Console", "toggle", logging_feature, function(f)
     if f.on then
         joinlog = event.add_event_listener("player_join", function(e)
@@ -2798,14 +2507,14 @@ menu.add_feature("Save Settings", "action", settings, function(f)
     SaveSettings()
 end)
 
-menu.add_feature("F8 To Save Settings", "toggle", settings, function(f)
+feats.f8_to_save = menu.add_feature("F8 To Save Settings", "toggle", settings, function(f)
     while f.on do
         if controls.is_control_just_pressed(0, 169) or controls.is_control_just_pressed(2, 169) and f.on then
             SaveSettings()
         end
         system.wait()
     end
-end).on = true
+end)
 
 menu.add_feature("Changelog", "action_value_str", settings, function(f)
     if f.value == 0 then
@@ -2830,38 +2539,91 @@ menu.add_feature("Feature List", "action", settings, function(f)
     utils.to_clipboard("https://github.com/Decuwu/femboylua/blob/main/Femboy.md")
 end)
 
+-- vpn checker 
+local flagged_players = {}
+local enable_vpn_check = true
+feats.disable_vpn = menu.add_feature("Disable VPN Check", "toggle", settings, function(f)
+    if f.on then
+        enable_vpn_check = not enable_vpn_check
+    else
+        check_vpn(pid)
+    end
+end)
+local vpnListener = event.add_event_listener("player_join", check_vpn)
+menu.create_thread(function()
+    if network.is_session_started() then -- does a check when you change session
+        for i = 0, 31 do
+            check_vpn(i)
+        end
+    end
+    for i = 0, 31 do
+        if player.is_player_valid(i) then -- does a check for everyone in the session when loading the script
+            check_vpn(i)
+            system.wait(100)
+        end
+    end
+end)
+menu.create_thread(function() -- check if the player has been flagged before, if yes then give the flag back
+    while true do
+        for pid, v in pairs(flagged_players) do
+            local player_parent = menu.get_feature_by_hierarchy_key("online.online_players.player_" .. pid)
+            if not player_parent.name:find("VPN") then
+                local name = ""
+                player_parent.name = player_parent.name .. " #DEFAULT#[#FFC0CBFF#VPN#DEFAULT#]"
+            end
+        end
+        system.wait(3000)
+    end
+end)
+
 -- credits 
-menu.add_feature("Toph", "action", credits, function()
+menu.add_feature("Toph", "action_value_str", credits, function(f)
     if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then
         return menu.notify("Helped an absolute BUNCH with understanding the API and helped with a lot of features!","Toph")
     else
-        NotifyMap("Topher", "~h~~r~The Gopher","~b~Helped an absolute BUNCH with understanding the API and helped with a lot of features!", "CHAR_HAO", 140)
+        if f.value == 0 then
+            NotifyMap("Topher", "~h~~r~The Gopher","~b~Helped an absolute BUNCH with understanding the API and helped with a lot of features!", "CHAR_HAO", 140)
+        elseif f.value == 1 then
+            menu.notify("#FFFFCC00#Credits:\n-#FFFFDD00#Made above map notification\n-#FFFFDD22#IP info function\n-#FFFFDD33#Aim Karma\n-#FFFFDD44#Air Suspension\n-#FFFFDD55#Chat Moderation\n-#FFFFDD66#Bail To SP\n-#FFFFDD77#Minimap Disco\n-#FFFFDD88#Save and Load settings function", "#FFFFCC00#Toph", 5, 0xFFFFCC00)
+        end
     end
-end) 
+end):set_str_data({"Credit", "Features Made/Helped With"})
 
-menu.add_feature("Rimuru", "action", credits, function()
+menu.add_feature("Rimuru", "action_value_str", credits, function(f)
     if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then
         return menu.notify("'let' me learn LUA using her script and gave me many helpful tips", "Rimuru")
     else
-        NotifyMap("Rimuru", "~h~~r~Wannabe Welsh", "~b~'let' me learn LUA using her script and still continues to help me all the time","CHAR_WENDY", 140) --no_u = invalid image / does not exist
+        if f.value == 0 then
+            NotifyMap("Rimuru", "~h~~r~Wannabe Welsh", "~b~'let' me learn LUA using her script and still continues to help me all the time","CHAR_WENDY", 140) --no_u = invalid image / does not exist
+        elseif f.value == 1 then
+            menu.notify("#FFFF55AA#Credits:\n-#FFFF4488#Made Auto Updater\n-#FFFF4499#Taught me how to use tables to make features\n-#FFFF44AA#Yelled at me for bad code\n-#FFFF44BB#Let me ask dumb af questions\n-#FFFF44CC#Gave the code for nightclub loop\n-#FFFF44DD#Gave the function for RGB Neon", "#FFFF55AA#Rimuru", 5, 0xFFFF55AA)
+        end
     end 
-end)
+end):set_str_data({"Credit", "Features Made/Helped With"})
 
-menu.add_feature("GhostOne", "action", credits, function()
+menu.add_feature("GhostOne", "action_value_str", credits, function(f)
     if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then
         return menu.notify("Makes zero sense when giving help but still helps a lot. made: Homing lockon, VPN flag, IP info shit","GhostOne")
     else
-        NotifyMap("GhostOne", "~h~~r~Has Cheese", "~b~Makes zero sense when giving help but still helps a lot. made: Homing lockon, VPN flag, IP info shit","CHAR_TAXI", 140) --no_u = invalid image / does not exist
+        if f.value == 0 then
+            NotifyMap("GhostOne", "~h~~r~Has Cheese", "~b~Makes zero sense when giving help but still helps a lot. made: Homing lockon, VPN flag, IP info shit","CHAR_TAXI", 140) --no_u = invalid image / does not exist
+        elseif f.value == 1 then
+            menu.notify("#FF00FFEE#Credits:\n-#FF00EEFF#Made Auto Kick By Country\n-#FF00DDFF#Made VPN detection flag\n-#FF00CCFF#Made IP lookup\n-#FF00BBFF#Made a lot of different functions\n-#FF00AAFF#Taught me a lot to do with functions and tables\n-#FF0099FF#Cheese", "#FF00FFFF#GhostOne", 5, 0xFF00FFFF)
+        end
     end
-end)
+end):set_str_data({"Credit", "Features Made/Helped With"})
 
-menu.add_feature("Aren", "action", credits, function()
+menu.add_feature("Aren", "action_value_str", credits, function(f)
     if not menu.is_trusted_mode_enabled(eTrustedFlags.LUA_TRUST_NATIVES) then
         return menu.notify("Helped me a lot with LUA at the beginning, taught me how to use natives", "Aren")
     else
-        NotifyMap("Aren", "~h~~r~Mostly Cringe", "~b~Helped me a lot with LUA at the beginning, taught me how to use natives","CHAR_JIMMY", 140) --no_u = invalid image / does not exist
+        if f.value == 0 then
+            NotifyMap("Aren", "~h~~r~Mostly Cringe", "~b~Helped me a lot with LUA at the beginning, taught me how to use natives","CHAR_JIMMY", 140) --no_u = invalid image / does not exist
+        elseif f.value == 1 then
+            menu.notify("#FFFF1100#Credits:\n-#FFFF2211#Taught me how to use natives\n-#FFFF3311#Taught me how to start making luas", "#FFFF1111#Aren", 5, 0xFFFF1111)
+        end
     end 
-end)
+end):set_str_data({"Credit", "Features Made/Helped With"})
 
 -- main_online 
 --- ip_online_lookup
@@ -2998,28 +2760,6 @@ menu.add_player_feature("RP Drop", "toggle", friendly_options, function(f, pid)
             native.call(0x673966A0C0FD7171, 738282662, coords, 0, 1, 437412629, 0, 1)
             system.wait(5)
         end
-    end
-end)
-
-menu.add_player_feature("Give Collectibles", "toggle", friendly_options, function(f, pid)
-    request_model(1839167950) 
-    while f.on do
-        script.trigger_script_event(1839167950, pid, {1, -5, 1, 1, 1})
-        script.trigger_script_event(1839167950, pid, {2, -5, 1, 1, 1})
-        script.trigger_script_event(1839167950, pid, {3, -5, 1, 1, 1})
-        script.trigger_script_event(1839167950, pid, {5. -5, 1, 1, 1})
-        script.trigger_script_event(1839167950, pid, {6, -5, 1, 1, 1})
-        script.trigger_script_event(1839167950, pid, {8, -5, 1, 1, 1})
-        script.trigger_script_event(1839167950, pid, {10, -5, 1, 1, 1})
-        script.trigger_script_event(1839167950, pid, {17, 1-5, 1, 1, 1})
-        for i = 0,20 do
-            script.trigger_script_event(1839167950, pid, {4, i, 4, 4, 4})
-        end
-        for i = 0, 99 do
-            script.trigger_script_event(1839167950, pid, {9, i, 1, 1, 1})
-            system.wait(300)
-        end
-        system.wait(500)
     end
 end)
 
