@@ -4,9 +4,9 @@ Repository containing all scripts developed by me
 Currently inlcudes:<br>
 [Rimurus Menu](https://github.com/Rimmuru/Rimurus-2T1-Scripts/tree/main/Rimurus%20Scripts/Rimurus%20Menu)<br/>
 [Realistic FuelMod](https://github.com/GoldenLys/FuelMod/releases)<br>
-[Rimurus Toolkit Reborn](https://tenor.com/bKl31.gif)<br/>
 [ChatGPT](https://github.com/Rimmuru/Rimurus-2T1-Scripts/releases/tag/gpt1.0.2)<br/>
 [Trucker Jobs](https://tenor.com/bKl31.gif)<br/>
+[Rimurus Toolkit Reborn](https://github.com/Rimmuru/Rimurus-2T1-Scripts/blob/main/Rimurus%20Scripts/ToolkitReborn/RimurusToolkit%20Reborn%20Features.md)<br/>
 [Rimurus Toolkit (Discontinued)](https://github.com/Rimmuru/Rimurus-2T1-Scripts/tree/main/Rimurus%20Scripts/Rimurus%20Toolkit)<br/>
 [LuaUI (Discontinued)](https://github.com/Rimmuru/Rimurus-2T1-Scripts/tree/main/Rimurus%20Scripts/LuaUI)<br/><br>
 
