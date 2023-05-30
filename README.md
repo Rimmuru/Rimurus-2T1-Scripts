@@ -4,7 +4,7 @@ Join the [discord](https://discord.gg/jD2TanwYTC) for support and early releases
 https://rimurusmenu.com/
 
 ## Currently inlcudes:
-[Rimurus Menu](https://github.com/Rimmuru/Rimurus-2T1-Scripts/tree/main/Rimurus%20Scripts/Rimurus%20Menu)<br/>
+[Rimurus Menu (Discontinued)](https://github.com/Rimmuru/Rimurus-2T1-Scripts/tree/main/Rimurus%20Scripts/Rimurus%20Menu)<br/>
 [Realistic FuelMod](https://github.com/GoldenLys/FuelMod/releases)<br>
 [ChatGPT](https://github.com/Rimmuru/Rimurus-2T1-Scripts/releases/tag/gpt1.0.2)<br/>
 [Trucker Jobs](https://tenor.com/bKl31.gif)<br/>
