@@ -1,4 +1,4 @@
-return = {
+return {
     "3D Green",
     "Baby Blue",
     "Beige",
