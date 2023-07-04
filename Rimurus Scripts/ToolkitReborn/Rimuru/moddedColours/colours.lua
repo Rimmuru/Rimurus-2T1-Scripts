@@ -1,0 +1,15 @@
+return = {
+    "3D Green",
+    "Baby Blue",
+    "Beige",
+    "Bleek Banana",
+    "Bubbles",
+    "Chav Green",
+    "Cream",
+    "Daffodil",
+    "Fall Green",
+    "Flamingo Pink",
+    "Purplish Blue",
+    "cherryBlossomPink",
+    "sunflowerYellow",
+}
