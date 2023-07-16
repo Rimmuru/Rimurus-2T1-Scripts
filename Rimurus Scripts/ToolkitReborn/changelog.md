@@ -1,0 +1,37 @@
+- added modded colour downloader
+- added autoupdater
+- added 1.6m money loop
+- added smart kick
+- added remove money (not ballistic armor)
+- added remove all money
+- added hide transaction error (credit jkNX)
+- added alert screens
+    - custom alert message
+    - custom custom reason ban screen
+    - ban screen (no reason)
+    - ban screen w/ (preset reason)
+    - suspended screen
+    - rp given/removed
+    - money given/removed
+- added card drop
+- added nuke gun
+- added wall gun
+- added dildo gun
+- added delete gun
+- added rainbow hair
+- added loop all hair colours
+- improved 2take1's kick all
+- improved auto repair (again)
+- improved deposit/withdraw money
+- updated spam protection again
+    - now uses migrate kick
+- updated kick modder flag
+    - now uses migrate kick
+- improved and fixed money manager
+    - deposit/withdraw all actually stops
+    - checks for invalid amounts if over the max 32bit integer
+- 2take1 user proofed hidden options
+- fixed rimurus dyslexia
+- fixed bad sport
+- fixed max lstuners rep
+- fixed remove money (decco broke it)
