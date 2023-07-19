@@ -1,26 +1,2 @@
-- added autoupdater changelog
-- added toolkit-only chat
-- added ai driving
-- added casino chips manager
-- added blacklisted phrase checker
-  - save custom phrases to be blacklisted
-  - delete them within the script
-- added teleport all to me
-- added teleport all players
-- added teleport to gta iv
-  - kills some godmode players
-- added vault
-  - lock/unlock vault
-  - tp all players to vault
-- added model swap
-- added acidlab bike phone request
-- added custom teleport for all players
-- updated smart kick
-- improved modder detection karma
-- improved single player money
-- moved recovery - casino -> casino 
-- moved misc - phone requests -> online - services
-- http trusted required (so we can push fixes for you) 
-- dumbed down (again) script feature tip/hint
-- fixed issues with phone requests
-- fixed an error when not having toolkit folder installed
+- blacklisted r* admin dlc
+- fixed standard user issues 
