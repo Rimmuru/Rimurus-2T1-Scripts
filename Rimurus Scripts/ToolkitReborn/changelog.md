@@ -1,2 +1,1 @@
-- blacklisted r* admin dlc
-- fixed standard user issues 
+- fixed Toolkit Chat opening when pressing "U" while typing
