@@ -1,1 +1,1 @@
-- fixed Toolkit Chat opening when pressing "U" while typing
+- Temperarily disabled Toolkit only chat
