@@ -1,1 +1,1 @@
-- Temperarily disabled Toolkit only chat
+- Temporarily disabled Toolkit only chat
