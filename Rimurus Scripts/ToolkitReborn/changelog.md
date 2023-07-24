@@ -1,1 +1,21 @@
-- Temporarily disabled Toolkit only chat
+- added collectables
+  - action figures
+  - ld organics
+  - playing card
+  - signal jammers
+  - usb stick
+  - movie props
+  - buried stashes (daily)
+  - hidden cache (daily)
+  - treasure chests  (daily)
+  - shipwrecks (daily)
+  - trick or treat (halloween)
+  - snowmen
+- added give rp
+- added porter to delete duplicate toolkit files 
+- cleaned up the file system
+- removed site notify
+- removed bloat easteregg
+- removed pause clock rebuild
+- fixed trade in chips slider not working
+- fixed bodygaurds error 
