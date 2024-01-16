@@ -15,8 +15,6 @@ Ymuno ein [Discord](https://discord.gg/gee-skid)
 - [**Realistic FuelMod**](https://github.com/GoldenLys/FuelMod/releases) - Enhance your game with realistic fuel mechanics.
 - [**ChatGPT**](https://github.com/Rimmuru/Rimurus-2T1-Scripts/releases/tag/gpt1.0.2) - Integrate GPT-powered chat functionalities.
 - [**5ModsLua Loader**](https://github.com/Rimmuru/Gta5-Mods-Lua-Loader) - Easily load and manage your Lua scripts.
-- [**Trucker Jobs**](https://tenor.com/bKl31.gif) - Add immersive trucking jobs to your game.
-- [**LuaUI 2Take1 Edition**](https://github.com/Rimmuru/Rimurus-2T1-Scripts/tree/main/Rimurus%20Scripts/LuaUI%202Take1%20Edition) - A UI library tailored for 2Take1.
 - [**Rimurus Menu (Discontinued)**](https://github.com/Rimmuru/Rimurus-2T1-Scripts/tree/main/Rimurus%20Scripts/Rimurus%20Menu)
 - [**Rimurus Toolkit (Discontinued)**](https://github.com/Rimmuru/Rimurus-2T1-Scripts/tree/main/Rimurus%20Scripts/Rimurus%20Toolkit)
 - [**LuaUI (Discontinued)**](https://github.com/Rimmuru/Rimurus-2T1-Scripts/tree/main/Rimurus%20Scripts/LuaUI)
