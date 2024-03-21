@@ -1,21 +1,9 @@
-- added collectables
-  - action figures
-  - ld organics
-  - playing card
-  - signal jammers
-  - usb stick
-  - movie props
-  - buried stashes (daily)
-  - hidden cache (daily)
-  - treasure chests  (daily)
-  - shipwrecks (daily)
-  - trick or treat (halloween)
-  - snowmen
-- added give rp
-- added porter to delete duplicate toolkit files 
-- cleaned up the file system
-- removed site notify
-- removed bloat easteregg
-- removed pause clock rebuild
-- fixed trade in chips slider not working
-- fixed bodygaurds error 
+# Rimurus Toolkit 1.12.3
+## Feature Changes
+- performance improvements
+    - 9% performance improvement loading script
+    - performance improvement filtering dlcs
+    - performance improvement "Add Blacklisted Phrase"
+- modified startup notify
+- moved save custom colour to colours submenu
+- Save Custom Color -> Save Custom Colour
