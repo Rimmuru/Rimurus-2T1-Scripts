@@ -1,6 +1,5 @@
 # LuaUI
-LuaUI is am early wip lua ui wrapper libary for 2take1.menu devloped by Rimuru.<br />
-This project has and still is a huge undertaking for me that wouldnt be possible without all the great people who helped me gain confidence in using lua along with 2take1's api.
+LuaUI is am  wip lua ui wrapper libary for GTAV using natives devloped by Rimuru.<br />
 
 # Install
 Add LuaUI.lua to your poject directory<br />
@@ -117,5 +116,4 @@ end)
 <br />
 
 # Examples
-[![GTA5-Bw-LZwjkl9-F.jpg](https://i.postimg.cc/XJXkT2Bx/GTA5-Bw-LZwjkl9-F.jpg)](https://postimg.cc/Q9G77JbW)
 [![GTA5-Rmnimlq-Ih9.jpg](https://i.postimg.cc/mg2zXPHy/GTA5-Rmnimlq-Ih9.jpg)](https://postimg.cc/Vdpk5L4J)
