@@ -1,10 +1,8 @@
-# Rimurus 2Take1 Scripts
+# Rimurus 2Take1 Scripts - Discontinued 
 
 Welcome to my repository where you can find all scripts developed by me for 2Take1. <br/>
-Croeso i fy nghronfa ddata lle gallwch ddod o hyd i'r holl sgriptiau a ddatblygwyd gennyf ar gyfer 2Take1. Mae'r scripts hyn yn amrywio o offer defnyddiol i welliannau gameplay, wedi'u cynllunio i gyfoethogi eich profiad GTA5 <br/> 
 
 Join our [Discord](https://discord.gg/gee-skid) for support, early releases, and community interaction.  <br/>
-Ymuno ein [Discord](https://discord.gg/gee-skid) 
 
 [![Github All Releases](https://img.shields.io/github/downloads/Rimmuru/Rimurus-2T1-Scripts/total.svg)]()  [![GitHub Stars](https://img.shields.io/github/stars/Rimmuru/Rimurus-2T1-Scripts?style=flat-square)]()
 
